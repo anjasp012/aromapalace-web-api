@@ -1,0 +1,250 @@
+@extends('layouts.app')
+
+@section('title', 'Order #' . $order->order_number . ' - Aroma Palace')
+
+@section('content')
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-6 sm:pb-8">
+    <!-- Breadcrumb & Actions Header -->
+    <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4 border-b border-gray-200 pb-4 sm:pb-6">
+        <div>
+            <div class="flex items-center gap-2 text-[11px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">
+                <a href="{{ route('home') }}" class="hover:text-[#650506]">Home</a>
+                <span>/</span>
+                <a href="{{ route('account.orders') }}" class="hover:text-[#650506]">Order History</a>
+                <span>/</span>
+                <span class="text-gray-900 font-medium">#{{ $order->order_number }}</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-gray-900 tracking-tight">Order #{{ $order->order_number }}</h1>
+            <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Placed on {{ $order->created_at->format('M d, Y, H:i') }}</p>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+            @if($order->order_status === 'pending_payment')
+                <form method="POST" action="{{ route('account.orders.cancel', $order->order_number) }}" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                    @csrf
+                    <button type="submit" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50 text-[11px] sm:text-xs font-semibold transition">
+                        Cancel Order
+                    </button>
+                </form>
+            @endif
+            <a href="{{ route('account.orders') }}" class="inline-flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-gray-100 text-gray-800 border border-gray-200 hover:bg-gray-200 text-[11px] sm:text-xs font-semibold transition">
+                <span>&larr;</span>
+                <span>Back to Orders</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Tracking Timeline Card -->
+    <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-2xs space-y-4 sm:space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4 border-b border-gray-100 pb-3 sm:pb-4">
+            <div>
+                <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Fulfillment & Tracking</span>
+                <h3 class="font-bold text-gray-900 text-base sm:text-lg mt-0.5">
+                    {{ strtoupper(str_replace('_', ' ', $order->order_status)) }}
+                </h3>
+            </div>
+            <div class="text-left sm:text-right text-xs">
+                @if(in_array($order->fulfillment_type, ['pickup', 'store_pickup']))
+                    <span class="text-gray-500 block text-[10px] sm:text-xs">Pickup Code (Click & Collect):</span>
+                    <span class="font-mono text-sm sm:text-base font-bold text-[#650506]">{{ $order->pickup_code ?? 'Ready upon notification' }}</span>
+                @else
+                    <span class="text-gray-500 block text-[10px] sm:text-xs">Tracking Number ({{ $order->shipping_courier ?? 'Courier' }}):</span>
+                    <span class="font-mono text-sm sm:text-base font-bold text-gray-900">{{ $order->tracking_number ?? 'In preparation' }}</span>
+                @endif
+            </div>
+        </div>
+
+        <!-- Visual Timeline -->
+        <div class="relative pl-5 sm:pl-6 border-l-2 border-gray-300 space-y-4 sm:space-y-6 my-2 sm:my-4">
+            @forelse($tracking['timeline'] as $step)
+                <div class="relative group">
+                    <span class="absolute -left-[27px] sm:-left-[31px] top-0.5 w-3 sm:w-3.5 h-3 sm:h-3.5 rounded-full bg-[#650506] ring-4 ring-red-100"></span>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                            <h4 class="font-bold text-xs sm:text-sm text-gray-900">{{ $step['title'] }}</h4>
+                            <span class="text-[10px] sm:text-[11px] text-gray-400 font-mono">{{ $step['time'] }}</span>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-gray-600 mt-0.5">{{ $step['description'] }}</p>
+                    </div>
+                </div>
+            @empty
+                <p class="text-xs text-gray-400">No status updates yet.</p>
+            @endforelse
+        </div>
+    </div>
+
+    <!-- 2 Column Details: Items & Delivery/Payment -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <!-- Order Items (2 Cols) -->
+        <div class="lg:col-span-2 bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-2xs space-y-4 sm:space-y-6">
+            <h3 class="font-bold text-gray-900 text-sm sm:text-base border-b border-gray-100 pb-2.5 sm:pb-3">Items Ordered</h3>
+
+            <div class="divide-y divide-gray-100">
+                @foreach($order->items as $item)
+                    <div class="py-3 sm:py-4 flex items-center justify-between gap-3 sm:gap-4">
+                        <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-[#F4F2EE] border border-gray-200 p-1.5 sm:p-2 flex items-center justify-center shrink-0">
+                                <img src="{{ $item->product?->images?->first()?->image_url ?? 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=150&q=80' }}"
+                                     alt="{{ $item->product?->name ?? 'Product' }}"
+                                     class="max-h-full max-w-full object-contain mix-blend-multiply">
+                            </div>
+                            <div class="min-w-0">
+                                @if($item->product)
+                                    <a href="{{ route('products.show', $item->product->slug) }}" class="font-bold text-gray-900 text-xs sm:text-sm hover:text-[#650506] truncate block">
+                                        {{ $item->product->name }}
+                                    </a>
+                                @else
+                                    <span class="font-bold text-gray-900 text-xs sm:text-sm">Product</span>
+                                @endif
+                                <p class="text-[10px] sm:text-xs text-gray-500 mt-0.5">
+                                    Variant: <span class="font-semibold text-gray-700">{{ $item->variant?->name ?? 'Default' }}</span> &bull; 
+                                    Qty: <span class="font-semibold text-gray-700">{{ $item->quantity }}</span> &times; Rp {{ number_format($item->price, 0, ',', '.') }}
+                                </p>
+                            </div>
+                        </div>
+                        <span class="text-xs sm:text-sm font-bold text-gray-900 whitespace-nowrap font-mono shrink-0">
+                            Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Notes if any -->
+            @if($order->notes)
+                <div class="p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl border border-gray-200 text-xs text-gray-600">
+                    <span class="font-bold text-gray-700 block mb-1">Customer Note:</span>
+                    <p>{{ $order->notes }}</p>
+                </div>
+            @endif
+        </div>
+
+        <!-- Sidebar: Fulfillment & Payment Summary (1 Col) -->
+        <div class="space-y-4 sm:space-y-6">
+            <!-- Fulfillment Info Card -->
+            <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-2xs space-y-3 sm:space-y-4">
+                <h4 class="font-bold text-gray-900 text-sm">Delivery Information</h4>
+
+                @if(in_array($order->fulfillment_type, ['pickup', 'store_pickup']))
+                    <div class="text-xs space-y-2 text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <span class="font-bold text-gray-900 block">Pickup Location (Store Pickup):</span>
+                        <p class="font-bold text-sm text-gray-900">{{ $order->store->name ?? 'Aroma Palace Boutique' }}</p>
+                        <p class="text-gray-600">{{ $order->store->address ?? '' }}{{ !empty($order->store?->city) ? ', ' . $order->store->city : '' }}</p>
+                        <div class="pt-2 border-t border-gray-200 flex items-center justify-between">
+                            <span class="text-gray-500">Pickup Code:</span>
+                            <span class="font-mono font-bold text-[#650506] text-sm">{{ $order->pickup_code ?? 'Ready upon notification' }}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400">Please present this pickup code to our boutique staff upon arrival.</p>
+                    </div>
+                @else
+                    @php
+                        $snapshot = $order->shipping_address_snapshot ?? [];
+                        $recipientName = $snapshot['recipient_name'] ?? $order->address?->recipient_name ?? $order->user?->name ?? 'Customer';
+                        $label = $snapshot['label'] ?? $order->address?->label ?? 'Home';
+                        $phone = $snapshot['phone_number'] ?? $order->address?->phone_number ?? $order->user?->phone ?? '-';
+                        $fullAddress = $snapshot['full_address'] ?? $order->address?->full_address ?? 'Address not specified';
+                        $city = $snapshot['city'] ?? $order->address?->city ?? '';
+                        $postalCode = $snapshot['postal_code'] ?? $order->address?->postal_code ?? '';
+                    @endphp
+                    <div class="text-xs space-y-2 text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-gray-900">{{ $recipientName }}</span>
+                            <span class="text-[10px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded font-bold">{{ $label }}</span>
+                        </div>
+                        <p class="text-gray-500">{{ $phone }}</p>
+                        <p class="text-gray-700">{{ $fullAddress }}{{ $city ? ', ' . $city : '' }} {{ $postalCode }}</p>
+                        <p class="text-gray-500 pt-1 border-t border-gray-200">Courier: <span class="font-bold text-gray-800">{{ $order->shipping_courier ?? 'Courier' }} {{ $order->shipping_service ? '(' . $order->shipping_service . ')' : '' }}</span></p>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Payment Summary Card -->
+            <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-2xs space-y-3 sm:space-y-4">
+                <h4 class="font-bold text-gray-900 text-sm">Payment Details</h4>
+
+                <div class="space-y-2 sm:space-y-2.5 text-[11px] sm:text-xs text-gray-600">
+                    <div class="flex justify-between">
+                        <span>Items Subtotal</span>
+                        <span class="font-bold text-gray-900 font-mono">Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span>Shipping Cost</span>
+                        <span class="font-bold text-gray-900 font-mono">
+                            {{ $order->shipping_cost > 0 ? 'Rp ' . number_format($order->shipping_cost, 0, ',', '.') : 'FREE' }}
+                        </span>
+                    </div>
+
+                    @if($order->discount_amount > 0)
+                        <div class="flex justify-between text-emerald-700 font-medium">
+                            <span>Discount</span>
+                            <span class="font-mono">-Rp {{ number_format($order->discount_amount, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
+
+                    @if(!empty($order->points_discount) && $order->points_discount > 0)
+                        <div class="flex justify-between text-emerald-700 font-medium">
+                            <span>Points Redemption</span>
+                            <span class="font-mono">-Rp {{ number_format($order->points_discount, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
+
+                    <div class="border-t border-gray-200 pt-2.5 sm:pt-3 flex justify-between items-baseline">
+                        <span class="font-bold text-gray-900 text-xs sm:text-sm">Total</span>
+                        <span class="text-lg sm:text-xl font-extrabold text-gray-900 font-mono">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+
+                @if($order->payment)
+                    <div class="pt-2.5 sm:pt-3 border-t border-gray-100 text-[11px] sm:text-xs space-y-1.5 sm:space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-500">Gateway:</span>
+                            <span class="px-2 py-0.5 rounded bg-gray-100 text-gray-800 border border-gray-200 font-semibold uppercase text-[10px]">
+                                {{ strtoupper($order->payment->payment_gateway ?? 'Pakasir') }}
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Method:</span>
+                            <span class="font-bold text-gray-800">{{ strtoupper($order->payment->payment_type ?? $order->payment_method) }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Payment Status:</span>
+                            <span class="font-bold {{ $order->payment_status === 'paid' ? 'text-emerald-700' : 'text-amber-600' }}">
+                                {{ strtoupper($order->payment_status) }}
+                            </span>
+                        </div>
+
+                        <!-- Pakasir QRIS / VA Instructions if pending -->
+                        @if($order->payment_status !== 'paid')
+                            <div class="mt-3 sm:mt-4 p-3 sm:p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2.5 sm:space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-gray-900 text-xs">Payment Instructions</span>
+                                    <span class="text-[10px] text-gray-500">Complete within 24h</span>
+                                </div>
+
+                                @if($order->payment->qr_string)
+                                    <div class="text-center space-y-1.5 sm:space-y-2">
+                                        <div class="inline-block p-1.5 sm:p-2 bg-white rounded-xl shadow-2xs border border-gray-200">
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ urlencode($order->payment->qr_string) }}"
+                                                 alt="QRIS Code"
+                                                 class="w-32 h-32 sm:w-36 sm:h-36 mx-auto">
+                                        </div>
+                                        <p class="text-[10px] sm:text-[11px] text-gray-500">Scan QRIS with your banking or e-wallet app</p>
+                                    </div>
+                                @elseif($order->payment->va_number)
+                                    <div class="p-2.5 sm:p-3 bg-white rounded-xl border border-gray-200 text-center">
+                                        <span class="text-[10px] sm:text-[11px] text-gray-400 block uppercase">Virtual Account</span>
+                                        <span class="font-mono text-sm sm:text-base font-extrabold text-gray-900 tracking-wider block my-1 select-all">
+                                            {{ $order->payment->va_number }}
+                                        </span>
+                                        <span class="text-[10px] text-gray-500">Amount: <strong>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</strong></span>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

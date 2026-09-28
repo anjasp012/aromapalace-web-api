@@ -1,0 +1,397 @@
+@extends('layouts.app')
+
+@section('title', 'Akun Saya - Aroma Palace')
+
+@section('content')
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-6 sm:pb-8">
+    <!-- Luxury Membership Hero Banner -->
+    <div class="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#4A070B] via-[#650506] to-[#2B0304] text-white p-4 sm:p-6 lg:p-8 shadow-xl border border-[#650506]/40">
+        <!-- Ambient Decorative Glows -->
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-[#800708]/30 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
+            <!-- User Info & Avatar -->
+            <div class="flex items-center gap-3 sm:gap-5">
+                @if($user->avatar)
+                    <img src="{{ $user->avatar }}" class="w-14 h-14 sm:w-18 sm:h-18 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl object-cover ring-2 sm:ring-4 ring-white/10 shadow-lg shrink-0" alt="{{ $user->name }}">
+                @else
+                    <div class="w-14 h-14 sm:w-18 sm:h-18 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm flex items-center justify-center text-white font-serif font-bold text-xl sm:text-2xl lg:text-3xl shadow-inner ring-2 sm:ring-4 ring-white/10 shrink-0">
+                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                    </div>
+                @endif
+
+                <div class="space-y-0.5 sm:space-y-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-[10px] sm:text-xs uppercase tracking-widest text-amber-200/90 font-semibold font-mono">
+                            ID: #AP-{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}
+                        </span>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider border shadow-xs bg-amber-400/20 text-amber-200 border-amber-400/30">
+                            ★ Member Aroma Palace
+                        </span>
+                    </div>
+
+                    <h2 class="text-base sm:text-xl lg:text-2xl font-serif font-bold text-white tracking-tight truncate">{{ $user->name }}</h2>
+                    <p class="text-[11px] sm:text-xs text-white/70 flex flex-wrap items-center gap-1 sm:gap-2">
+                        <span class="truncate max-w-[180px] sm:max-w-none">{{ $user->email }}</span>
+                        <span>&bull;</span>
+                        <span>Bergabung {{ $membershipStatus['joined_at'] }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Points & Reward Action Card -->
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 sm:p-5 flex items-center justify-between sm:justify-end gap-3 sm:gap-6 shadow-sm shrink-0">
+                <div>
+                    <span class="text-[10px] sm:text-[11px] font-bold text-amber-200 uppercase tracking-wider block">Poin Keanggotaan</span>
+                    <div class="flex items-baseline gap-1 mt-0.5">
+                        <span class="text-xl sm:text-3xl font-extrabold font-mono tracking-tight text-white">{{ number_format($membershipStatus['points']) }}</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-white/70">poin</span>
+                    </div>
+                </div>
+                <div class="shrink-0">
+                    <a href="{{ route('account.rewards') }}" class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-white text-[#650506] hover:bg-amber-100 font-bold text-[11px] sm:text-xs shadow-sm transition">
+                        <span>Tukar Poin</span>
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loyalty Points & Membership Strip -->
+        <div class="relative z-10 mt-4 sm:mt-6 pt-3.5 sm:pt-5 border-t border-white/15 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 text-[11px] sm:text-xs">
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <span class="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-semibold text-[10px] sm:text-[11px] border border-emerald-500/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Keanggotaan Aktif
+                </span>
+                <span class="text-white/40">&bull;</span>
+                <span class="text-white/90">Kumpulkan <strong class="text-amber-200">1 Poin</strong> per <strong class="text-white">Rp 10.000</strong></span>
+            </div>
+            <a href="{{ route('account.rewards') }}" class="text-amber-200 hover:text-white underline font-semibold transition inline-flex items-center gap-1 text-[11px] sm:text-xs">
+                <span>Katalog Reward &amp; Riwayat Poin &rarr;</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs Bar with Integrated Logout -->
+    <div class="flex items-center justify-between gap-2 border-b border-gray-200 pb-1.5 sm:pb-2">
+        <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto min-w-0 flex-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <a href="{{ route('account.index') }}" 
+               class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-[#650506] text-white font-bold text-[11px] sm:text-xs shadow-xs shrink-0">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span>Ringkasan Akun</span>
+            </a>
+
+            <a href="{{ route('account.orders') }}" 
+               class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-semibold text-[11px] sm:text-xs transition shrink-0">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                <span>Riwayat Pesanan</span>
+                @if($stats['pending_orders'] > 0)
+                    <span class="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[9px] sm:text-[10px] font-bold">
+                        {{ $stats['pending_orders'] }}
+                    </span>
+                @endif
+            </a>
+
+            <a href="{{ route('account.rewards') }}" 
+               class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-semibold text-[11px] sm:text-xs transition shrink-0">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Loyalty Rewards</span>
+                <span class="px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[9px] sm:text-[10px] font-mono font-bold">
+                    {{ number_format($stats['points']) }} pts
+                </span>
+            </a>
+
+            <a href="{{ route('account.addresses') }}" 
+               class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-semibold text-[11px] sm:text-xs transition shrink-0">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>Buku Alamat</span>
+            </a>
+
+            <a href="{{ route('account.points') }}" 
+               class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-semibold text-[11px] sm:text-xs transition shrink-0">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Riwayat Poin</span>
+                @if(($stats['point_history_count'] ?? 0) > 0)
+                    <span class="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[9px] sm:text-[10px] font-mono font-bold">
+                        {{ $stats['point_history_count'] }}
+                    </span>
+                @endif
+            </a>
+        </div>
+
+        <form method="POST" action="{{ route('logout') }}" class="shrink-0">
+            @csrf
+            <button type="submit" class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-gray-200 hover:border-rose-200 hover:bg-rose-50 text-gray-500 hover:text-rose-600 text-[11px] sm:text-xs font-semibold transition cursor-pointer shrink-0" title="Keluar dari akun">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 group-hover:text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                <span>Keluar</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Quick Stat KPI Metrics (4 Columns) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <!-- Metric 1: Total Orders -->
+        <div class="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-gray-200/90 shadow-2xs hover:shadow-sm transition group">
+            <div class="flex items-center justify-between text-gray-400 mb-1.5 sm:mb-2">
+                <span class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Pesanan</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-[#650506]/5 text-[#650506] flex items-center justify-center group-hover:scale-110 transition">
+                    <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                </div>
+            </div>
+            <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 font-mono">{{ number_format($stats['total_orders']) }}</div>
+            <a href="{{ route('account.orders') }}" class="text-[10px] sm:text-[11px] font-semibold text-[#650506] hover:underline mt-1.5 sm:mt-2 inline-block">
+                Lihat semua pesanan &rarr;
+            </a>
+        </div>
+
+        <!-- Metric 2: Pending Orders -->
+        <div class="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-gray-200/90 shadow-2xs hover:shadow-sm transition group">
+            <div class="flex items-center justify-between text-gray-400 mb-1.5 sm:mb-2">
+                <span class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Perlu Diproses</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center group-hover:scale-110 transition">
+                    <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+            </div>
+            <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 font-mono">{{ number_format($stats['pending_orders']) }}</div>
+            <a href="{{ route('account.orders', ['status' => 'processing']) }}" class="text-[10px] sm:text-[11px] font-semibold text-amber-700 hover:underline mt-1.5 sm:mt-2 inline-block">
+                Pesanan aktif &rarr;
+            </a>
+        </div>
+
+        <!-- Metric 3: Reward Points -->
+        <div class="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-gray-200/90 shadow-2xs hover:shadow-sm transition group">
+            <div class="flex items-center justify-between text-gray-400 mb-1.5 sm:mb-2">
+                <span class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Poin Loyalty</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:scale-110 transition">
+                    <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                </div>
+            </div>
+            <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 font-mono">{{ number_format($stats['points']) }}</div>
+            <a href="{{ route('account.rewards') }}" class="text-[10px] sm:text-[11px] font-semibold text-emerald-700 hover:underline mt-1.5 sm:mt-2 inline-block">
+                Tukar voucher diskon &rarr;
+            </a>
+        </div>
+
+        <!-- Metric 4: Riwayat Poin -->
+        <div class="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-gray-200/90 shadow-2xs hover:shadow-sm transition group">
+            <div class="flex items-center justify-between text-gray-400 mb-1.5 sm:mb-2">
+                <span class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Riwayat Poin</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center group-hover:scale-110 transition">
+                    <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+            </div>
+            <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 font-mono">{{ number_format($stats['point_history_count'] ?? 0) }}</div>
+            <a href="{{ route('account.points') }}" class="text-[10px] sm:text-[11px] font-semibold text-amber-700 hover:underline mt-1.5 sm:mt-2 inline-block">
+                Lihat transaksi poin &rarr;
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content 2-Columns (Recent Orders + Sidebar Info) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <!-- Left: Recent Orders (2 Cols) -->
+        <div class="lg:col-span-2 space-y-4">
+            <div class="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-6 lg:p-7 border border-gray-200/90 shadow-2xs space-y-3.5 sm:space-y-5">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-3 sm:pb-4 gap-2">
+                    <div>
+                        <h3 class="font-serif font-bold text-gray-900 text-base sm:text-lg">Pesanan Terkini</h3>
+                        <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5">Pantau status transaksi dan pengiriman parfum Anda.</p>
+                    </div>
+                    <a href="{{ route('account.orders') }}" class="text-xs sm:text-sm font-semibold text-[#650506] hover:text-[#4A070B] inline-flex items-center gap-1 group shrink-0 transition-colors">
+                        <span>Lihat Semua ({{ $stats['total_orders'] }})</span>
+                        <span class="inline-block transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
+                    </a>
+                </div>
+
+                <div class="divide-y divide-gray-100">
+                    @forelse($recentOrders as $order)
+                        @php
+                            $statusStyles = [
+                                'pending_payment' => 'bg-amber-50 text-amber-800 border-amber-200',
+                                'processing' => 'bg-blue-50 text-blue-800 border-blue-200',
+                                'shipped' => 'bg-purple-50 text-purple-800 border-purple-200',
+                                'ready_for_pickup' => 'bg-indigo-50 text-indigo-800 border-indigo-200',
+                                'delivered' => 'bg-teal-50 text-teal-800 border-teal-200',
+                                'completed' => 'bg-emerald-50 text-emerald-800 border-emerald-200',
+                                'cancelled' => 'bg-rose-50 text-rose-800 border-rose-200',
+                            ];
+                            $style = $statusStyles[$order->order_status] ?? 'bg-gray-100 text-gray-700 border-gray-200';
+                            $statusLabel = match($order->order_status) {
+                                'pending_payment' => 'Menunggu Pembayaran',
+                                'processing' => 'Sedang Diproses',
+                                'shipped' => 'Dalam Pengiriman',
+                                'ready_for_pickup' => 'Siap Diambil di Butik',
+                                'delivered' => 'Terkirim',
+                                'completed' => 'Selesai',
+                                'cancelled' => 'Dibatalkan',
+                                default => strtoupper(str_replace('_', ' ', $order->order_status))
+                            };
+                            $firstItem = $order->items->first();
+                        @endphp
+                        <div class="py-3.5 sm:py-4.5 first:pt-1 last:pb-1 space-y-2.5 sm:space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+                                <div class="flex items-center gap-1.5 sm:gap-2">
+                                    <span class="font-bold text-gray-900 text-xs sm:text-sm font-mono">#{{ $order->order_number }}</span>
+                                    <span class="text-gray-400 text-xs">&bull;</span>
+                                    <span class="text-[11px] sm:text-xs text-gray-500">{{ $order->created_at->format('d M Y, H:i') }}</span>
+                                    <span class="text-gray-400 text-xs">&bull;</span>
+                                    <span class="text-[10px] sm:text-[11px] text-gray-600 bg-gray-100 px-1.5 sm:px-2 py-0.5 rounded font-medium">
+                                        {{ in_array($order->fulfillment_type, ['store_pickup', 'pickup']) ? 'Ambil di Butik' : ($order->shipping_courier ?? 'Kurir') }}
+                                    </span>
+                                </div>
+
+                                <span class="px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full border {{ $style }}">
+                                    {{ $statusLabel }}
+                                </span>
+                            </div>
+
+                            @if($firstItem)
+                            <div class="flex items-center justify-between gap-3 sm:gap-4 bg-stone-50/60 rounded-xl p-2.5 sm:p-3 border border-gray-100">
+                                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                                    <img src="{{ $firstItem->product?->images?->first()?->image_url ?? 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=120&q=80' }}" 
+                                         alt="{{ $firstItem->product?->name ?? 'Produk' }}" 
+                                         class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover bg-white border border-gray-200 shrink-0">
+                                    <div class="min-w-0">
+                                        <h4 class="font-bold text-xs text-gray-900 truncate">{{ $firstItem->product?->name ?? 'Produk Aroma Palace' }}</h4>
+                                        <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">
+                                            {{ $firstItem->variant?->name ?? 'Default' }} &bull; {{ $firstItem->quantity }}x &bull; 
+                                            <span class="font-mono font-semibold text-gray-800">Rp {{ number_format($firstItem->price, 0, ',', '.') }}</span>
+                                            @if($order->items->count() > 1)
+                                                <span class="text-gray-400 font-medium">(+{{ $order->items->count() - 1 }} lainnya)</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="text-right shrink-0">
+                                    <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-wider block font-semibold">Total Tagihan</span>
+                                    <span class="text-xs sm:text-sm font-extrabold text-gray-900 font-mono">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                            @endif
+
+                            <div class="flex items-center justify-end gap-3 pt-0.5 sm:pt-1">
+                                <a href="{{ route('account.orders.show', $order->order_number) }}" 
+                                   class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg border border-gray-200 hover:border-[#650506] hover:text-[#650506] text-[11px] sm:text-xs font-semibold text-gray-700 transition">
+                                    <span>Rincian Lengkap</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-10 sm:py-12 space-y-3">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-full bg-[#650506]/5 text-[#650506] flex items-center justify-center">
+                                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                            </div>
+                            <h4 class="font-bold text-sm text-gray-900">Belum Ada Transaksi</h4>
+                            <p class="text-xs text-gray-500 max-w-sm mx-auto">Temukan koleksi wewangian niche eksklusif dari desainer dunia untuk melengkapi pesona Anda.</p>
+                            <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#650506] text-white font-bold text-xs hover:bg-[#4A070B] transition shadow-sm mt-2">
+                                <span>Jelajahi Katalog Parfum</span>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Sidebar Information (1 Col) -->
+        <div class="space-y-4 sm:space-y-6">
+            <!-- Primary Address Card -->
+            <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/90 shadow-2xs space-y-3 sm:space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2.5 sm:pb-3">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-[#650506]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <h4 class="font-bold text-gray-900 text-sm">Alamat Utama</h4>
+                    </div>
+                    <a href="{{ route('account.addresses') }}" class="text-xs font-semibold text-[#650506] hover:underline">
+                        {{ $primaryAddress ? 'Kelola' : '+ Tambah' }}
+                    </a>
+                </div>
+
+                @if($primaryAddress)
+                    <div class="bg-stone-50/70 p-3 sm:p-4 rounded-xl border border-gray-200/80 space-y-1.5 sm:space-y-2 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-gray-900 text-xs sm:text-sm">{{ $primaryAddress->recipient_name }}</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#650506]/10 text-[#650506]">
+                                {{ $primaryAddress->label ?? 'Utama' }}
+                            </span>
+                        </div>
+                        <p class="text-gray-500 font-mono text-[11px] sm:text-xs">{{ $primaryAddress->phone_number }}</p>
+                        <p class="text-gray-700 leading-relaxed text-[11px] sm:text-xs">
+                            {{ $primaryAddress->full_address }}<br>
+                            {{ $primaryAddress->city }}{{ $primaryAddress->postal_code ? ', ' . $primaryAddress->postal_code : '' }}
+                        </p>
+                    </div>
+                @else
+                    <div class="text-center py-5 sm:py-6 bg-stone-50 rounded-xl border border-dashed border-gray-300 p-3 sm:p-4">
+                        <p class="text-xs text-gray-500">Belum ada alamat pengiriman utama yang tersimpan.</p>
+                        <a href="{{ route('account.addresses') }}" class="inline-block mt-2.5 sm:mt-3 px-3 sm:px-3.5 py-1.5 rounded-lg bg-[#650506] text-white text-xs font-bold hover:bg-[#4A070B] transition">
+                            + Tambah Alamat Baru
+                        </a>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Member Benefits Card -->
+            <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/90 shadow-2xs space-y-3 sm:space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2.5 sm:pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-amber-500 text-base">★</span>
+                        <h4 class="font-bold text-gray-900 text-sm">Keuntungan Membership</h4>
+                    </div>
+                    <a href="{{ route('account.rewards') }}" class="text-xs font-semibold text-[#650506] hover:underline">
+                        Lihat Reward &rarr;
+                    </a>
+                </div>
+
+                <ul class="space-y-2 sm:space-y-2.5 text-[11px] sm:text-xs text-gray-600">
+                    @forelse($membershipStatus['benefits'] ?? $membershipStatus['my_benefits'] as $benefit)
+                        <li class="flex items-start gap-2 sm:gap-2.5">
+                            <span class="text-emerald-600 font-bold mt-0.5">✓</span>
+                            <span class="leading-relaxed">{{ $benefit }}</span>
+                        </li>
+                    @empty
+                        <li class="text-gray-400">Keuntungan membership aktif untuk seluruh transaksi Anda.</li>
+                    @endforelse
+                </ul>
+            </div>
+
+            <!-- Concierge & Customer Care Support -->
+            <div class="bg-stone-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/80 space-y-3 sm:space-y-3.5">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#650506] text-white flex items-center justify-center shrink-0">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-xs text-gray-900 uppercase tracking-wider">Fragrance Concierge</h5>
+                        <p class="text-[10px] sm:text-[11px] text-gray-500">Butik Bantuan & Konsultasi Aroma</p>
+                    </div>
+                </div>
+                <p class="text-[11px] sm:text-xs text-gray-600 leading-relaxed">
+                    Butuh rekomendasi wewangian atau bantuan dengan pesanan Anda? Tim Beauty Advisor kami siap melayani.
+                </p>
+                <div class="pt-1.5 sm:pt-2 flex items-center gap-2">
+                    <a href="https://wa.me/6281234567890" target="_blank" class="flex-1 text-center py-1.5 sm:py-2 px-2.5 sm:px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center justify-center gap-1.5">
+                        <span>WhatsApp Concierge</span>
+                    </a>
+                    <a href="{{ route('stores.index') }}" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-white text-xs font-semibold transition">
+                        Lokasi Butik
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tombol Keluar dari Akun (Sidebar Footer) -->
+            <form method="POST" action="{{ route('logout') }}" class="pt-0.5">
+                @csrf
+                <button type="submit" class="w-full py-2.5 px-4 rounded-xl border border-gray-200 hover:border-rose-300 bg-white hover:bg-rose-50/70 text-gray-500 hover:text-rose-600 text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer shadow-2xs">
+                    <svg class="w-4 h-4 text-gray-400 group-hover:text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    <span>Keluar dari Akun</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
