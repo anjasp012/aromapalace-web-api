@@ -38,10 +38,10 @@
     <div class="bg-[#4A070B] border-b border-[#3B0407] text-white text-xs py-2 relative z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             <!-- Left: Promo Announcement -->
-            <div class="flex items-center gap-2 text-[11px] sm:text-xs text-amber-100 font-medium">
-                <span class="text-amber-400 text-sm leading-none">✦</span>
-                <span>Summer Sale is Live – Up to 40% Off!</span>
-            </div>
+            <button type="button" @click="window.openPromoModal()" class="flex items-center gap-2 text-[11px] sm:text-xs text-amber-100 font-medium hover:text-white transition cursor-pointer group text-left">
+                <span class="text-amber-400 text-sm leading-none group-hover:scale-110 transition-transform">✦</span>
+                <span class="underline decoration-amber-400/50 underline-offset-2">Summer Sale is Live – Up to 40% Off! Klaim Voucher &rarr;</span>
+            </button>
 
             <!-- Right: Free Shipping & Authentic Brands -->
             <div class="hidden md:flex items-center gap-6 text-[10px] text-gray-200">
@@ -855,6 +855,9 @@
     @unless(request()->routeIs('cart*') || request()->is('cart*'))
         @include('components.mobile-bottom-nav')
     @endunless
+
+    <!-- Luxury Welcome & Promotional Popup Modal -->
+    @include('components.promo-modal')
 
     <!-- Customer Service & Policy Modal (FAQs, Shipping, Returns, Privacy, Terms) -->
     @include('components.info-modal')
