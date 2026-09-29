@@ -40,7 +40,7 @@
             <!-- Left: Promo Announcement -->
             <button type="button" @click="window.openPromoModal()" class="flex items-center gap-2 text-[11px] sm:text-xs text-amber-100 font-medium hover:text-white transition cursor-pointer group text-left">
                 <span class="text-amber-400 text-sm leading-none group-hover:scale-110 transition-transform">✦</span>
-                <span class="underline decoration-amber-400/50 underline-offset-2">Summer Sale is Live – Up to 40% Off! Klaim Voucher &rarr;</span>
+                <span class="">Summer Sale is Live – Up to 40% Off! Klaim Voucher &rarr;</span>
             </button>
 
             <!-- Right: Free Shipping & Authentic Brands -->
@@ -83,8 +83,8 @@
                     <button onclick="window.dispatchEvent(new CustomEvent('open-spotlight'))"
                             @click="$dispatch('open-spotlight')" 
                             type="button" 
-                            class="hidden lg:flex items-center gap-2.5 border-b border-gray-300 pb-1.5 w-full hover:border-[#650506] cursor-pointer group transition text-left">
-                        <svg class="w-4 h-4 text-gray-500 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="hidden lg:flex items-center gap-2.5 border-b border-[#C5A575] pb-1.5 w-full hover:border-[#704828] cursor-pointer group transition text-left">
+                        <svg class="w-4 h-4 text-[#8C6239] group-hover:text-[#704828] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                         <span class="text-xs text-gray-400 group-hover:text-gray-600 transition-colors select-none font-normal">Search for perfumes...</span>
@@ -94,7 +94,7 @@
                     <button onclick="window.dispatchEvent(new CustomEvent('open-spotlight'))"
                             @click="$dispatch('open-spotlight')" 
                             type="button" 
-                            class="lg:hidden p-1.5 text-gray-700 hover:text-[#650506] transition rounded-lg hover:bg-stone-50 cursor-pointer" 
+                            class="lg:hidden p-1.5 text-[#704828] hover:text-[#4A250D] transition rounded-lg hover:bg-stone-50 cursor-pointer" 
                             title="Pencarian">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -106,11 +106,11 @@
                 <div class="flex items-center justify-center shrink-0 mx-auto px-1 sm:px-2">
                     <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-2.5 lg:gap-3 group">
                         <img src="{{ asset('images/logo.png') }}" alt="Aroma Palace" class="w-9 h-9 sm:w-11 sm:h-11 lg:w-13 lg:h-13 object-contain rounded-full shadow-2xs group-hover:scale-105 transition-transform shrink-0">
-                        <div class="flex flex-col text-left">
-                            <span class="font-serif text-base sm:text-xl lg:text-2xl font-bold tracking-[0.14em] lg:tracking-[0.18em] text-[#4A070B] group-hover:text-[#650506] transition uppercase leading-none whitespace-nowrap">
+                        <div class="flex flex-col items-center text-center">
+                            <span class="font-serif text-base sm:text-xl lg:text-2xl font-bold tracking-[0.14em] lg:tracking-[0.18em] text-[#704828] group-hover:text-[#522E14] transition uppercase leading-none whitespace-nowrap text-center">
                                 Aroma Palace
                             </span>
-                            <span class="text-[7px] sm:text-[8.5px] lg:text-[9.5px] uppercase tracking-[0.2em] lg:tracking-[0.25em] text-[#9B783E] font-semibold mt-0.5 sm:mt-1 whitespace-nowrap">
+                            <span class="text-[7px] sm:text-[8.5px] lg:text-[9.5px] uppercase tracking-[0.2em] lg:tracking-[0.25em] text-[#B88E58] font-semibold mt-0.5 sm:mt-1 whitespace-nowrap text-center">
                                 Dubai's Signature Perfumes
                             </span>
                         </div>
@@ -121,14 +121,14 @@
                 <div class="flex items-center justify-end flex-1 gap-2.5 sm:gap-4 lg:gap-7 shrink-0 lg:max-w-[260px]">
                     <!-- Account Icon + Label (Desktop Only - accessible via Bottom Nav on Mobile) -->
                     @auth
-                        <a href="{{ route('account.index') }}" class="hidden lg:flex flex-col items-center gap-1 text-gray-700 hover:text-[#650506] transition group" title="{{ auth()->user()->name }}">
+                        <a href="{{ route('account.index') }}" class="hidden lg:flex flex-col items-center gap-1 text-[#704828] hover:text-[#4A250D] transition group" title="{{ auth()->user()->name }}">
                             <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                            <span class="text-[11px] font-medium text-gray-600 group-hover:text-[#650506] leading-none">Account</span>
+                            <span class="text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none">Account</span>
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="hidden lg:flex flex-col items-center gap-1 text-gray-700 hover:text-[#650506] transition group" title="Login / Register">
+                        <a href="{{ route('login') }}" class="hidden lg:flex flex-col items-center gap-1 text-[#704828] hover:text-[#4A250D] transition group" title="Login / Register">
                             <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                            <span class="text-[11px] font-medium text-gray-600 group-hover:text-[#650506] leading-none">Account</span>
+                            <span class="text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none">Account</span>
                         </a>
                     @endauth
 
@@ -138,14 +138,14 @@
                             ? \App\Models\Wishlist::where('user_id', auth()->id())->count()
                             : 0;
                     @endphp
-                    <a href="{{ route('wishlist.index') }}" class="hidden lg:flex flex-col items-center gap-1 text-gray-700 hover:text-[#650506] transition relative group" title="Wishlist">
+                    <a href="{{ route('wishlist.index') }}" class="hidden lg:flex flex-col items-center gap-1 text-[#704828] hover:text-[#4A250D] transition relative group" title="Wishlist">
                         <div class="relative">
                             <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                            <span id="wishlist-badge" class="{{ $wishlistCount > 0 ? '' : 'hidden' }} absolute -top-1.5 -right-2 w-4 h-4 bg-[#650506] text-white rounded-full text-[10px] font-bold flex items-center justify-center">
+                            <span id="wishlist-badge" class="{{ $wishlistCount > 0 ? '' : 'hidden' }} absolute -top-1.5 -right-2 w-4 h-4 bg-[#704828] text-white rounded-full text-[10px] font-bold flex items-center justify-center">
                                 {{ $wishlistCount }}
                             </span>
                         </div>
-                        <span class="text-[11px] font-medium text-gray-600 group-hover:text-[#650506] leading-none">Wishlist</span>
+                        <span class="text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none">Wishlist</span>
                     </a>
 
                     <!-- Cart Icon + Label (Both Desktop & Mobile) -->
@@ -154,14 +154,14 @@
                             ? \App\Models\CartItem::whereHas('cart', fn($q) => $q->where('user_id', auth()->id()))->count() 
                             : 0;
                     @endphp
-                    <a href="{{ route('cart.index') }}" class="flex flex-col items-center gap-0.5 lg:gap-1 p-1 lg:p-0 text-gray-700 hover:text-[#650506] transition relative group" title="Shopping Cart">
+                    <a href="{{ route('cart.index') }}" class="flex flex-col items-center gap-0.5 lg:gap-1 p-1 lg:p-0 text-[#704828] hover:text-[#4A250D] transition relative group" title="Shopping Cart">
                         <div class="relative">
                             <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                             <span id="cart-badge" class="{{ $cartCount > 0 ? '' : 'hidden' }} absolute -top-1.5 -right-2 w-4 h-4 bg-[#650506] text-white rounded-full text-[10px] font-bold flex items-center justify-center">
                                 {{ $cartCount }}
                             </span>
                         </div>
-                        <span class="hidden lg:block text-[11px] font-medium text-gray-600 group-hover:text-[#650506] leading-none">Cart</span>
+                        <span class="hidden lg:block text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none">Cart</span>
                     </a>
                 </div>
             </div>
