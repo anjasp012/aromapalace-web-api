@@ -356,24 +356,24 @@
                         <span class="text-sm sm:text-base font-extrabold tracking-[0.14em] text-[#4A070B] uppercase">AROMA PALACE</span>
                     </div>
                     <p class="text-xs text-gray-500 leading-relaxed max-w-sm">
-                        Luxury fragrances and artisanal lifestyle essentials. Quality products, exceptional service direct from Dubai.
+                        Luxury fragrances and artisanal lifestyle essentials direct from Dubai. Quality products, exceptional service.
                     </p>
                     <div class="flex items-center gap-2 pt-1">
-                        <!-- Facebook -->
-                        <a href="https://facebook.com" target="_blank" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-black hover:border-gray-400 flex items-center justify-center transition" title="Facebook">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.556 5 15.964 5H18V0h-3.808C10.595 0 9 1.582 9 4.615V8z"/></svg>
-                        </a>
                         <!-- Instagram -->
-                        <a href="https://instagram.com" target="_blank" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-black hover:border-gray-400 flex items-center justify-center transition" title="Instagram">
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-[#650506] hover:border-[#650506] flex items-center justify-center transition shadow-2xs" title="Instagram">
                             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                         </a>
-                        <!-- Twitter / X -->
-                        <a href="https://twitter.com" target="_blank" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-black hover:border-gray-400 flex items-center justify-center transition" title="Twitter">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        <!-- TikTok -->
+                        <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-black hover:border-black flex items-center justify-center transition shadow-2xs" title="TikTok">
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
                         </a>
-                        <!-- Pinterest -->
-                        <a href="https://pinterest.com" target="_blank" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-black hover:border-gray-400 flex items-center justify-center transition" title="Pinterest">
-                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345-.09.375-.291 1.199-.334 1.357-.057.235-.188.285-.434.171-1.62-.754-2.634-3.123-2.634-5.028 0-4.094 2.974-7.854 8.577-7.854 4.504 0 8.004 3.209 8.004 7.5 0 4.475-2.822 8.077-6.738 8.077-1.316 0-2.554-.684-2.977-1.492l-.811 3.09c-.293 1.121-1.085 2.525-1.616 3.391C9.697 23.85 10.825 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+                        <!-- WhatsApp Direct -->
+                        <a href="https://wa.me/6281188888888?text=Halo%20Aroma%20Palace%2C%20saya%20tertarik%20dengan%20koleksi%20parfum%20Dubai" target="_blank" rel="noopener noreferrer" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-emerald-600 hover:border-emerald-600 flex items-center justify-center transition shadow-2xs" title="WhatsApp Customer Support">
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                        </a>
+                        <!-- Facebook -->
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-blue-600 hover:border-blue-600 flex items-center justify-center transition shadow-2xs" title="Facebook">
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.556 5 15.964 5H18V0h-3.808C10.595 0 9 1.582 9 4.615V8z"/></svg>
                         </a>
                     </div>
                 </div>
@@ -382,11 +382,12 @@
                 <div class="col-span-1 sm:col-span-1 lg:col-span-2 space-y-2.5 sm:space-y-3">
                     <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Shop</h5>
                     <ul class="space-y-2 text-xs text-gray-600">
-                        <li><a href="{{ route('products.index') }}" class="hover:text-black transition">All Products</a></li>
-                        <li><a href="{{ route('products.index', ['sort' => 'popular']) }}" class="hover:text-black transition">Best Sellers</a></li>
-                        <li><a href="{{ route('products.index', ['sort' => 'newest']) }}" class="hover:text-black transition">New Arrivals</a></li>
-                        <li><a href="{{ route('products.index') }}" class="hover:text-black transition">Categories</a></li>
-                        <li><a href="{{ route('products.index', ['discount' => 1]) }}" class="hover:text-black transition">Sale</a></li>
+                        <li><a href="{{ route('products.index') }}" class="hover:text-[#650506] transition">All Products</a></li>
+                        <li><a href="{{ route('products.index', ['sort' => 'popular']) }}" class="hover:text-[#650506] transition">Best Sellers</a></li>
+                        <li><a href="{{ route('products.index', ['sort' => 'newest']) }}" class="hover:text-[#650506] transition">New Arrivals</a></li>
+                        <li><a href="{{ route('home') }}#categories" class="hover:text-[#650506] transition">Categories</a></li>
+                        <li><a href="{{ route('home') }}#brands" class="hover:text-[#650506] transition">Featured Brands</a></li>
+                        <li><a href="{{ route('products.index', ['discount' => 1]) }}" class="hover:text-[#650506] transition">Special Offers &amp; Sale</a></li>
                     </ul>
                 </div>
 
@@ -394,11 +395,12 @@
                 <div class="col-span-1 sm:col-span-1 lg:col-span-2 space-y-2.5 sm:space-y-3">
                     <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Customer Service</h5>
                     <ul class="space-y-2 text-xs text-gray-600">
-                        <li><a href="https://wa.me/6281188888888" target="_blank" class="hover:text-black transition">Help Center</a></li>
-                        <li><a href="{{ route('account.orders') }}" class="hover:text-black transition">Track Order</a></li>
-                        <li><a href="#" class="hover:text-black transition">Returns &amp; Refunds</a></li>
-                        <li><a href="#" class="hover:text-black transition">Shipping Info</a></li>
-                        <li><a href="#" class="hover:text-black transition">FAQs</a></li>
+                        <li><a href="https://wa.me/6281188888888?text=Halo%20Aroma%20Palace%2C%20saya%20butuh%20bantuan%20layanan%20pelanggan" target="_blank" rel="noopener noreferrer" class="hover:text-[#650506] transition flex items-center gap-1"><span>Help Center</span><span class="text-[10px] text-emerald-600 font-bold">(WA)</span></a></li>
+                        <li><a href="{{ route('account.orders') }}" class="hover:text-[#650506] transition">Track Order</a></li>
+                        <li><a href="{{ route('wishlist.index') }}" class="hover:text-[#650506] transition">Wishlist Saya</a></li>
+                        <li><button type="button" @click="window.openInfoModal('shipping')" class="hover:text-[#650506] transition text-left cursor-pointer">Shipping &amp; Delivery</button></li>
+                        <li><button type="button" @click="window.openInfoModal('returns')" class="hover:text-[#650506] transition text-left cursor-pointer">Returns &amp; Warranty</button></li>
+                        <li><button type="button" @click="window.openInfoModal('faq')" class="hover:text-[#650506] transition text-left cursor-pointer">FAQs</button></li>
                     </ul>
                 </div>
 
@@ -406,11 +408,11 @@
                 <div class="col-span-1 sm:col-span-1 lg:col-span-2 space-y-2.5 sm:space-y-3">
                     <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Company</h5>
                     <ul class="space-y-2 text-xs text-gray-600">
-                        <li><a href="{{ route('home') }}" class="hover:text-black transition">About Us</a></li>
-                        <li><a href="{{ route('articles.index') }}" class="hover:text-black transition">Our Story</a></li>
-                        <li><a href="#" class="hover:text-black transition">Careers</a></li>
-                        <li><a href="https://wa.me/6281188888888" target="_blank" class="hover:text-black transition">Contact Us</a></li>
-                        <li><a href="{{ route('articles.index') }}" class="hover:text-black transition">Blog</a></li>
+                        <li><a href="{{ route('home') }}#about-us" class="hover:text-[#650506] transition">About Us</a></li>
+                        <li><a href="{{ route('stores.index') }}" class="hover:text-[#650506] transition">Store Locator</a></li>
+                        <li><a href="{{ route('articles.index') }}" class="hover:text-[#650506] transition">Aroma Journal (Blog)</a></li>
+                        <li><a href="https://wa.me/6281188888888?text=Halo%20Tim%20Aroma%20Palace%2C%20saya%20tertarik%20dengan%20peluang%20karir%20atau%20kemitraan" target="_blank" rel="noopener noreferrer" class="hover:text-[#650506] transition">Careers &amp; Partners</a></li>
+                        <li><a href="https://wa.me/6281188888888?text=Halo%20Aroma%20Palace%2C%20saya%20ingin%20menghubungi%20tim%20Aroma%20Palace" target="_blank" rel="noopener noreferrer" class="hover:text-[#650506] transition">Contact Us</a></li>
                     </ul>
                 </div>
 
@@ -420,7 +422,7 @@
                     <p class="text-[11px] text-gray-500 leading-relaxed">
                         Butuh saran aroma wewangian Dubai?
                     </p>
-                    <a href="https://wa.me/6281188888888" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#650506] hover:underline pt-0.5">
+                    <a href="https://wa.me/6281188888888?text=Halo%20Aroma%20Palace%2C%20saya%20butuh%20konsultasi%20aroma%20parfum%20Dubai" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#650506] hover:underline pt-0.5">
                         <span>Chat WhatsApp</span>
                         <span>&rarr;</span>
                     </a>
@@ -434,7 +436,9 @@
                     </p>
                     <div class="flex flex-row flex-wrap sm:flex-row lg:flex-col xl:flex-row gap-2 sm:gap-2.5 pt-0.5">
                         <!-- Google Play Store -->
-                        <a href="https://play.google.com" target="_blank" class="flex-1 sm:flex-initial min-w-[130px] inline-flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-white border border-gray-200/90 text-gray-900 hover:border-gray-400 hover:bg-gray-50 transition shadow-2xs shrink-0 group">
+                        <button type="button" 
+                                @click="showPromoToast('Aplikasi Aroma Palace untuk Android segera hadir di Google Play!')" 
+                                class="flex-1 sm:flex-initial min-w-[130px] inline-flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-white border border-gray-200/90 text-gray-900 hover:border-gray-400 hover:bg-gray-50 transition shadow-2xs shrink-0 group text-left cursor-pointer">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3.6 2.4C3.2 2.8 3 3.4 3 4.2V19.8C3 20.6 3.2 21.2 3.6 21.6L3.7 21.7L13.6 12L3.7 2.3L3.6 2.4Z" fill="#00D2FF"/>
                                 <path d="M16.9 15.3L13.6 12L3.6 21.7C4.1 22.2 4.9 22.3 5.7 21.8L16.9 15.3Z" fill="#00F076"/>
@@ -445,10 +449,12 @@
                                 <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-gray-500 block font-medium">GET IT ON</span>
                                 <span class="text-[11px] sm:text-xs font-bold text-gray-900 tracking-wide block">Google Play</span>
                             </div>
-                        </a>
+                        </button>
 
                         <!-- Apple App Store -->
-                        <a href="https://www.apple.com/app-store/" target="_blank" class="flex-1 sm:flex-initial min-w-[130px] inline-flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-white border border-gray-200/90 text-gray-900 hover:border-gray-400 hover:bg-gray-50 transition shadow-2xs shrink-0 group">
+                        <button type="button" 
+                                @click="showPromoToast('Aplikasi Aroma Palace untuk iOS segera hadir di App Store!')" 
+                                class="flex-1 sm:flex-initial min-w-[130px] inline-flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-white border border-gray-200/90 text-gray-900 hover:border-gray-400 hover:bg-gray-50 transition shadow-2xs shrink-0 group text-left cursor-pointer">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5 fill-current text-gray-900 shrink-0" viewBox="0 0 24 24">
                                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.84c.62-.75 1.04-1.8 0.93-2.84-.9.04-1.99.6-2.63 1.35-.57.65-1.07 1.71-.94 2.73 1 .08 2.02-.49 2.64-1.24z"/>
                             </svg>
@@ -456,7 +462,7 @@
                                 <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-gray-500 block font-medium">Download on the</span>
                                 <span class="text-[11px] sm:text-xs font-bold text-gray-900 tracking-wide block">App Store</span>
                             </div>
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -466,10 +472,12 @@
                 <div>
                     &copy; {{ date('Y') }} Aroma Palace. All Rights Reserved.
                 </div>
-                <div class="flex items-center gap-3 sm:gap-6 text-gray-400">
-                    <a href="#" class="hover:text-gray-900 transition">Privacy Policy</a>
+                <div class="flex items-center gap-3 sm:gap-5 text-gray-400">
+                    <button type="button" @click="window.openInfoModal('privacy')" class="hover:text-gray-900 transition cursor-pointer">Privacy Policy</button>
                     <span>&bull;</span>
-                    <a href="#" class="hover:text-gray-900 transition">Terms of Service</a>
+                    <button type="button" @click="window.openInfoModal('terms')" class="hover:text-gray-900 transition cursor-pointer">Terms of Service</button>
+                    <span>&bull;</span>
+                    <button type="button" @click="window.openInfoModal('faq')" class="hover:text-gray-900 transition cursor-pointer">FAQs</button>
                 </div>
             </div>
         </div>
@@ -847,6 +855,9 @@
     @unless(request()->routeIs('cart*') || request()->is('cart*'))
         @include('components.mobile-bottom-nav')
     @endunless
+
+    <!-- Customer Service & Policy Modal (FAQs, Shipping, Returns, Privacy, Terms) -->
+    @include('components.info-modal')
 
     <!-- macOS Spotlight Search Modal -->
     @include('components.spotlight-search')

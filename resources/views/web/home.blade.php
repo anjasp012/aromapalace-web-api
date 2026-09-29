@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Aroma Palace - Luxury Fragrance & Modern Essentials')
+@section('title', "Aroma Palace - Dubai's Signature Perfumes")
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-7 sm:space-y-11 lg:space-y-14">
@@ -144,7 +144,7 @@
     </section>
 
     <!-- 2. KATEGORI PRODUK (Shop by Category) -->
-    <section>
+    <section id="categories" class="scroll-mt-24 sm:scroll-mt-28">
         <div class="flex items-center justify-between mb-3 sm:mb-5">
             <div>
                 <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Kategori Produk</h2>
@@ -184,7 +184,7 @@
     </section>
 
     <!-- 3. PRODUK POPULER (Best Sellers) -->
-    <section>
+    <section id="best-sellers" class="scroll-mt-24 sm:scroll-mt-28">
         <div class="flex items-center justify-between mb-3 sm:mb-5">
             <div>
                 <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Produk Populer</h2>
@@ -204,7 +204,7 @@
     </section>
 
     <!-- 4. INFORMASI PROMO ATAU EXCLUSIVE OFFER (Mid-Banner Campaign) -->
-    <section class="space-y-5 sm:space-y-8">
+    <section id="special-offers" class="scroll-mt-24 sm:scroll-mt-28 space-y-5 sm:space-y-8">
         <!-- Promotional Campaign Banner (Summer Sale!, Royal Maroon Card) -->
         <div class="relative bg-gradient-to-br from-[#4A070B] via-[#650506] to-[#360407] rounded-xl sm:rounded-2xl p-4 sm:p-10 lg:p-14 text-white overflow-hidden shadow-md">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-8 items-center relative z-10">
@@ -451,7 +451,7 @@
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-8 sm:pb-12 space-y-7 sm:space-y-11 lg:space-y-14">
 
     <!-- 7. BRAND PILIHAN (Featured Brands) -->
-    <section>
+    <section id="brands" class="scroll-mt-24 sm:scroll-mt-28">
         <div class="flex items-center justify-between mb-3 sm:mb-5">
             <div>
                 <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Brand Pilihan</h2>
@@ -505,11 +505,11 @@
 
     <!-- 8. ARTIKEL TERBARU (The Aroma Palace Journal) -->
     @if(!empty($latestArticles) && $latestArticles->count() > 0)
-    <section>
+    <section id="articles" class="scroll-mt-24 sm:scroll-mt-28">
         <div class="flex items-center justify-between mb-3 sm:mb-6">
             <div>
-                <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Artikel &amp; Cerita Wewangian Terbaru</h2>
-                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Eksplorasi wawasan parfum mewah, piramida aroma, dan tips wewangian dari para ahli.</p>
+                <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Artikel</h2>
+                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Eksplorasi artikel aroma palace.</p>
             </div>
             <a href="{{ route('articles.index') }}" class="text-xs sm:text-sm font-semibold text-[#650506] hover:text-[#4A070B] inline-flex items-center gap-1 group shrink-0 transition-colors">
                 <span>Lihat Semua</span>
