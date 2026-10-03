@@ -212,4 +212,73 @@ class PakasirAndKiriminAjaTest extends TestCase
         $order->refresh();
         $this->assertEquals('completed', $order->order_status);
     }
+
+    public function test_customer_check_and_simulate_payment(): void
+    {
+        $this->actingAs($this->user);
+
+        $order = Order::create([
+            'user_id' => $this->user->id,
+            'order_number' => 'AP-TEST-SIM-' . uniqid(),
+            'order_status' => 'pending_payment',
+            'payment_status' => 'unpaid',
+            'subtotal' => 200000,
+            'shipping_cost' => 15000,
+            'total_amount' => 215000,
+            'fulfillment_type' => 'home_delivery',
+            'payment_method' => 'bri_va',
+        ]);
+
+        Payment::create([
+            'order_id' => $order->id,
+            'payment_gateway' => 'pakasir',
+            'transaction_id' => 'PKS-TRX-SIM-' . uniqid(),
+            'payment_type' => 'bri_va',
+            'gross_amount' => 215000,
+            'transaction_status' => 'pending',
+            'va_number' => '1029812345678',
+        ]);
+
+        // Check payment endpoint
+        $checkRes = $this->post("/account/orders/{$order->order_number}/check-payment");
+        $checkRes->assertRedirect();
+
+        // Simulate payment endpoint
+        $simRes = $this->post("/account/orders/{$order->order_number}/simulate-payment");
+        $simRes->assertRedirect();
+
+        $order->refresh();
+        $this->assertEquals('paid', $order->payment_status);
+        $this->assertEquals('processing', $order->order_status);
+    }
+
+    public function test_checkout_with_bri_va_supported_method(): void
+    {
+        $this->actingAs($this->user);
+
+        $this->postJson('/cart', [
+            'product_id' => $this->product->id,
+            'quantity' => 1,
+        ]);
+
+        $orderRes = $this->postJson('/checkout', [
+            'fulfillment_type' => 'home_delivery',
+            'address_id' => $this->user->primaryAddress->id,
+            'shipping_courier' => 'JNE',
+            'shipping_service' => 'REG',
+            'payment_method' => 'bri_va',
+        ]);
+
+        $orderRes->assertStatus(200)
+            ->assertJsonPath('success', true);
+
+        $orderId = $orderRes->json('order.id');
+        $order = Order::find($orderId);
+
+        $this->assertNotNull($order);
+        $payment = Payment::where('order_id', $order->id)->first();
+        $this->assertNotNull($payment);
+        $this->assertEquals('bri_va', $payment->payment_type);
+        $this->assertNotEmpty($payment->va_number);
+    }
 }

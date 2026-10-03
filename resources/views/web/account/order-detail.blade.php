@@ -34,6 +34,25 @@
         </div>
     </div>
 
+    @if(session('success'))
+        <div class="p-3 sm:p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-medium flex items-center gap-2">
+            <span>✅</span>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+    @if(session('info'))
+        <div class="p-3 sm:p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs sm:text-sm font-medium flex items-center gap-2">
+            <span>ℹ️</span>
+            <span>{{ session('info') }}</span>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="p-3 sm:p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-medium flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
+
     <!-- Tracking Timeline Card -->
     <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-2xs space-y-4 sm:space-y-6">
         <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4 border-b border-gray-100 pb-3 sm:pb-4">
@@ -215,11 +234,27 @@
 
                         <!-- Pakasir QRIS / VA Instructions if pending -->
                         @if($order->payment_status !== 'paid')
-                            <div class="mt-3 sm:mt-4 p-3 sm:p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2.5 sm:space-y-3">
+                            @php
+                                $payload = $order->payment->payload ?? [];
+                                $isSandbox = !empty($payload['is_sandbox']) || str_contains($order->payment->qr_string ?? '', 'lorem-ipsum') || ($order->payment->va_number === '123123123');
+                                $paymentUrl = $payload['payment_url'] ?? null;
+                            @endphp
+
+                            <div class="mt-3 sm:mt-4 p-3 sm:p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-3">
                                 <div class="flex items-center justify-between">
                                     <span class="font-bold text-gray-900 text-xs">Instruksi Pembayaran</span>
                                     <span class="text-[10px] text-gray-500">Selesaikan dalam 24 jam</span>
                                 </div>
+
+                                @if($isSandbox)
+                                    <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
+                                        <div class="flex items-center gap-1.5 font-bold mb-0.5 text-amber-800">
+                                            <span>🧪</span>
+                                            <span>Mode Sandbox Pakasir (Testing)</span>
+                                        </div>
+                                        <p class="text-amber-700">Transaksi aktif dalam mode sandbox Pakasir. Gunakan tombol <strong>Simulasikan Pembayaran Sukses</strong> di bawah untuk menguji perubahan status menjadi Lunas secara instan.</p>
+                                    </div>
+                                @endif
 
                                 @if($order->payment->qr_string)
                                     <div class="text-center space-y-1.5 sm:space-y-2">
@@ -232,13 +267,41 @@
                                     </div>
                                 @elseif($order->payment->va_number)
                                     <div class="p-2.5 sm:p-3 bg-white rounded-xl border border-gray-200 text-center">
-                                        <span class="text-[10px] sm:text-[11px] text-gray-400 block uppercase">Virtual Account</span>
+                                        <span class="text-[10px] sm:text-[11px] text-gray-400 block uppercase">Virtual Account {{ strtoupper(str_replace('_va', '', $order->payment->payment_type)) }}</span>
                                         <span class="font-mono text-sm sm:text-base font-extrabold text-gray-900 tracking-wider block my-1 select-all">
                                             {{ $order->payment->va_number }}
                                         </span>
-                                        <span class="text-[10px] text-gray-500">Jumlah: <strong>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</strong></span>
+                                        <span class="text-[10px] text-gray-500">Jumlah Transfer: <strong>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</strong></span>
                                     </div>
                                 @endif
+
+                                <!-- Actions: Cek Status & Simulasi -->
+                                <div class="pt-2 border-t border-gray-200 space-y-2">
+                                    <form method="POST" action="{{ route('account.orders.check_payment', $order->order_number) }}">
+                                        @csrf
+                                        <button type="submit" class="w-full bg-white hover:bg-gray-100 text-gray-800 font-bold py-2 px-3 border border-gray-300 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
+                                            <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                            <span>Cek & Sinkron Status Pembayaran</span>
+                                        </button>
+                                    </form>
+
+                                    @if($paymentUrl)
+                                        <a href="{{ $paymentUrl }}" target="_blank" rel="noopener noreferrer"
+                                           class="w-full bg-[#650506] hover:bg-[#4A070B] text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition text-center shadow-2xs">
+                                            <span>💳 Buka Halaman Bayar Pakasir</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </a>
+                                    @endif
+
+                                    @if($isSandbox || app()->environment('local', 'testing'))
+                                        <form method="POST" action="{{ route('account.orders.simulate_payment', $order->order_number) }}">
+                                            @csrf
+                                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
+                                                <span>⚡ Simulasikan Pembayaran Sukses</span>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             </div>
                         @endif
                     </div>

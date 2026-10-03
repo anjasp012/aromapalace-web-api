@@ -143,10 +143,9 @@ class CheckoutService
             'total_amount' => $totalAmount,
             'available_payment_methods' => [
                 ['code' => 'qris', 'name' => 'QRIS Instant (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'qr'],
-                ['code' => 'bca_va', 'name' => 'BCA Virtual Account (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'bank'],
-                ['code' => 'mandiri_va', 'name' => 'Mandiri Virtual Account (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'bank'],
-                ['code' => 'bni_va', 'name' => 'BNI Virtual Account (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'bank'],
                 ['code' => 'bri_va', 'name' => 'BRI Virtual Account (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'bank'],
+                ['code' => 'bni_va', 'name' => 'BNI Virtual Account (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'bank'],
+                ['code' => 'permata_va', 'name' => 'Permata Virtual Account (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'bank'],
                 ['code' => 'cod', 'name' => 'Cash On Delivery (Bayar di Tempat)', 'provider' => 'COD', 'icon' => 'cash'],
             ],
         ];
@@ -183,22 +182,40 @@ class CheckoutService
             $shippingCost = 0.0;
             $estimatedDelivery = null;
             $addressSnapshot = null;
+            $courier = $validated['shipping_courier'] ?? 'JNE';
+            $service = $validated['shipping_service'] ?? 'REG';
 
             if ($validated['fulfillment_type'] === 'home_delivery') {
                 $address = UserAddress::findOrFail($validated['address_id']);
                 $addressSnapshot = $address->toArray();
-                $service = $validated['shipping_service'] ?? 'REG';
-                $shippingCost = match ($service) {
-                    'YES', 'EXPRESS' => 28000.0,
-                    'SAMEDAY' => 35000.0,
-                    default => 15000.0,
-                };
-                $estimatedDelivery = match ($service) {
-                    'YES', 'EXPRESS' => '1 Hari Kerja',
-                    'SAMEDAY' => 'Hari Ini',
-                    default => '2-3 Hari Kerja',
-                };
+                $destinationCity = $address->city ?? 'Jakarta Selatan';
+
+                // Hitung ongkir dinamis via KiriminAja agregator
+                $rates = $this->kiriminAjaService->getShippingRates($destinationCity, 1000);
+                $matchedRate = collect($rates)->first(function ($r) use ($courier, $service) {
+                    return strcasecmp($r['courier'], $courier) === 0 && strcasecmp($r['service'], $service) === 0;
+                }) ?? ($rates[0] ?? null);
+
+                if ($matchedRate) {
+                    $shippingCost = (float) $matchedRate['cost'];
+                    $estimatedDelivery = $matchedRate['etd'] ?? '2-3 Hari Kerja';
+                    $courier = $matchedRate['courier'] ?? $courier;
+                    $service = $matchedRate['service'] ?? $service;
+                } else {
+                    $shippingCost = match ($service) {
+                        'YES', 'EXPRESS' => 28000.0,
+                        'SAMEDAY' => 35000.0,
+                        default => 15000.0,
+                    };
+                    $estimatedDelivery = match ($service) {
+                        'YES', 'EXPRESS' => '1 Hari Kerja',
+                        'SAMEDAY' => 'Hari Ini',
+                        default => '2-3 Hari Kerja',
+                    };
+                }
             } else {
+                $courier = 'STORE_PICKUP';
+                $service = 'INSTANT';
                 $shippingCost = 0.0;
                 $estimatedDelivery = 'Siap diambil di Toko';
             }
@@ -226,8 +243,8 @@ class CheckoutService
                 'store_id' => $validated['store_id'] ?? null,
                 'address_id' => $validated['address_id'] ?? null,
                 'shipping_address_snapshot' => $addressSnapshot,
-                'shipping_courier' => $validated['shipping_courier'] ?? 'Internal Express',
-                'shipping_service' => $validated['shipping_service'] ?? 'REG',
+                'shipping_courier' => $courier,
+                'shipping_service' => $service,
                 'shipping_cost' => $shippingCost,
                 'estimated_delivery' => $estimatedDelivery,
                 'subtotal' => $subtotal,

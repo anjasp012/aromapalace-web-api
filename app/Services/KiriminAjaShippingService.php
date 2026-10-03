@@ -26,6 +26,15 @@ class KiriminAjaShippingService
         $this->senderCityId = (int) config('services.kiriminaja.sender_city_id', 151); // Jakarta Pusat
     }
 
+    protected function getMitraBaseUrl(): string
+    {
+        $base = rtrim($this->baseUrl, '/');
+        if (str_ends_with($base, '/api/mitra')) {
+            return $base;
+        }
+        return $base . '/api/mitra';
+    }
+
     /**
      * Cek tarif ongkos kirim agregator kurir (JNE, J&T, SiCepat, Anteraja, dll.)
      */
@@ -41,21 +50,30 @@ class KiriminAjaShippingService
                     'courier' => ['jne', 'jnt', 'sicepat', 'anteraja', 'ninja'],
                 ];
 
-                $base = rtrim($this->baseUrl, '/');
+                $mitraBase = $this->getMitraBaseUrl();
                 $response = Http::timeout(8)
                     ->withHeaders([
                         'Authorization' => 'Bearer ' . $this->apiKey,
                         'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
                     ])
-                    ->post("{$base}/v6.1/shipping_price", $payload);
+                    ->post("{$mitraBase}/shipping_price", $payload);
 
                 if (!$response->successful() || !$response->json('status')) {
                     $response = Http::timeout(8)
                         ->withHeaders([
                             'Authorization' => 'Bearer ' . $this->apiKey,
                             'Accept' => 'application/json',
+                            'Content-Type' => 'application/json',
                         ])
-                        ->post("{$base}/shipping_price", $payload);
+                        ->post("{$mitraBase}/v6.1/shipping_price", $payload);
+                }
+
+                if ($response->status() === 401) {
+                    $resJson = $response->json();
+                    if (isset($resJson['your_ip'])) {
+                        Log::warning("KiriminAja IP Whitelist blocked IP {$resJson['your_ip']}. Tambahkan IP ini ke Dashboard KiriminAja -> Integrasi -> IP Whitelist.");
+                    }
                 }
 
                 if ($response->successful() && $response->json('status')) {
@@ -108,21 +126,23 @@ class KiriminAjaShippingService
                     'total_amount' => (int) $order->total_amount,
                 ];
 
-                $base = rtrim($this->baseUrl, '/');
-                $response = Http::timeout(8)
+                $mitraBase = $this->getMitraBaseUrl();
+                $response = Http::timeout(10)
                     ->withHeaders([
                         'Authorization' => 'Bearer ' . $this->apiKey,
                         'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
                     ])
-                    ->post("{$base}/v6.2/request_pickup", $payload);
+                    ->post("{$mitraBase}/v6.2/request_pickup", $payload);
 
                 if (!$response->successful() || !$response->json('status')) {
-                    $response = Http::timeout(8)
+                    $response = Http::timeout(10)
                         ->withHeaders([
                             'Authorization' => 'Bearer ' . $this->apiKey,
                             'Accept' => 'application/json',
+                            'Content-Type' => 'application/json',
                         ])
-                        ->post("{$base}/request_pickup", $payload);
+                        ->post("{$mitraBase}/request_pickup", $payload);
                 }
 
                 if ($response->successful() && $response->json('status')) {
@@ -310,15 +330,40 @@ class KiriminAjaShippingService
 
     protected function resolveCityId(string $cityName): int
     {
-        // Default mapping Jakarta Pusat = 151, Surabaya = 444, Bandung = 23
+        $city = strtolower(trim($cityName));
         $map = [
             'jakarta pusat' => 151,
-            'jakarta selatan' => 152,
+            'jakarta utara' => 154,
             'jakarta barat' => 153,
+            'jakarta selatan' => 152,
+            'jakarta timur' => 155,
             'surabaya' => 444,
             'bandung' => 23,
+            'semarang' => 399,
+            'yogyakarta' => 501,
+            'jogja' => 501,
+            'solo' => 445,
+            'surakarta' => 445,
+            'malang' => 256,
+            'denpasar' => 114,
+            'badung' => 17,
             'bali' => 114,
+            'medan' => 278,
+            'makassar' => 254,
+            'palembang' => 327,
+            'tangerang selatan' => 457,
+            'tangerang' => 455,
+            'bekasi' => 55,
+            'depok' => 115,
+            'bogor' => 79,
         ];
-        return $map[strtolower(trim($cityName))] ?? 151;
+
+        foreach ($map as $key => $id) {
+            if (str_contains($city, $key)) {
+                return $id;
+            }
+        }
+
+        return 151; // Default Jakarta Pusat
     }
 }

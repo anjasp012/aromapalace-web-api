@@ -59,7 +59,7 @@ class CheckoutController extends Controller
             'store_id' => 'required_if:fulfillment_type,store_pickup|nullable|exists:stores,id',
             'shipping_courier' => 'nullable|string',
             'shipping_service' => 'nullable|string',
-            'payment_method' => 'required|string|in:qris,bca_va,mandiri_va,bni_va,bri_va,credit_card,cod',
+            'payment_method' => 'required|string|in:qris,bca_va,mandiri_va,bni_va,bri_va,permata_va,maybank_va,bnc_va,credit_card,cod',
             'promo_code' => 'nullable|string',
             'notes' => 'nullable|string|max:500',
         ]);

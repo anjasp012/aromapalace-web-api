@@ -78,6 +78,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [AccountController::class, 'index'])->name('index');
         Route::get('/orders', [AccountController::class, 'orders'])->name('orders');
         Route::get('/orders/{orderNumber}', [AccountController::class, 'orderShow'])->name('orders.show');
+        Route::post('/orders/{orderNumber}/check-payment', [AccountController::class, 'orderCheckPayment'])->name('orders.check_payment');
+        Route::post('/orders/{orderNumber}/simulate-payment', [AccountController::class, 'orderSimulatePayment'])->name('orders.simulate_payment');
         Route::post('/orders/{orderNumber}/cancel', [AccountController::class, 'orderCancel'])->name('orders.cancel');
 
         Route::get('/rewards', [AccountController::class, 'rewards'])->name('rewards');

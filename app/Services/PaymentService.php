@@ -32,7 +32,7 @@ class PaymentService
     /**
      * Konfirmasi pembayaran berhasil (Settlement)
      */
-    public function processSettlement(string $orderNumber): Order
+    public function processSettlement(string $orderNumber, ?string $transactionId = null, ?string $paymentType = null): Order
     {
         $order = Order::where('order_number', $orderNumber)->firstOrFail();
 
@@ -40,7 +40,7 @@ class PaymentService
             return $order;
         }
 
-        return DB::transaction(function () use ($order) {
+        return DB::transaction(function () use ($order, $transactionId, $paymentType) {
             $newOrderStatus = ($order->fulfillment_type === 'store_pickup') ? 'ready_for_pickup' : 'processing';
 
             $order->update([
@@ -49,10 +49,18 @@ class PaymentService
                 'paid_at' => now(),
             ]);
 
-            $order->payment?->update([
+            $paymentUpdate = [
                 'transaction_status' => 'settlement',
                 'paid_at' => now(),
-            ]);
+            ];
+            if ($transactionId && empty($order->payment?->transaction_id)) {
+                $paymentUpdate['transaction_id'] = $transactionId;
+            }
+            if ($paymentType && empty($order->payment?->payment_type)) {
+                $paymentUpdate['payment_type'] = $paymentType;
+            }
+
+            $order->payment?->update($paymentUpdate);
 
             OrderStatusHistory::create([
                 'order_id' => $order->id,

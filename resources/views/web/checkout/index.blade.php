@@ -230,6 +230,9 @@
                                     <template x-if="pm.code === 'bri_va'">
                                         <span class="px-1.5 py-0.5 rounded bg-blue-50 text-[#00529C] font-black text-[11px] tracking-tight shrink-0 border border-blue-100">BRI</span>
                                     </template>
+                                    <template x-if="pm.code === 'permata_va'">
+                                        <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-[#008144] font-black text-[11px] tracking-tight shrink-0 border border-emerald-100">PERMATA</span>
+                                    </template>
                                     <template x-if="pm.code === 'qris'">
                                         <span class="px-1.5 py-0.5 rounded bg-rose-50 text-[#650506] font-black text-[11px] tracking-tight shrink-0 border border-rose-100">QRIS</span>
                                     </template>
@@ -497,6 +500,9 @@
                             <template x-if="pm.code === 'bri_va'">
                                 <span class="px-2 py-1 rounded bg-blue-50 text-[#00529C] font-black text-xs tracking-tight shrink-0 border border-blue-100">BRI</span>
                             </template>
+                            <template x-if="pm.code === 'permata_va'">
+                                <span class="px-2 py-1 rounded bg-emerald-50 text-[#008144] font-black text-xs tracking-tight shrink-0 border border-emerald-100">PERMATA</span>
+                            </template>
                             <template x-if="pm.code === 'qris'">
                                 <span class="px-2 py-1 rounded bg-rose-50 text-[#650506] font-black text-xs tracking-tight shrink-0 border border-rose-100">QRIS</span>
                             </template>
@@ -544,7 +550,7 @@ function checkoutApp(initialPreview, initialAddresses, initialStores) {
         discountAmount: initialPreview?.discount_amount || 0,
         totalAmount: initialPreview?.total_amount || 0,
         paymentMethods: initialPreview?.available_payment_methods || [],
-        selectedPaymentMethod: 'bca_va',
+        selectedPaymentMethod: initialPreview?.available_payment_methods?.[0]?.code || 'qris',
         notes: '',
         openAddressModal: false,
         openShippingModal: false,

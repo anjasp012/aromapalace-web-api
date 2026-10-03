@@ -72,6 +72,47 @@ class AccountController extends Controller
         }
     }
 
+    public function orderCheckPayment(string $orderNumber, \App\Services\PakasirPaymentService $pakasirService): RedirectResponse
+    {
+        $user = auth()->user();
+        $order = $this->orderService->getOrderDetail($user, $orderNumber);
+
+        if ($order->payment_status === 'paid') {
+            return back()->with('success', 'Pesanan ini sudah berstatus LUNAS.');
+        }
+
+        try {
+            $result = $pakasirService->checkTransactionStatus($order);
+            if ($result['paid']) {
+                return back()->with('success', 'Pembayaran berhasil terverifikasi! Pesanan Anda sedang diproses.');
+            }
+            return back()->with('info', $result['message'] ?? 'Menunggu pembayaran diselesaikan.');
+        } catch (Exception $e) {
+            return back()->with('error', 'Gagal memeriksa status pembayaran: ' . $e->getMessage());
+        }
+    }
+
+    public function orderSimulatePayment(string $orderNumber, \App\Services\PaymentService $paymentService): RedirectResponse
+    {
+        $user = auth()->user();
+        $order = $this->orderService->getOrderDetail($user, $orderNumber);
+
+        if ($order->payment_status === 'paid') {
+            return back()->with('success', 'Pesanan sudah berstatus LUNAS.');
+        }
+
+        try {
+            $paymentService->processSettlement(
+                $order->order_number,
+                'PKS-SIM-' . strtoupper(\Illuminate\Support\Str::random(8)),
+                $order->payment_method
+            );
+            return back()->with('success', 'Simulasi pembayaran sukses! Status pesanan kini menjadi DIPROSES.');
+        } catch (Exception $e) {
+            return back()->with('error', 'Gagal memproses simulasi: ' . $e->getMessage());
+        }
+    }
+
     public function rewards(): View
     {
         $user = auth()->user();
