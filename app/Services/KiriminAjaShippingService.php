@@ -152,13 +152,15 @@ class KiriminAjaShippingService
                 'package_type_id' => 1,
             ];
 
+            $pickupSchedule = $this->resolvePickupSchedule();
+
             $pickupPayload = [
                 'address' => 'Jl. M.H. Thamrin No. 88, Menteng, Jakarta Pusat',
                 'phone' => $this->senderPhone,
                 'name' => $this->senderName,
                 'zipcode' => '10350',
                 'kecamatan_id' => $this->senderCityId,
-                'schedule' => 'daily',
+                'schedule' => $pickupSchedule,
                 'packages' => [$packageData],
             ];
 
@@ -250,6 +252,50 @@ class KiriminAjaShippingService
             'booking_id' => $bookingId,
             'is_simulation' => true,
         ];
+    }
+
+    /**
+     * Dapatkan jadwal pickup kurir dalam format mandatory: Y-m-d H:i:s
+     */
+    public function resolvePickupSchedule(): string
+    {
+        $now = now()->timezone('Asia/Jakarta');
+
+        // Coba periksa slot jadwal resmi dari API KiriminAja
+        try {
+            $mitraBase = $this->getMitraBaseUrl();
+            $res = Http::timeout(4)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Accept' => 'application/json',
+                ])
+                ->post("{$mitraBase}/v2/schedules");
+
+            if ($res->successful() && $res->json('status')) {
+                $schedules = $res->json('schedules') ?? [];
+                foreach ($schedules as $slot) {
+                    if (empty($slot['expired']) && empty($slot['libur']) && !empty($slot['clock'])) {
+                        $clock = trim($slot['clock']);
+                        if (strlen($clock) === 5) {
+                            $clock .= ':00';
+                        }
+                        return $now->format('Y-m-d') . ' ' . $clock;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::info('KiriminAja schedules check notice: ' . $e->getMessage());
+        }
+
+        // Fallback waktu yang valid (format: Y-m-d H:i:s)
+        if ($now->hour >= 16) {
+            return $now->copy()->addDay()->setTime(10, 0, 0)->format('Y-m-d H:i:s');
+        }
+        if ($now->hour < 9) {
+            return $now->copy()->setTime(11, 0, 0)->format('Y-m-d H:i:s');
+        }
+
+        return $now->copy()->addHours(2)->format('Y-m-d H:i:00');
     }
 
     /**
