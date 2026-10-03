@@ -35,15 +35,14 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders', 'counts', 'status', 'search'));
     }
 
-    public function show(int $id): View
+    public function show(string|int $id): View
     {
-        $order = Order::with(['user', 'items.product', 'items.variant', 'store', 'address', 'payment', 'statusHistories'])
-            ->findOrFail($id);
+        $order = $this->findOrder($id);
 
         return view('admin.orders.show', compact('order'));
     }
 
-    public function updateStatus(Request $request, int $id): RedirectResponse
+    public function updateStatus(Request $request, string|int $id): RedirectResponse
     {
         $validated = $request->validate([
             'order_status' => 'required|in:pending_payment,processing,shipped,ready_for_pickup,completed,cancelled',
@@ -52,7 +51,7 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $order = Order::findOrFail($id);
+        $order = $this->findOrder($id);
 
         try {
             $this->orderService->adminUpdateStatus(
@@ -80,9 +79,9 @@ class OrderController extends Controller
     /**
      * Request booking kurir dan terbitkan nomor resi otomatis via KiriminAja
      */
-    public function generateKiriminAjaAwb(int $id, \App\Services\KiriminAjaShippingService $kiriminAjaService): RedirectResponse
+    public function generateKiriminAjaAwb(string|int $id, \App\Services\KiriminAjaShippingService $kiriminAjaService): RedirectResponse
     {
-        $order = Order::findOrFail($id);
+        $order = $this->findOrder($id);
 
         if ($order->fulfillment_type !== 'home_delivery') {
             return back()->with('error', 'Pesanan ini bertipe Click & Collect (Store Pickup), tidak memerlukan resi kurir.');
@@ -94,6 +93,22 @@ class OrderController extends Controller
         } catch (Exception $e) {
             return back()->with('error', 'Gagal menerbitkan resi KiriminAja: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Cari pesanan berdasarkan ID numerik atau Order Number
+     */
+    protected function findOrder(string|int $id): Order
+    {
+        return Order::with(['user', 'items.product', 'items.variant', 'store', 'address', 'payment', 'statusHistories'])
+            ->where(function ($q) use ($id) {
+                if (is_numeric($id)) {
+                    $q->where('id', (int) $id)->orWhere('order_number', (string) $id);
+                } else {
+                    $q->where('order_number', (string) $id);
+                }
+            })
+            ->firstOrFail();
     }
 }
 
