@@ -122,7 +122,7 @@ class OrderService
      */
     public function adminGetAllOrders(?string $status = null, ?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
-        $query = Order::with(['user', 'items', 'store', 'payment']);
+        $query = Order::with(['user', 'items.product', 'store', 'payment']);
 
         if ($status && $status !== 'all') {
             $query->where('order_status', $status);

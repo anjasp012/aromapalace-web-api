@@ -46,7 +46,8 @@ class OrderController extends Controller
     public function updateStatus(Request $request, int $id): RedirectResponse
     {
         $validated = $request->validate([
-            'order_status' => 'required|in:processing,shipped,ready_for_pickup,completed,cancelled',
+            'order_status' => 'required|in:pending_payment,processing,shipped,ready_for_pickup,completed,cancelled',
+            'payment_status' => 'nullable|in:unpaid,paid,refunded',
             'tracking_number' => 'nullable|string|max:100',
             'notes' => 'nullable|string|max:500',
         ]);
@@ -60,6 +61,15 @@ class OrderController extends Controller
                 $validated['tracking_number'] ?? null,
                 $validated['notes'] ?? null
             );
+
+            if (!empty($validated['payment_status']) && $validated['payment_status'] !== $order->payment_status) {
+                $order->update(['payment_status' => $validated['payment_status']]);
+                if ($order->payment) {
+                    $order->payment->update([
+                        'transaction_status' => $validated['payment_status'] === 'paid' ? 'settlement' : 'pending'
+                    ]);
+                }
+            }
 
             return back()->with('success', "Status pesanan #{$order->order_number} berhasil diperbarui.");
         } catch (Exception $e) {
