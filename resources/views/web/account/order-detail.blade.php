@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Order #' . $order->order_number . ' - Aroma Palace')
+@section('title', 'Pesanan #' . $order->order_number . ' - Aroma Palace')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6 pb-6 sm:pb-8">
@@ -8,28 +8,28 @@
     <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4 border-b border-gray-200 pb-4 sm:pb-6">
         <div>
             <div class="flex items-center gap-2 text-[11px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">
-                <a href="{{ route('home') }}" class="hover:text-[#650506]">Home</a>
+                <a href="{{ route('home') }}" class="hover:text-[#650506]">Beranda</a>
                 <span>/</span>
-                <a href="{{ route('account.orders') }}" class="hover:text-[#650506]">Order History</a>
+                <a href="{{ route('account.orders') }}" class="hover:text-[#650506]">Riwayat Pesanan</a>
                 <span>/</span>
                 <span class="text-gray-900 font-medium">#{{ $order->order_number }}</span>
             </div>
-            <h1 class="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-gray-900 tracking-tight">Order #{{ $order->order_number }}</h1>
-            <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Placed on {{ $order->created_at->format('M d, Y, H:i') }}</p>
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-gray-900 tracking-tight">Pesanan #{{ $order->order_number }}</h1>
+            <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Dibuat pada {{ $order->created_at->format('d M Y, H:i') }}</p>
         </div>
 
         <div class="flex items-center gap-2 sm:gap-3">
             @if($order->order_status === 'pending_payment')
-                <form method="POST" action="{{ route('account.orders.cancel', $order->order_number) }}" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                <form method="POST" action="{{ route('account.orders.cancel', $order->order_number) }}" onsubmit="return confirm('Yakin ingin membatalkan pesanan ini?');">
                     @csrf
                     <button type="submit" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50 text-[11px] sm:text-xs font-semibold transition">
-                        Cancel Order
+                        Batalkan Pesanan
                     </button>
                 </form>
             @endif
             <a href="{{ route('account.orders') }}" class="inline-flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-gray-100 text-gray-800 border border-gray-200 hover:bg-gray-200 text-[11px] sm:text-xs font-semibold transition">
                 <span>&larr;</span>
-                <span>Back to Orders</span>
+                <span>Kembali ke Pesanan</span>
             </a>
         </div>
     </div>
@@ -68,7 +68,7 @@
                     </div>
                 </div>
             @empty
-                <p class="text-xs text-gray-400">No status updates yet.</p>
+                <p class="text-xs text-gray-400">Belum ada pembaruan status.</p>
             @endforelse
         </div>
     </div>
@@ -77,7 +77,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         <!-- Order Items (2 Cols) -->
         <div class="lg:col-span-2 bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-200 shadow-2xs space-y-4 sm:space-y-6">
-            <h3 class="font-bold text-gray-900 text-sm sm:text-base border-b border-gray-100 pb-2.5 sm:pb-3">Items Ordered</h3>
+            <h3 class="font-bold text-gray-900 text-sm sm:text-base border-b border-gray-100 pb-2.5 sm:pb-3">Produk Dipesan</h3>
 
             <div class="divide-y divide-gray-100">
                 @foreach($order->items as $item)
@@ -97,8 +97,8 @@
                                     <span class="font-bold text-gray-900 text-xs sm:text-sm">Product</span>
                                 @endif
                                 <p class="text-[10px] sm:text-xs text-gray-500 mt-0.5">
-                                    Variant: <span class="font-semibold text-gray-700">{{ $item->variant?->name ?? 'Default' }}</span> &bull; 
-                                    Qty: <span class="font-semibold text-gray-700">{{ $item->quantity }}</span> &times; Rp {{ number_format($item->price, 0, ',', '.') }}
+                                    Varian: <span class="font-semibold text-gray-700">{{ $item->variant?->name ?? 'Standar' }}</span> &bull; 
+                                    Jml: <span class="font-semibold text-gray-700">{{ $item->quantity }}</span> &times; Rp {{ number_format($item->price, 0, ',', '.') }}
                                 </p>
                             </div>
                         </div>
@@ -112,7 +112,7 @@
             <!-- Notes if any -->
             @if($order->notes)
                 <div class="p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl border border-gray-200 text-xs text-gray-600">
-                    <span class="font-bold text-gray-700 block mb-1">Customer Note:</span>
+                    <span class="font-bold text-gray-700 block mb-1">Catatan Pelanggan:</span>
                     <p>{{ $order->notes }}</p>
                 </div>
             @endif
@@ -122,18 +122,18 @@
         <div class="space-y-4 sm:space-y-6">
             <!-- Fulfillment Info Card -->
             <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-2xs space-y-3 sm:space-y-4">
-                <h4 class="font-bold text-gray-900 text-sm">Delivery Information</h4>
+                <h4 class="font-bold text-gray-900 text-sm">Informasi Pengiriman</h4>
 
                 @if(in_array($order->fulfillment_type, ['pickup', 'store_pickup']))
                     <div class="text-xs space-y-2 text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <span class="font-bold text-gray-900 block">Pickup Location (Store Pickup):</span>
+                        <span class="font-bold text-gray-900 block">Lokasi Pengambilan (Store Pickup):</span>
                         <p class="font-bold text-sm text-gray-900">{{ $order->store->name ?? 'Aroma Palace Boutique' }}</p>
                         <p class="text-gray-600">{{ $order->store->address ?? '' }}{{ !empty($order->store?->city) ? ', ' . $order->store->city : '' }}</p>
                         <div class="pt-2 border-t border-gray-200 flex items-center justify-between">
-                            <span class="text-gray-500">Pickup Code:</span>
-                            <span class="font-mono font-bold text-[#650506] text-sm">{{ $order->pickup_code ?? 'Ready upon notification' }}</span>
+                            <span class="text-gray-500">Kode Pengambilan:</span>
+                            <span class="font-mono font-bold text-[#650506] text-sm">{{ $order->pickup_code ?? 'Siap saat notifikasi' }}</span>
                         </div>
-                        <p class="text-[11px] text-gray-400">Please present this pickup code to our boutique staff upon arrival.</p>
+                        <p class="text-[11px] text-gray-400">Tunjukkan kode ini kepada staf butik kami saat tiba.</p>
                     </div>
                 @else
                     @php
@@ -152,38 +152,38 @@
                         </div>
                         <p class="text-gray-500">{{ $phone }}</p>
                         <p class="text-gray-700">{{ $fullAddress }}{{ $city ? ', ' . $city : '' }} {{ $postalCode }}</p>
-                        <p class="text-gray-500 pt-1 border-t border-gray-200">Courier: <span class="font-bold text-gray-800">{{ $order->shipping_courier ?? 'Courier' }} {{ $order->shipping_service ? '(' . $order->shipping_service . ')' : '' }}</span></p>
+                        <p class="text-gray-500 pt-1 border-t border-gray-200">Kurir: <span class="font-bold text-gray-800">{{ $order->shipping_courier ?? 'Kurir' }} {{ $order->shipping_service ? '(' . $order->shipping_service . ')' : '' }}</span></p>
                     </div>
                 @endif
             </div>
 
             <!-- Payment Summary Card -->
             <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-2xs space-y-3 sm:space-y-4">
-                <h4 class="font-bold text-gray-900 text-sm">Payment Details</h4>
+                <h4 class="font-bold text-gray-900 text-sm">Detail Pembayaran</h4>
 
                 <div class="space-y-2 sm:space-y-2.5 text-[11px] sm:text-xs text-gray-600">
                     <div class="flex justify-between">
-                        <span>Items Subtotal</span>
+                        <span>Subtotal Produk</span>
                         <span class="font-bold text-gray-900 font-mono">Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
                     </div>
 
                     <div class="flex justify-between">
-                        <span>Shipping Cost</span>
+                        <span>Biaya Pengiriman</span>
                         <span class="font-bold text-gray-900 font-mono">
-                            {{ $order->shipping_cost > 0 ? 'Rp ' . number_format($order->shipping_cost, 0, ',', '.') : 'FREE' }}
+                            {{ $order->shipping_cost > 0 ? 'Rp ' . number_format($order->shipping_cost, 0, ',', '.') : 'GRATIS' }}
                         </span>
                     </div>
 
                     @if($order->discount_amount > 0)
                         <div class="flex justify-between text-emerald-700 font-medium">
-                            <span>Discount</span>
+                            <span>Diskon</span>
                             <span class="font-mono">-Rp {{ number_format($order->discount_amount, 0, ',', '.') }}</span>
                         </div>
                     @endif
 
                     @if(!empty($order->points_discount) && $order->points_discount > 0)
                         <div class="flex justify-between text-emerald-700 font-medium">
-                            <span>Points Redemption</span>
+                            <span>Penukaran Poin</span>
                             <span class="font-mono">-Rp {{ number_format($order->points_discount, 0, ',', '.') }}</span>
                         </div>
                     @endif
@@ -203,11 +203,11 @@
                             </span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Method:</span>
+                            <span class="text-gray-500">Metode:</span>
                             <span class="font-bold text-gray-800">{{ strtoupper($order->payment->payment_type ?? $order->payment_method) }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Payment Status:</span>
+                            <span class="text-gray-500">Status Pembayaran:</span>
                             <span class="font-bold {{ $order->payment_status === 'paid' ? 'text-emerald-700' : 'text-amber-600' }}">
                                 {{ strtoupper($order->payment_status) }}
                             </span>
@@ -217,8 +217,8 @@
                         @if($order->payment_status !== 'paid')
                             <div class="mt-3 sm:mt-4 p-3 sm:p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2.5 sm:space-y-3">
                                 <div class="flex items-center justify-between">
-                                    <span class="font-bold text-gray-900 text-xs">Payment Instructions</span>
-                                    <span class="text-[10px] text-gray-500">Complete within 24h</span>
+                                    <span class="font-bold text-gray-900 text-xs">Instruksi Pembayaran</span>
+                                    <span class="text-[10px] text-gray-500">Selesaikan dalam 24 jam</span>
                                 </div>
 
                                 @if($order->payment->qr_string)
@@ -228,7 +228,7 @@
                                                  alt="QRIS Code"
                                                  class="w-32 h-32 sm:w-36 sm:h-36 mx-auto">
                                         </div>
-                                        <p class="text-[10px] sm:text-[11px] text-gray-500">Scan QRIS with your banking or e-wallet app</p>
+                                        <p class="text-[10px] sm:text-[11px] text-gray-500">Scan QRIS dengan aplikasi perbankan atau e-wallet Anda</p>
                                     </div>
                                 @elseif($order->payment->va_number)
                                     <div class="p-2.5 sm:p-3 bg-white rounded-xl border border-gray-200 text-center">
@@ -236,7 +236,7 @@
                                         <span class="font-mono text-sm sm:text-base font-extrabold text-gray-900 tracking-wider block my-1 select-all">
                                             {{ $order->payment->va_number }}
                                         </span>
-                                        <span class="text-[10px] text-gray-500">Amount: <strong>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</strong></span>
+                                        <span class="text-[10px] text-gray-500">Jumlah: <strong>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</strong></span>
                                     </div>
                                 @endif
                             </div>

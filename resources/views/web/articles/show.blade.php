@@ -24,7 +24,7 @@
         {
           "@@type": "ListItem",
           "position": 2,
-          "name": "Journal",
+          "name": "Artikel",
           "item": "{{ route('articles.index') }}"
         },
         {
@@ -61,9 +61,9 @@
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6">
     <!-- Breadcrumb -->
     <nav class="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-gray-500">
-        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Home</a>
+        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Beranda</a>
         <span>/</span>
-        <a href="{{ route('articles.index') }}" class="hover:text-[#650506] transition">Journal</a>
+        <a href="{{ route('articles.index') }}" class="hover:text-[#650506] transition">Artikel</a>
         <span>/</span>
         <span class="text-gray-900 font-medium truncate max-w-xs sm:max-w-md">{{ $article->title }}</span>
     </nav>
@@ -94,7 +94,7 @@
                 </span>
                 <span class="text-gray-300">&bull;</span>
                 <span class="text-gray-500 font-medium">
-                    {{ $article->reading_time_minutes ?? 4 }} min read
+                    {{ $article->reading_time_minutes ?? 4 }} menit baca
                 </span>
             </div>
         </header>
@@ -117,7 +117,7 @@
         <div class="pt-6 sm:pt-10 border-t border-gray-200 space-y-3 sm:space-y-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">The Journal</span>
+                    <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Artikel</span>
                     <h3 class="text-base sm:text-xl font-bold text-gray-900 mt-0.5">Cerita Pilihan Lainnya</h3>
                 </div>
                 <a href="{{ route('articles.index') }}" class="text-xs sm:text-sm font-semibold text-[#650506] hover:text-[#4A070B] inline-flex items-center gap-1 group shrink-0 transition-colors">
@@ -227,13 +227,7 @@
          }">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-4 sm:mb-6">
-            <div>
-                <h2 class="text-lg sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                    <span>Produk dengan Diskon</span>
-                    <span class="text-[10px] sm:text-xs bg-[#D4AF37] text-[#4A070B] px-2 sm:px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Sale</span>
-                </h2>
-                <p class="text-[11px] sm:text-sm text-stone-300 mt-0.5 sm:mt-1">Penawaran harga terbaik dengan potongan harga spesial terbatas.</p>
-            </div>
+            <h2 class="text-lg sm:text-2xl font-normal text-white tracking-tight">Produk dengan <span class="font-bold">Diskon</span></h2>
             
             <a href="{{ route('products.index', ['discount' => 1]) }}" class="text-xs sm:text-sm font-semibold text-amber-300 hover:text-white inline-flex items-center gap-1 group shrink-0 transition-colors">
                 <span>Lihat Semua</span>
@@ -278,7 +272,7 @@
     <!-- Back to Articles Footer -->
     <div class="flex justify-between items-center gap-2">
         <a href="{{ route('articles.index') }}" class="inline-flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-semibold text-gray-600 hover:text-[#650506] transition shrink-0">
-            &larr; Kembali ke Journal
+            &larr; Kembali ke Artikel
         </a>
         <a href="{{ route('products.index') }}" class="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-[#650506] hover:bg-[#4A070B] text-white text-[11px] sm:text-xs font-semibold transition shadow-2xs shrink-0">
             Belanja Produk &rarr;

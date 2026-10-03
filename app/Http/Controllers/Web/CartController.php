@@ -18,16 +18,19 @@ class CartController extends Controller
 
     public function index(Request $request): View|JsonResponse
     {
-        $summary = $this->cartService->getCartSummary(auth()->user());
+        $user = auth()->user();
+        $summary = $this->cartService->getCartSummary($user);
+        $addresses = $user ? $user->addresses()->orderBy('is_primary', 'desc')->get() : collect();
 
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'data' => $summary,
+                'addresses' => $addresses,
             ]);
         }
 
-        return view('web.cart.index', compact('summary'));
+        return view('web.cart.index', compact('summary', 'addresses'));
     }
 
     public function store(Request $request): RedirectResponse|JsonResponse

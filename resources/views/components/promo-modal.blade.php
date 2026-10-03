@@ -112,13 +112,13 @@
                         <!-- Sub-heading Tagline -->
                         <div class="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300 drop-shadow-sm flex items-center gap-1.5 mb-1 sm:mb-1.5">
                             <span>✦</span>
-                            <span>DUBAI LUXURY FRAGRANCE</span>
+                            <span>PARFUM MEWAH DUBAI</span>
                             <span>✦</span>
                         </div>
 
                         <!-- Main Ad Title -->
                         <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight uppercase leading-none drop-shadow-md">
-                            Special Summer Sale
+                            Promo Spesial Terbatas
                         </h3>
 
                         <!-- Promo Value Pill -->

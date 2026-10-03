@@ -132,6 +132,46 @@ class PakasirAndKiriminAjaTest extends TestCase
         $this->assertEquals('processing', $order->order_status);
     }
 
+    public function test_pakasir_v2_webhook_with_secret_and_txn_id(): void
+    {
+        $order = Order::create([
+            'user_id' => $this->user->id,
+            'order_number' => 'AP-PKSV2-' . uniqid(),
+            'order_status' => 'pending_payment',
+            'payment_status' => 'unpaid',
+            'subtotal' => 300000,
+            'shipping_cost' => 0,
+            'total_amount' => 300000,
+            'fulfillment_type' => 'home_delivery',
+            'payment_method' => 'qris',
+        ]);
+
+        Payment::create([
+            'order_id' => $order->id,
+            'payment_gateway' => 'pakasir',
+            'transaction_id' => 'PKS-TRX-V2-' . uniqid(),
+            'payment_type' => 'qris',
+            'gross_amount' => 300000,
+            'transaction_status' => 'pending',
+        ]);
+
+        $response = $this->withHeaders([
+            'X-Secret' => config('services.pakasir.webhook_secret'),
+        ])->postJson('/api/v1/payments/pakasir/webhook', [
+            'order_id' => $order->order_number,
+            'txn_id' => 'PKS-TXN-V2-DONE',
+            'status' => 'completed',
+            'amount' => 300000,
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success');
+
+        $order->refresh();
+        $this->assertEquals('paid', $order->payment_status);
+        $this->assertEquals('processing', $order->order_status);
+    }
+
     public function test_admin_generate_kiriminaja_awb_and_tracking_webhook(): void
     {
         $order = Order::create([

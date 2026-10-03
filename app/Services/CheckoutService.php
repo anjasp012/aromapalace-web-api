@@ -29,8 +29,10 @@ class CheckoutService
      */
     public function previewCheckout(User $user, array $options = []): array
     {
-        $cart = Cart::where('user_id', $user->id)->first();
-        if (!$cart || $cart->items()->count() === 0) {
+        $cart = Cart::where('user_id', $user->id)
+            ->with(['items.product.brand', 'items.variant'])
+            ->first();
+        if (!$cart || $cart->items->isEmpty()) {
             throw new Exception('Keranjang belanja Anda masih kosong.');
         }
 
@@ -48,14 +50,19 @@ class CheckoutService
             $unitPrice = $item->variant ? $item->variant->final_price : ($item->product?->final_price ?? 0);
             $subtotal += ($unitPrice * $item->quantity);
             $items[] = [
+                'id' => $item->id,
                 'product_id' => $item->product_id,
                 'product_name' => $item->product?->name,
                 'product_slug' => $item->product?->slug,
+                'product_image' => $item->product?->primary_image,
+                'brand_name' => $item->product?->brand?->name,
                 'variant_id' => $item->product_variant_id,
                 'variant_name' => $item->variant?->name,
-                'price' => $unitPrice,
-                'quantity' => $item->quantity,
-                'subtotal' => $unitPrice * $item->quantity,
+                'price' => (float) $unitPrice,
+                'unit_price' => (float) $unitPrice,
+                'quantity' => (int) $item->quantity,
+                'subtotal' => (float) ($unitPrice * $item->quantity),
+                'weight' => (int) ($item->product?->weight_grams ?? 250),
             ];
         }
 

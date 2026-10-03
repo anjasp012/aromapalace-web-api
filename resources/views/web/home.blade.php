@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', "Aroma Palace - Dubai's Signature Perfumes")
+@section('title', 'Aroma Palace - Parfum Mewah Dubai')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-7 sm:space-y-11 lg:space-y-14">
@@ -69,10 +69,10 @@
                         <!-- Action Buttons -->
                         <div class="mt-4 sm:mt-8 flex flex-wrap items-center gap-2 sm:gap-3.5">
                             <a :href="banner.link" class="inline-flex items-center justify-center px-4 sm:px-7 py-2 sm:py-3 bg-[#650506] hover:bg-[#4A070B] text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition">
-                                Shop Now
+                                Belanja Sekarang
                             </a>
                             <a href="{{ route('products.index', ['sort' => 'popular']) }}" class="inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition">
-                                Explore Collection
+                                Jelajahi Koleksi
                             </a>
                         </div>
 
@@ -83,8 +83,8 @@
                                     <svg class="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                                 </div>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-bold text-gray-900 leading-tight">Free Shipping</p>
-                                    <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">Over Rp 500k</p>
+                                    <p class="text-[11px] sm:text-xs font-bold text-gray-900 leading-tight">Gratis Ongkir</p>
+                                    <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">Min. Rp 500rb</p>
                                 </div>
                             </div>
 
@@ -93,8 +93,8 @@
                                     <svg class="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                                 </div>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-bold text-gray-900 leading-tight">Secure Payment</p>
-                                    <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">100% Checkout</p>
+                                    <p class="text-[11px] sm:text-xs font-bold text-gray-900 leading-tight">Pembayaran Aman</p>
+                                    <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">100% Terenkripsi</p>
                                 </div>
                             </div>
 
@@ -103,8 +103,8 @@
                                     <svg class="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                                 </div>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-bold text-gray-900 leading-tight">24/7 Support</p>
-                                    <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">Here to help</p>
+                                    <p class="text-[11px] sm:text-xs font-bold text-gray-900 leading-tight">Layanan 24/7</p>
+                                    <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">Bantuan Ramah</p>
                                 </div>
                             </div>
 
@@ -113,8 +113,8 @@
                                     <svg class="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                 </div>
                                 <div>
-                                    <p class="text-[11px] sm:text-xs font-bold text-gray-900 leading-tight">Easy Returns</p>
-                                    <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">30-day policy</p>
+                                    <p class="text-[11px] sm:text-xs font-bold text-gray-900 leading-tight">Garansi Retur</p>
+                                    <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">Jaminan 100% Asli</p>
                                 </div>
                             </div>
                         </div>
@@ -146,20 +146,17 @@
     <!-- 2. KATEGORI PRODUK (Shop by Category) -->
     <section id="categories" class="scroll-mt-24 sm:scroll-mt-28">
         <div class="flex items-center justify-between mb-3 sm:mb-5">
-            <div>
-                <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Kategori Produk</h2>
-                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Jelajahi beragam koleksi wewangian dan produk gaya hidup pilihan kami.</p>
-            </div>
+            <h2 class="text-lg sm:text-2xl font-normal text-gray-900 tracking-tight">Kategori <span class="font-bold">Produk</span></h2>
             <a href="{{ route('products.index') }}" class="text-xs sm:text-sm font-semibold text-[#650506] hover:text-[#4A070B] inline-flex items-center gap-1 group shrink-0 transition-colors">
                 <span>Lihat Semua</span>
                 <span class="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
             </a>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4">
-            @foreach($categories as $cat)
+        <div class="flex items-stretch gap-2.5 sm:gap-3 lg:gap-3.5 overflow-x-auto lg:grid lg:grid-cols-8 pb-2 sm:pb-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            @foreach($categories->take(8) as $cat)
             <a href="{{ route('products.index', ['category' => $cat->slug]) }}"
-               class="group relative aspect-square rounded-lg overflow-hidden block shadow-2xs hover:shadow-md transition-all duration-300">
+               class="w-[125px] sm:w-[145px] lg:w-auto shrink-0 group relative aspect-square rounded-lg sm:rounded-xl overflow-hidden block shadow-2xs hover:shadow-md transition-all duration-300">
                 <!-- Full-bleed Image -->
                 <img src="{{ $cat->image_url ?? 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=600&q=80' }}"
                      class="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
@@ -169,14 +166,10 @@
                 <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/5 group-hover:from-black/90 transition-colors duration-300"></div>
 
                 <!-- Text Overlay at Bottom -->
-                <div class="absolute inset-x-0 bottom-0 p-2.5 sm:p-4 text-left flex flex-col justify-end">
-                    <h3 class="text-xs sm:text-base font-bold text-white tracking-wide leading-snug line-clamp-1 group-hover:translate-x-0.5 transition-transform duration-300">
+                <div class="absolute inset-x-0 bottom-0 p-2 sm:p-2.5 text-left flex flex-col justify-end">
+                    <h3 class="text-[11px] sm:text-xs lg:text-[13px] font-bold text-white tracking-wide leading-tight line-clamp-2 group-hover:translate-x-0.5 transition-transform duration-300">
                         {{ $cat->name }}
                     </h3>
-                    <p class="text-[10px] sm:text-xs text-gray-300 mt-0.5 font-medium flex items-center justify-between">
-                        <span>{{ $cat->products()->count() }} Produk</span>
-                        <span class="opacity-0 group-hover:opacity-100 transition-opacity text-white">&rarr;</span>
-                    </p>
                 </div>
             </a>
             @endforeach
@@ -186,10 +179,7 @@
     <!-- 3. PRODUK POPULER (Best Sellers) -->
     <section id="best-sellers" class="scroll-mt-24 sm:scroll-mt-28">
         <div class="flex items-center justify-between mb-3 sm:mb-5">
-            <div>
-                <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Produk Populer</h2>
-                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Koleksi terlaris dan paling diminati pelanggan minggu ini.</p>
-            </div>
+            <h2 class="text-lg sm:text-2xl font-normal text-gray-900 tracking-tight">Produk <span class="font-bold">Populer</span></h2>
             <a href="{{ route('products.index', ['sort' => 'popular']) }}" class="text-xs sm:text-sm font-semibold text-[#650506] hover:text-[#4A070B] inline-flex items-center gap-1 group shrink-0 transition-colors">
                 <span>Lihat Semua</span>
                 <span class="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
@@ -212,17 +202,17 @@
                 <div class="order-2 md:order-1 md:col-span-7 space-y-2 sm:space-y-4">
                     <div class="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-amber-300 flex items-center gap-1.5">
                         <span>✦</span>
-                        <span>EXCLUSIVE OFFER &amp; CAMPAIGN</span>
+                        <span>PENAWARAN EKSKLUSIF &amp; PROMO</span>
                     </div>
                     <h2 class="text-xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
-                        Summer Sale!
+                        Promo Spesial!
                     </h2>
                     <p class="text-stone-200 text-[11px] sm:text-base leading-relaxed max-w-md">
-                        Dapatkan diskon istimewa untuk koleksi wewangian dan essentials pilihan. Gunakan voucher eksklusif sebelum periode promo berakhir.
+                        Dapatkan diskon istimewa untuk koleksi wewangian pilihan. Gunakan voucher eksklusif sebelum periode promo berakhir.
                     </p>
                     <div class="pt-1 sm:pt-3 flex flex-wrap items-center gap-2 sm:gap-3">
                         <a href="{{ route('products.index', ['discount' => 1]) }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 sm:px-7 py-2.5 sm:py-3.5 bg-white text-[#4A070B] hover:bg-amber-50 font-semibold rounded-xl text-xs sm:text-sm transition shadow-sm text-center">
-                            Shop the Sale
+                            Belanja Sekarang
                         </a>
                         <a href="{{ route('cart.index') }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold rounded-xl text-xs sm:text-sm transition text-center">
                             Cek Keranjang
@@ -263,10 +253,9 @@
             }
         }">
             <div class="mb-3 sm:mb-5">
-                <h3 class="text-base sm:text-lg font-bold text-gray-900 tracking-tight flex items-center gap-2">
-                    <span>Voucher &amp; Promo Eksklusif Hari Ini</span>
+                <h3 class="text-lg sm:text-2xl font-normal text-gray-900 tracking-tight">
+                    Voucher &amp; Promo <span class="font-bold">Eksklusif</span>
                 </h3>
-                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Gunakan kode voucher di keranjang belanja untuk menikmati potongan harga istimewa.</p>
             </div>
             
             <!-- Horizontal Voucher Slider with Floating Left/Right Arrows -->
@@ -358,10 +347,7 @@
     <!-- 5. PRODUK REKOMENDASI (Standard Grid) -->
     <section>
         <div class="flex items-center justify-between mb-3 sm:mb-5">
-            <div>
-                <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Produk Rekomendasi</h2>
-                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Pilihan wewangian dan essentials terbaik yang dikurasi khusus untuk Anda.</p>
-            </div>
+            <h2 class="text-lg sm:text-2xl font-normal text-gray-900 tracking-tight">Dipilih Khusus <span class="font-bold">Untukmu</span></h2>
             <a href="{{ route('products.index') }}" class="text-xs sm:text-sm font-semibold text-[#650506] hover:text-[#4A070B] inline-flex items-center gap-1 group shrink-0 transition-colors">
                 <span>Lihat Semua</span>
                 <span class="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
@@ -402,13 +388,7 @@
          }">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-4 sm:mb-7">
-            <div>
-                <h2 class="text-lg sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                    <span>Produk dengan Diskon</span>
-                    <span class="text-[10px] sm:text-xs bg-[#D4AF37] text-[#4A070B] px-2 sm:px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Sale</span>
-                </h2>
-                <p class="text-[11px] sm:text-sm text-stone-300 mt-0.5 sm:mt-1">Penawaran harga terbaik dengan potongan harga spesial terbatas.</p>
-            </div>
+            <h2 class="text-lg sm:text-2xl font-normal text-white tracking-tight">Produk dengan <span class="font-bold">Diskon</span></h2>
             
             <a href="{{ route('products.index', ['discount' => 1]) }}" class="text-xs sm:text-sm font-semibold text-amber-300 hover:text-white inline-flex items-center gap-1 group shrink-0 transition-colors">
                 <span>Lihat Semua</span>
@@ -453,10 +433,7 @@
     <!-- 7. BRAND PILIHAN (Featured Brands) -->
     <section id="brands" class="scroll-mt-24 sm:scroll-mt-28">
         <div class="flex items-center justify-between mb-3 sm:mb-5">
-            <div>
-                <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Brand Pilihan</h2>
-                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Kurasi merek parfum mewah dan desainer ternama dunia.</p>
-            </div>
+            <h2 class="text-lg sm:text-2xl font-normal text-gray-900 tracking-tight">Brand <span class="font-bold">Pilihan</span></h2>
             <a href="{{ route('products.index') }}" class="text-xs sm:text-sm font-medium text-gray-600 hover:text-black flex items-center gap-1 group shrink-0">
                 <span>Jelajahi Brand</span>
                 <span class="transition-transform group-hover:translate-x-0.5">&rarr;</span>
@@ -478,7 +455,7 @@
                          loading="lazy"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
                     <span class="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 px-1.5 sm:px-2 py-0.5 rounded bg-white/90 backdrop-blur-xs text-[9px] sm:text-[10px] font-bold text-gray-900 uppercase tracking-wider shadow-2xs">
-                        Brand
+                        Merek
                     </span>
                 </div>
 
@@ -489,7 +466,7 @@
                             {{ $brand->name }}
                         </h3>
                         <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5 line-clamp-1 font-normal">
-                            {{ $brand->description ?? 'Luxury Fragrance House' }}
+                            {{ $brand->description ?? 'Rumah Parfum Mewah' }}
                         </p>
                     </div>
                     
@@ -507,10 +484,7 @@
     @if(!empty($latestArticles) && $latestArticles->count() > 0)
     <section id="articles" class="scroll-mt-24 sm:scroll-mt-28">
         <div class="flex items-center justify-between mb-3 sm:mb-6">
-            <div>
-                <h2 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Artikel</h2>
-                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Eksplorasi artikel aroma palace.</p>
-            </div>
+            <h2 class="text-lg sm:text-2xl font-normal text-gray-900 tracking-tight">Artikel <span class="font-bold">Terbaru</span></h2>
             <a href="{{ route('articles.index') }}" class="text-xs sm:text-sm font-semibold text-[#650506] hover:text-[#4A070B] inline-flex items-center gap-1 group shrink-0 transition-colors">
                 <span>Lihat Semua</span>
                 <span class="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
@@ -598,8 +572,8 @@
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 </div>
                 <div>
-                    <h4 class="text-xs sm:text-sm font-bold text-gray-900">Quality You Can Trust</h4>
-                    <p class="text-[10px] sm:text-[11px] text-gray-500">Carefully curated premium products</p>
+                    <h4 class="text-xs sm:text-sm font-bold text-gray-900">Kualitas Terjamin</h4>
+                    <p class="text-[10px] sm:text-[11px] text-gray-500">Produk premium pilihan terpercaya</p>
                 </div>
             </div>
 
@@ -618,8 +592,8 @@
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                 </div>
                 <div>
-                    <h4 class="text-xs sm:text-sm font-bold text-gray-900">Loved by Thousands</h4>
-                    <p class="text-[10px] sm:text-[11px] text-gray-500">Join our happy customers</p>
+                    <h4 class="text-xs sm:text-sm font-bold text-gray-900">Dipercaya Ribuan Pelanggan</h4>
+                    <p class="text-[10px] sm:text-[11px] text-gray-500">Bergabung dengan pelanggan bahagia kami</p>
                 </div>
             </div>
 
@@ -628,8 +602,8 @@
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div>
-                    <h4 class="text-xs sm:text-sm font-bold text-gray-900">Satisfaction Guaranteed</h4>
-                    <p class="text-[10px] sm:text-[11px] text-gray-500">Your happiness is our priority</p>
+                    <h4 class="text-xs sm:text-sm font-bold text-gray-900">Jaminan Kepuasan 100%</h4>
+                    <p class="text-[10px] sm:text-[11px] text-gray-500">Kepuasan Anda adalah prioritas kami</p>
                 </div>
             </div>
         </div>

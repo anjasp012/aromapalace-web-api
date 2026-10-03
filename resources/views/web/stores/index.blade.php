@@ -1,20 +1,20 @@
 @extends('layouts.app')
 
-@section('title', 'Store Locations - Aroma Palace')
+@section('title', 'Lokasi Butik & Toko - Aroma Palace')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8" x-data="storeMapApp()">
     <!-- Breadcrumb -->
     <nav class="text-xs text-gray-500 flex items-center gap-2">
-        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Home</a>
+        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Beranda</a>
         <span>/</span>
-        <span class="text-gray-900 font-medium">Boutique Stores &amp; Pickup</span>
+        <span class="text-gray-900 font-medium">Lokasi Butik &amp; Pengambilan</span>
     </nav>
 
     <!-- Header Banner -->
     <div class="flex flex-wrap items-end justify-between gap-4 border-b border-gray-200 pb-6">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Store Locations &amp; Pickup Points</h1>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Lokasi Butik &amp; Titik Pengambilan</h1>
             <p class="text-xs text-gray-500 mt-1">Kunjungi butik fisik kami untuk konsultasi piramida aroma atau nikmati layanan Click &amp; Collect gratis.</p>
         </div>
 

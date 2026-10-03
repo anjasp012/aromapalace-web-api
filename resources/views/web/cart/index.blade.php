@@ -1,28 +1,64 @@
 @extends('layouts.app')
 
-@section('title', 'Shopping Bag - Aroma Palace')
+@section('title', 'Keranjang - Aroma Palace')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6"
      :class="items.length > 0 ? 'pb-20 sm:pb-24 lg:pb-8' : ''"
-     x-data="cartApp(@js($summary))"
+     x-data="cartApp(@js($summary), @js($addresses ?? []))"
      x-cloak>
 
     <!-- Breadcrumb -->
     <nav class="text-[11px] sm:text-xs text-gray-500 flex items-center gap-1.5 sm:gap-2">
-        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Home</a>
+        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Beranda</a>
         <span>/</span>
-        <span class="text-gray-900 font-medium">Shopping Bag</span>
+        <span class="text-gray-900 font-medium">Keranjang</span>
     </nav>
 
     <!-- Page Header -->
-    <div class="flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 border-b border-gray-200/80 pb-3 sm:pb-5">
+    <div class="flex flex-wrap items-center justify-between gap-2.5 sm:gap-4">
         <div>
-            <span class="text-[10px] sm:text-xs uppercase tracking-widest text-[#650506] font-semibold block mb-0.5 sm:mb-1">Your Order</span>
-            <h1 class="text-xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Shopping Bag</h1>
+            <h1 class="text-lg sm:text-2xl font-bold text-gray-900 tracking-tight">Keranjang</h1>
         </div>
-        <div class="text-[11px] sm:text-xs text-gray-500 font-medium" x-show="items.length > 0">
-            Total Items: <span class="font-bold text-gray-900" x-text="items.length"></span>
+
+        <!-- Address Trigger (Toco style) -->
+        <div>
+            @auth
+            <button type="button" 
+                    @click="openAddressModal = true"
+                    class="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-gray-600 hover:text-gray-900 transition cursor-pointer select-none group">
+                <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-gray-500">Dikirim ke</span>
+                <span class="font-bold text-gray-900 truncate max-w-[120px] sm:max-w-[200px]" 
+                      x-text="activeAddress ? (activeAddress.label || activeAddress.city) : 'Atur Alamat'">
+                    {{ $addresses->firstWhere('is_primary', true)->label ?? ($addresses->first()->label ?? 'Atur Alamat') }}
+                </span>
+                <template x-if="activeAddress && activeAddress.is_primary">
+                    <span class="px-1.5 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700 rounded-sm leading-none shrink-0">
+                        Utama
+                    </span>
+                </template>
+                <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            @else
+            <a href="{{ route('login') }}" 
+               class="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-gray-600 hover:text-gray-900 transition">
+                <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-gray-500">Dikirim ke</span>
+                <span class="font-bold text-[#650506]">Masuk untuk Atur Alamat</span>
+                <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </a>
+            @endauth
         </div>
     </div>
 
@@ -38,6 +74,180 @@
         <span class="text-sm shrink-0" x-text="toast.type === 'success' ? '✓' : 'ℹ️'"></span>
         <span x-text="toast.message" class="truncate"></span>
         <button type="button" @click="toast.show = false" class="ml-1 text-gray-400 hover:text-white shrink-0 leading-none">&times;</button>
+    </div>
+
+    <!-- Address Selection Modal (Popup Modal Atur Alamat) -->
+    <div x-show="openAddressModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+         @keydown.escape.window="openAddressModal = false"
+         style="display: none;">
+        
+        <div x-show="openAddressModal"
+             x-transition:enter="transition ease-out duration-200 transform"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150 transform"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+             @click.outside="openAddressModal = false"
+             class="bg-white rounded-xl max-w-lg w-full p-4 sm:p-6 shadow-2xl border border-gray-100 space-y-4 max-h-[90vh] flex flex-col">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-gray-100 pb-3 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="w-1 h-4 bg-amber-400 rounded-full shrink-0"></span>
+                    <h3 class="font-bold text-sm sm:text-base text-gray-900" x-text="isAddingAddress ? 'Tambah Alamat Baru' : 'Pilih Alamat Pengiriman'">Pilih Alamat Pengiriman</h3>
+                </div>
+                <button type="button" @click="openAddressModal = false; isAddingAddress = false;" class="text-gray-400 hover:text-gray-700 text-lg leading-none cursor-pointer">&times;</button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="overflow-y-auto space-y-3 flex-1 pr-1 [-ms-overflow-style:none] [scrollbar-width:thin]">
+                
+                @auth
+                <!-- View 1: Address List -->
+                <template x-if="!isAddingAddress">
+                    <div class="space-y-3">
+                        <template x-if="addresses.length === 0">
+                            <div class="text-center py-8 space-y-3">
+                                <div class="w-12 h-12 rounded-full bg-stone-100 text-gray-400 flex items-center justify-center mx-auto text-xl">
+                                    📍
+                                </div>
+                                <p class="text-xs text-gray-500">Belum ada alamat tersimpan di akun Anda.</p>
+                                <button type="button" 
+                                        @click="isAddingAddress = true"
+                                        class="px-4 py-2 bg-[#650506] hover:bg-[#4A070B] text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer">
+                                    + Tambah Alamat Sekarang
+                                </button>
+                            </div>
+                        </template>
+
+                        <template x-for="addr in addresses" :key="addr.id">
+                            <div class="border rounded-xl p-3.5 sm:p-4 transition cursor-pointer relative"
+                                 :class="selectedAddressId === addr.id ? 'border-[#650506] bg-[#650506]/[0.02] ring-1 ring-[#650506]/20' : 'border-gray-200 hover:border-gray-300'"
+                                 @click="selectAddress(addr)">
+                                <div class="flex items-start justify-between gap-2 mb-1.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-xs sm:text-sm text-gray-900" x-text="addr.label || 'Alamat'"></span>
+                                        <template x-if="addr.is_primary">
+                                            <span class="px-1.5 py-0.5 text-[9px] font-bold bg-blue-100 text-blue-700 rounded-sm">
+                                                Utama
+                                            </span>
+                                        </template>
+                                    </div>
+                                    <div class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0"
+                                         :class="selectedAddressId === addr.id ? 'border-[#650506] bg-[#650506] text-white' : 'border-gray-300'">
+                                        <svg x-show="selectedAddressId === addr.id" class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    </div>
+                                </div>
+
+                                <p class="text-xs font-semibold text-gray-800" x-text="addr.recipient_name + ' (' + addr.phone_number + ')'"></p>
+                                <p class="text-xs text-gray-600 mt-1 leading-relaxed" x-text="addr.full_address + ', ' + addr.city + (addr.postal_code ? ' ' + addr.postal_code : '')"></p>
+
+                                <div class="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between text-xs">
+                                    <span class="text-[11px] text-[#650506] font-semibold" x-show="selectedAddressId === addr.id">✓ Sedang Dipilih</span>
+                                    <button type="button" 
+                                            x-show="!addr.is_primary"
+                                            @click.stop="setPrimary(addr)"
+                                            class="text-[11px] text-gray-500 hover:text-black font-medium underline cursor-pointer">
+                                        Jadikan Alamat Utama
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Add Address Button when addresses exist -->
+                        <div class="pt-2" x-show="addresses.length > 0">
+                            <button type="button" 
+                                    @click="isAddingAddress = true"
+                                    class="w-full py-2.5 border-2 border-dashed border-gray-300 hover:border-[#650506] hover:bg-stone-50 text-xs font-semibold text-gray-700 hover:text-[#650506] rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer">
+                                <span>+ Tambah Alamat Baru</span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- View 2: Add Address Form -->
+                <template x-if="isAddingAddress">
+                    <form @submit.prevent="saveNewAddress()" class="space-y-3 text-xs">
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-700 mb-1">Label Alamat</label>
+                                <input type="text" x-model="newAddress.label" placeholder="Rumah / Kantor / Kos" required
+                                       class="w-full bg-stone-50 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#650506] focus:bg-white transition">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-700 mb-1">Nama Penerima</label>
+                                <input type="text" x-model="newAddress.recipient_name" placeholder="Nama Lengkap" required
+                                       class="w-full bg-stone-50 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#650506] focus:bg-white transition">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-700 mb-1">Nomor Telepon</label>
+                                <input type="tel" x-model="newAddress.phone_number" placeholder="08xxxxxxxxxx" required
+                                       class="w-full bg-stone-50 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#650506] focus:bg-white transition">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-700 mb-1">Kota / Kabupaten</label>
+                                <input type="text" x-model="newAddress.city" placeholder="Contoh: Jakarta Selatan" required
+                                       class="w-full bg-stone-50 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#650506] focus:bg-white transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-700 mb-1">Kode Pos (Opsional)</label>
+                            <input type="text" x-model="newAddress.postal_code" placeholder="12345"
+                                   class="w-full bg-stone-50 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#650506] focus:bg-white transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-700 mb-1">Alamat Lengkap</label>
+                            <textarea x-model="newAddress.full_address" rows="2" placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan" required
+                                      class="w-full bg-stone-50 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-900 focus:outline-none focus:border-[#650506] focus:bg-white transition"></textarea>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" id="cart-addr-primary" x-model="newAddress.is_primary" class="rounded border-gray-300 text-[#650506] focus:ring-[#650506] cursor-pointer">
+                            <label for="cart-addr-primary" class="text-xs text-gray-700 cursor-pointer font-medium">Jadikan sebagai alamat utama</label>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2">
+                            <button type="button" @click="isAddingAddress = false" class="flex-1 py-2 px-3 border border-gray-300 text-gray-700 rounded-lg text-xs font-semibold hover:bg-stone-50 transition cursor-pointer">
+                                Kembali
+                            </button>
+                            <button type="submit" :disabled="savingAddress" class="flex-1 py-2 px-3 bg-[#650506] hover:bg-[#4A070B] text-white rounded-lg text-xs font-semibold shadow-2xs transition flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50">
+                                <span x-show="savingAddress">Menyimpan...</span>
+                                <span x-show="!savingAddress">Simpan Alamat</span>
+                            </button>
+                        </div>
+                    </form>
+                </template>
+                @else
+                <!-- Guest State -->
+                <div class="text-center py-8 space-y-3">
+                    <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-xl">
+                        🔒
+                    </div>
+                    <h4 class="font-bold text-sm text-gray-900">Masuk untuk Mengatur Alamat</h4>
+                    <p class="text-xs text-gray-500 max-w-xs mx-auto">Silakan masuk ke akun Aroma Palace Anda untuk memilih alamat pengiriman yang tersimpan.</p>
+                    <div class="pt-2">
+                        <a href="{{ route('login') }}" class="px-5 py-2.5 bg-[#650506] hover:bg-[#4A070B] text-white text-xs font-semibold rounded-lg shadow-2xs transition inline-block">
+                            Masuk ke Akun &rarr;
+                        </a>
+                    </div>
+                </div>
+                @endauth
+
+            </div>
+        </div>
     </div>
 
     <!-- Custom Delete Confirmation Modal -->
@@ -97,7 +307,7 @@
     <template x-if="items.length > 0">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-start">
             <!-- Items List (2 Cols) -->
-            <div class="lg:col-span-2 bg-white rounded-xl p-3.5 sm:p-6 lg:p-7 border border-gray-200 shadow-2xs space-y-4 sm:space-y-6">
+            <div class="lg:col-span-2 bg-white rounded-lg p-3.5 sm:p-6 lg:p-7 border border-gray-200 space-y-4 sm:space-y-6">
                 <div class="divide-y divide-gray-100">
                     <template x-for="item in items" :key="item.id">
                         <div class="py-3.5 sm:py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition duration-300"
@@ -121,9 +331,9 @@
                                     </h4>
                                     <template x-if="item.variant_name">
                                         <span class="text-[10px] sm:text-[11px] text-gray-700 bg-gray-100 border border-gray-200 px-1.5 sm:px-2 py-0.5 rounded-md font-medium inline-block mt-0.5"
-                                              x-text="'Variant: ' + item.variant_name"></span>
+                                              x-text="'Varian: ' + item.variant_name"></span>
                                     </template>
-                                    <span class="text-[11px] sm:text-xs text-gray-500 block mt-0.5 sm:mt-1 font-mono" x-text="$money(item.unit_price) + ' / item'"></span>
+                                    <span class="text-[11px] sm:text-xs text-gray-500 block mt-0.5 sm:mt-1 font-mono" x-text="$money(item.unit_price) + ' / pcs'"></span>
                                 </div>
 
                                 <!-- X Delete Button (Mobile: Far Right of Header) -->
@@ -141,7 +351,7 @@
                             <!-- Stepper & Subtotal -->
                             <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-5 pt-2 sm:pt-0 border-t border-gray-100/60 sm:border-0 shrink-0">
                                 <!-- Interactive Quantity Stepper -->
-                                <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white shadow-2xs">
+                                <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
                                     <button type="button"
                                             @click="updateQuantity(item.id, item.quantity - 1)"
                                             :disabled="item.quantity <= 1 || loading"
@@ -179,93 +389,78 @@
 
                 <!-- Mobile Cross-Navigation (lg:hidden) -->
                 <div class="lg:hidden pt-3 border-t border-gray-100 flex items-center justify-between text-xs px-1 text-gray-500">
-                    <a href="{{ route('products.index') }}" class="font-medium hover:text-black transition">
-                        &larr; Continue Shopping
+                    <a href="{{ route('products.index') }}" class="group font-medium hover:text-black transition-colors inline-flex items-center gap-1.5 select-none">
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        <span>Lanjut Belanja</span>
                     </a>
-                    <a href="{{ route('wishlist.index') }}" class="font-semibold text-[#650506] hover:text-[#4A070B] transition flex items-center gap-1">
-                        <span>View Wishlist</span>
-                        <span>&rarr;</span>
+                    <a href="{{ route('wishlist.index') }}" class="group font-semibold text-[#650506] hover:text-[#4A070B] transition-colors inline-flex items-center gap-1 select-none">
+                        <span>Lihat Wishlist</span>
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
                     </a>
                 </div>
             </div>
 
             <!-- Order Summary Card (Desktop Only: lg:block) -->
-            <div class="hidden lg:block bg-white rounded-xl p-6 lg:p-7 border border-gray-200 shadow-2xs space-y-5 h-fit lg:sticky lg:top-28">
-                <h3 class="text-base sm:text-lg font-bold text-gray-900 border-b border-gray-100 pb-2.5 sm:pb-3">Order Summary</h3>
+            <div class="hidden lg:block bg-white rounded-lg p-4 sm:p-6 border border-gray-200 space-y-4 h-fit lg:sticky lg:top-28">
+                <h3 class="text-sm font-bold text-gray-900">Ringkasan Belanja</h3>
 
-                <div class="space-y-2.5 sm:space-y-3 text-xs text-gray-600">
-                    <div class="flex justify-between items-center">
-                        <span>Subtotal (<span x-text="items.length"></span> items)</span>
-                        <span class="font-bold text-gray-900 text-xs sm:text-sm font-mono" x-text="$money(subtotal)"></span>
+                <!-- Total -->
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-semibold text-gray-500">Total Belanja</span>
+                        <template x-if="discountAmount > 0">
+                            <span class="text-[10px] text-emerald-600 font-semibold block" x-text="'Hemat ' + $money(discountAmount)"></span>
+                        </template>
                     </div>
-
-                    <template x-if="discountAmount > 0">
-                        <div class="flex justify-between items-center text-emerald-700 font-semibold">
-                            <span>Discount</span>
-                            <span class="font-mono text-xs sm:text-sm" x-text="'- ' + $money(discountAmount)"></span>
-                        </div>
-                    </template>
-
-                    <div class="border-t border-gray-200 pt-3 flex justify-between items-baseline">
-                        <div>
-                            <span class="text-xs sm:text-sm font-bold text-gray-900 block">Total</span>
-                            <span class="text-[10px] sm:text-[11px] text-gray-400">Shipping calculated at checkout</span>
-                        </div>
-                        <span class="text-xl sm:text-2xl font-extrabold text-[#650506]" x-text="$money(totalAmount)"></span>
-                    </div>
+                    <span class="text-xl font-extrabold text-[#650506] font-mono" x-text="$money(totalAmount)"></span>
                 </div>
 
-                <!-- Promo Code -->
+                <!-- Promo Code Input -->
                 <div class="space-y-2">
-                    <div class="flex items-center gap-2">
-                        <input type="text"
-                               x-model="promoInput"
-                               @keydown.enter.prevent="applyPromo()"
-                               placeholder="Enter promo code"
-                               class="uppercase font-mono bg-gray-50 border border-gray-300 rounded-lg px-2.5 sm:px-3 py-2 text-xs tracking-wider flex-1 focus:outline-none focus:border-[#650506] focus:bg-white">
-                        <button type="button"
-                                @click="applyPromo()"
-                                :disabled="promoLoading || !promoInput.trim()"
-                                class="bg-[#650506] hover:bg-[#4A070B] text-white font-medium text-xs px-3 sm:px-4 py-2 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer shrink-0">
-                            <span x-show="promoLoading" class="animate-spin text-xs">⏳</span>
-                            <span>Apply</span>
-                        </button>
-                    </div>
-
-                    <!-- Active Promo Banner -->
+                    <template x-if="!appliedPromo">
+                        <div class="flex items-center gap-2">
+                            <input type="text"
+                                   x-model="promoInput"
+                                   @keydown.enter.prevent="applyPromo()"
+                                   placeholder="Kode promo"
+                                   class="uppercase font-mono bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs tracking-wider flex-1 focus:outline-none focus:border-[#650506] focus:bg-white">
+                            <button type="button"
+                                    @click="applyPromo()"
+                                    :disabled="promoLoading || !promoInput.trim()"
+                                    class="bg-[#650506] hover:bg-[#4A070B] text-white font-medium text-xs px-3 py-2 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer shrink-0">
+                                <span x-show="promoLoading" class="animate-spin text-xs">⏳</span>
+                                <span>Pakai</span>
+                            </button>
+                        </div>
+                    </template>
                     <template x-if="appliedPromo">
-                        <div class="p-2.5 sm:p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs flex items-center justify-between">
-                            <div class="flex items-center gap-1.5 sm:gap-2 text-emerald-800">
+                        <div class="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs">
+                            <div class="flex items-center gap-2 text-emerald-800">
                                 <span>🏷️</span>
-                                <span class="font-bold uppercase font-mono tracking-wider text-[11px] sm:text-xs" x-text="appliedPromo.code"></span>
+                                <span class="font-bold uppercase font-mono tracking-wider" x-text="appliedPromo.code"></span>
+                                <span class="font-mono text-emerald-700" x-text="'- ' + $money(discountAmount)"></span>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold font-mono text-emerald-700 text-xs sm:text-sm" x-text="'- ' + $money(discountAmount)"></span>
-                                <button type="button" @click="removePromo()" :disabled="promoLoading"
-                                        class="text-emerald-600 hover:text-rose-600 transition cursor-pointer">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
+                            <button type="button" @click="removePromo()" :disabled="promoLoading"
+                                    class="text-emerald-500 hover:text-rose-500 transition cursor-pointer ml-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
                         </div>
                     </template>
                 </div>
 
+                <!-- CTA -->
                 <a href="{{ route('checkout.index') }}"
-                   class="w-full bg-[#650506] hover:bg-[#4A070B] text-white font-medium py-3 sm:py-3.5 px-4 sm:px-6 rounded-lg shadow-sm transition flex items-center justify-center gap-2 text-xs sm:text-sm">
-                    <span>Proceed to Checkout</span>
-                    <span>&rarr;</span>
+                   class="w-full bg-[#650506] hover:bg-[#4A070B] text-white font-medium py-3 px-4 rounded-lg transition flex items-center justify-center text-xs sm:text-sm">
+                    Beli
                 </a>
 
-                <div class="pt-2.5 sm:pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
-                    <a href="{{ route('products.index') }}" class="font-semibold text-gray-500 hover:text-black transition">
-                        &larr; Continue Shopping
-                    </a>
-                    <a href="{{ route('wishlist.index') }}" class="font-semibold text-[#650506] hover:text-[#4A070B] transition flex items-center gap-1">
-                        <span>View Wishlist</span>
-                        <span>&rarr;</span>
-                    </a>
+                <div class="flex items-center justify-between text-xs text-gray-400 pt-0.5">
+                    <a href="{{ route('products.index') }}" class="hover:text-gray-700 transition">← Lanjut Belanja</a>
+                    <a href="{{ route('wishlist.index') }}" class="hover:text-[#650506] transition text-[#650506]">Wishlist →</a>
                 </div>
             </div>
         </div>
@@ -289,14 +484,14 @@
                         <input type="text"
                                x-model="promoInput"
                                @keydown.enter.prevent="applyPromo()"
-                               placeholder="Enter promo code"
+                               placeholder="Masukkan kode promo"
                                class="uppercase font-mono bg-transparent text-xs tracking-wider flex-1 py-1 px-1 focus:outline-none placeholder:text-gray-400">
                         <button type="button"
                                 @click="applyPromo()"
                                 :disabled="promoLoading || !promoInput.trim()"
                                 class="bg-[#650506] hover:bg-[#4A070B] text-white font-medium text-xs px-3 py-1.5 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 cursor-pointer shrink-0">
                             <span x-show="promoLoading" class="animate-spin text-[10px]">⏳</span>
-                            <span>Apply</span>
+                            <span>Gunakan</span>
                         </button>
                     </div>
                 </template>
@@ -307,12 +502,12 @@
                         <div class="flex items-center gap-1.5 text-emerald-800 min-w-0">
                             <span class="text-xs">🏷️</span>
                             <span class="font-bold uppercase font-mono tracking-wider text-[11px] truncate" x-text="appliedPromo.code"></span>
-                            <span class="text-[10px] text-emerald-600 font-semibold">(Applied)</span>
+                            <span class="text-[10px] text-emerald-600 font-semibold">(Digunakan)</span>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
                             <span class="font-bold font-mono text-emerald-700 text-xs" x-text="'- ' + $money(discountAmount)"></span>
                             <button type="button" @click="removePromo()" :disabled="promoLoading"
-                                    title="Remove promo code"
+                                    title="Hapus kode promo"
                                     class="text-emerald-600 hover:text-rose-600 transition cursor-pointer p-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
@@ -334,24 +529,24 @@
                  class="bg-gray-50/90 rounded-xl p-3 border border-gray-200/90 space-y-2">
                 
                 <div class="flex items-center justify-between border-b border-gray-200/60 pb-1.5">
-                    <span class="text-[11px] font-bold text-gray-800 uppercase tracking-wider">Order Breakdown</span>
+                    <span class="text-[11px] font-bold text-gray-800 uppercase tracking-wider">Ringkasan Pesanan</span>
                     <button type="button" @click="showBreakdown = false" class="text-gray-400 hover:text-gray-700 text-xs font-semibold p-0.5">Tutup</button>
                 </div>
 
                 <div class="space-y-1.5 text-xs text-gray-600">
                     <div class="flex justify-between items-center">
-                        <span>Subtotal (<span x-text="items.length"></span> items)</span>
+                        <span>Subtotal (<span x-text="items.length"></span> produk)</span>
                         <span class="font-bold text-gray-900 font-mono" x-text="$money(subtotal)"></span>
                     </div>
                     <template x-if="discountAmount > 0">
                         <div class="flex justify-between items-center text-emerald-700 font-semibold">
-                            <span>Discount</span>
+                            <span>Diskon Promo</span>
                             <span class="font-mono text-xs" x-text="'- ' + $money(discountAmount)"></span>
                         </div>
                     </template>
                     <div class="flex justify-between items-center text-gray-400 text-[11px]">
-                        <span>Shipping</span>
-                        <span>Calculated at checkout</span>
+                        <span>Ongkos Kirim</span>
+                        <span>Dihitung saat pengiriman</span>
                     </div>
                 </div>
             </div>
@@ -363,7 +558,7 @@
                     <button type="button"
                             @click="showBreakdown = !showBreakdown"
                             class="flex items-center gap-1 text-[10px] text-gray-500 hover:text-[#650506] font-medium leading-none text-left cursor-pointer">
-                        <span>Total Amount</span>
+                        <span>Total Pesanan</span>
                         <svg class="w-3 h-3 text-gray-400 transition-transform duration-200"
                              :class="{ 'rotate-180': showBreakdown }"
                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -371,7 +566,7 @@
                         </svg>
                         <template x-if="discountAmount > 0">
                             <span class="text-[9px] text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded font-semibold font-mono"
-                                  x-text="'Saved ' + $money(discountAmount)"></span>
+                                  x-text="'Hemat ' + $money(discountAmount)"></span>
                         </template>
                     </button>
                     <span class="text-base sm:text-lg font-extrabold text-[#650506] font-mono leading-tight mt-0.5 truncate"
@@ -380,8 +575,8 @@
 
                 <!-- Right: Proceed to Checkout Button -->
                 <a href="{{ route('checkout.index') }}"
-                   class="bg-[#650506] hover:bg-[#4A070B] active:scale-95 text-white font-semibold py-2.5 px-4 sm:px-6 rounded-lg shadow-sm transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
-                    <span>Proceed to Checkout</span>
+                   class="bg-[#650506] hover:bg-[#4A070B] active:scale-95 text-white font-semibold py-2.5 px-4 sm:px-6 rounded-lg transition flex items-center justify-center gap-1.5 text-xs sm:text-sm shrink-0">
+                    <span>Lanjut ke Pengiriman</span>
                     <span class="text-[11px] opacity-80" x-text="'(' + items.length + ')'"></span>
                     <span>&rarr;</span>
                 </a>
@@ -398,14 +593,14 @@
         <div class="w-14 h-14 sm:w-16 sm:h-16 bg-[#F4F2EE] text-[#650506] rounded-full flex items-center justify-center mx-auto">
             <svg class="w-7 h-7 sm:w-8 sm:h-8 text-[#650506]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
         </div>
-        <h3 class="text-lg sm:text-xl font-bold text-gray-900">Your bag is empty</h3>
+        <h3 class="text-lg sm:text-xl font-bold text-gray-900">Keranjang belanja kosong</h3>
         <p class="text-[11px] sm:text-xs text-gray-500 max-w-sm mx-auto leading-relaxed px-4">
-            Looks like you haven't added anything to your cart yet. Explore our curated collections.
+            Sepertinya Anda belum menambahkan produk ke keranjang. Jelajahi berbagai koleksi aroma terbaik kami.
         </p>
         <div class="pt-2 sm:pt-3">
             <a href="{{ route('products.index') }}"
-               class="bg-[#650506] hover:bg-[#4A070B] text-white font-semibold text-xs px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-sm transition inline-block">
-                Start Shopping &rarr;
+               class="bg-[#650506] hover:bg-[#4A070B] text-white font-semibold text-xs px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg transition inline-block">
+                Mulai Belanja &rarr;
             </a>
         </div>
     </div>
@@ -413,7 +608,7 @@
 
 <!-- Alpine.js Cart Logic Component -->
 <script>
-function cartApp(initialSummary) {
+function cartApp(initialSummary, initialAddresses = []) {
     return {
         items: initialSummary?.items || [],
         subtotal: initialSummary?.subtotal || 0,
@@ -425,6 +620,106 @@ function cartApp(initialSummary) {
         loading: false,
         updatingId: null,
         promoLoading: false,
+
+        // Address Management
+        addresses: initialAddresses || [],
+        selectedAddressId: (initialAddresses && initialAddresses.length > 0) 
+            ? (initialAddresses.find(a => a.is_primary)?.id || initialAddresses[0].id) 
+            : null,
+        openAddressModal: false,
+        isAddingAddress: false,
+        savingAddress: false,
+        settingPrimary: false,
+        newAddress: {
+            label: 'Rumah',
+            recipient_name: '{{ auth()->user()?->name ?? "" }}',
+            phone_number: '{{ auth()->user()?->phone_number ?? "" }}',
+            city: '',
+            postal_code: '',
+            full_address: '',
+            is_primary: true,
+        },
+
+        get activeAddress() {
+            if (!this.addresses || this.addresses.length === 0) return null;
+            return this.addresses.find(a => a.id == this.selectedAddressId) || this.addresses[0];
+        },
+
+        selectAddress(addr) {
+            this.selectedAddressId = addr.id;
+            this.openAddressModal = false;
+            this.showToast('Alamat pengiriman: ' + (addr.label || addr.city), 'success');
+        },
+
+        async setPrimary(addr) {
+            this.settingPrimary = true;
+            try {
+                const res = await fetch(`/account/addresses/${addr.id}/primary`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken(),
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.addresses.forEach(a => a.is_primary = (a.id === addr.id));
+                    this.selectedAddressId = addr.id;
+                    this.showToast('Alamat utama berhasil diperbarui', 'success');
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.settingPrimary = false;
+            }
+        },
+
+        async saveNewAddress() {
+            if (!this.newAddress.recipient_name || !this.newAddress.phone_number || !this.newAddress.full_address || !this.newAddress.city) {
+                alert('Mohon lengkapi nama penerima, nomor HP, kota, dan alamat lengkap.');
+                return;
+            }
+            this.savingAddress = true;
+            try {
+                const res = await fetch('/account/addresses', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken(),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(this.newAddress)
+                });
+                const data = await res.json();
+                if (data.success && data.data) {
+                    if (this.newAddress.is_primary) {
+                        this.addresses.forEach(a => a.is_primary = false);
+                    }
+                    this.addresses.unshift(data.data);
+                    this.selectedAddressId = data.data.id;
+                    this.isAddingAddress = false;
+                    this.openAddressModal = false;
+                    this.showToast('Alamat baru berhasil ditambahkan', 'success');
+                    this.newAddress = {
+                        label: 'Rumah',
+                        recipient_name: '{{ auth()->user()?->name ?? "" }}',
+                        phone_number: '{{ auth()->user()?->phone_number ?? "" }}',
+                        city: '',
+                        postal_code: '',
+                        full_address: '',
+                        is_primary: false,
+                    };
+                } else {
+                    alert(data.message || 'Gagal menyimpan alamat.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Terjadi kesalahan saat menyimpan alamat.');
+            } finally {
+                this.savingAddress = false;
+            }
+        },
         toast: {
             show: false,
             message: '',
@@ -507,12 +802,12 @@ function cartApp(initialSummary) {
                 const json = await res.json();
                 if (json.success) {
                     this.syncSummary(json.data);
-                    this.showToast(json.message || 'Cart updated', 'success');
+                    this.showToast(json.message || 'Keranjang berhasil diperbarui', 'success');
                 } else {
-                    this.showToast(json.message || 'Failed to update quantity', 'error');
+                    this.showToast(json.message || 'Gagal memperbarui jumlah produk', 'error');
                 }
             } catch (err) {
-                this.showToast('Network error', 'error');
+                this.showToast('Terjadi kesalahan jaringan', 'error');
             } finally {
                 this.loading = false;
                 this.updatingId = null;
@@ -584,12 +879,12 @@ function cartApp(initialSummary) {
                     if (delJson.success) {
                         this.syncSummary(delJson.data);
                     }
-                    this.showToast('Item saved to your Wishlist', 'success');
+                    this.showToast('Produk berhasil disimpan ke Wishlist', 'success');
                 } else {
-                    this.showToast(json.message || 'Failed to save to Wishlist', 'error');
+                    this.showToast(json.message || 'Gagal menyimpan ke Wishlist', 'error');
                 }
             } catch (err) {
-                this.showToast('Network error', 'error');
+                this.showToast('Terjadi kesalahan jaringan', 'error');
             } finally {
                 this.loading = false;
                 this.updatingId = null;
@@ -614,12 +909,12 @@ function cartApp(initialSummary) {
                 const json = await res.json();
                 if (json.success) {
                     this.syncSummary(json.data);
-                    this.showToast(json.message || 'Promo code applied!', 'success');
+                    this.showToast(json.message || 'Kode promo berhasil digunakan!', 'success');
                 } else {
-                    this.showToast(json.message || 'Invalid promo code', 'error');
+                    this.showToast(json.message || 'Kode promo tidak valid', 'error');
                 }
             } catch (err) {
-                this.showToast('Failed to apply promo code', 'error');
+                this.showToast('Gagal menggunakan kode promo', 'error');
             } finally {
                 this.promoLoading = false;
             }
@@ -642,12 +937,12 @@ function cartApp(initialSummary) {
                 if (json.success) {
                     this.syncSummary(json.data);
                     this.promoInput = '';
-                    this.showToast(json.message || 'Promo code removed', 'success');
+                    this.showToast(json.message || 'Kode promo berhasil dihapus', 'success');
                 } else {
-                    this.showToast(json.message || 'Failed to remove promo code', 'error');
+                    this.showToast(json.message || 'Gagal menghapus kode promo', 'error');
                 }
             } catch (err) {
-                this.showToast('Error processing request', 'error');
+                this.showToast('Terjadi kesalahan saat memproses permintaan', 'error');
             } finally {
                 this.promoLoading = false;
             }

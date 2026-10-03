@@ -36,14 +36,15 @@ return [
     ],
 
     'pakasir' => [
-        'base_url' => env('PAKASIR_BASE_URL', 'https://api.pakasir.com'),
-        'project' => env('PAKASIR_PROJECT', 'aromapalace'),
+        'base_url' => env('PAKASIR_BASE_URL', 'https://app.pakasir.com'),
+        'project' => env('PAKASIR_PROJECT', 'aromapalace-id'),
         'api_key' => env('PAKASIR_API_KEY', 'demo_pakasir_key'),
+        'webhook_secret' => env('PAKASIR_WEBHOOK_SECRET', ''),
     ],
 
     'kiriminaja' => [
         'mode' => env('KIRIMINAJA_MODE', 'staging'),
-        'base_url' => env('KIRIMINAJA_BASE_URL', 'https://tdev.kiriminaja.com/api/v3'),
+        'base_url' => env('KIRIMINAJA_BASE_URL', 'https://tdev.kiriminaja.com/api/mitra'),
         'api_key' => env('KIRIMINAJA_API_KEY', 'demo_kiriminaja_key'),
         'sender_name' => env('KIRIMINAJA_SENDER_NAME', 'Aroma Palace Haute Parfumerie'),
         'sender_phone' => env('KIRIMINAJA_SENDER_PHONE', '081100001111'),

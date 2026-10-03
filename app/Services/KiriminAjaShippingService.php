@@ -34,17 +34,29 @@ class KiriminAjaShippingService
         // Jika mode live dengan API key asli, panggil KiriminAja API
         if ($this->apiKey !== 'demo_kiriminaja_key' && !app()->environment('testing')) {
             try {
-                $response = Http::timeout(10)
+                $payload = [
+                    'origin' => $this->senderCityId,
+                    'destination' => $this->resolveCityId($destinationCity),
+                    'weight' => max(100, $weightInGrams),
+                    'courier' => ['jne', 'jnt', 'sicepat', 'anteraja', 'ninja'],
+                ];
+
+                $base = rtrim($this->baseUrl, '/');
+                $response = Http::timeout(8)
                     ->withHeaders([
                         'Authorization' => 'Bearer ' . $this->apiKey,
                         'Accept' => 'application/json',
                     ])
-                    ->post("{$this->baseUrl}/shipping_cost", [
-                        'origin' => $this->senderCityId,
-                        'destination' => $this->resolveCityId($destinationCity),
-                        'weight' => max(100, $weightInGrams),
-                        'courier' => ['jne', 'jnt', 'sicepat', 'anteraja', 'ninja'],
-                    ]);
+                    ->post("{$base}/v6.1/shipping_price", $payload);
+
+                if (!$response->successful() || !$response->json('status')) {
+                    $response = Http::timeout(8)
+                        ->withHeaders([
+                            'Authorization' => 'Bearer ' . $this->apiKey,
+                            'Accept' => 'application/json',
+                        ])
+                        ->post("{$base}/shipping_price", $payload);
+                }
 
                 if ($response->successful() && $response->json('status')) {
                     $results = [];
@@ -81,25 +93,37 @@ class KiriminAjaShippingService
         // Jika mode live dengan API key asli
         if ($this->apiKey !== 'demo_kiriminaja_key' && !app()->environment('testing')) {
             try {
-                $response = Http::timeout(10)
+                $payload = [
+                    'order_id' => $order->order_number,
+                    'courier' => strtolower($courier),
+                    'service' => strtolower($service),
+                    'sender_name' => $this->senderName,
+                    'sender_phone' => $this->senderPhone,
+                    'recipient_name' => $order->address->recipient_name ?? $order->user->name,
+                    'recipient_phone' => $order->address->phone_number ?? '08123456789',
+                    'destination_address' => $order->address->full_address ?? 'Alamat Pemesan',
+                    'destination_city' => $order->address->city ?? 'Jakarta',
+                    'destination_postal_code' => $order->address->postal_code ?? '10110',
+                    'item_description' => 'Parfum Eksklusif Aroma Palace (Haute Fragrance)',
+                    'total_amount' => (int) $order->total_amount,
+                ];
+
+                $base = rtrim($this->baseUrl, '/');
+                $response = Http::timeout(8)
                     ->withHeaders([
                         'Authorization' => 'Bearer ' . $this->apiKey,
                         'Accept' => 'application/json',
                     ])
-                    ->post("{$this->baseUrl}/request_pickup", [
-                        'order_id' => $order->order_number,
-                        'courier' => strtolower($courier),
-                        'service' => strtolower($service),
-                        'sender_name' => $this->senderName,
-                        'sender_phone' => $this->senderPhone,
-                        'recipient_name' => $order->address->recipient_name ?? $order->user->name,
-                        'recipient_phone' => $order->address->phone_number ?? '08123456789',
-                        'destination_address' => $order->address->full_address ?? 'Alamat Pemesan',
-                        'destination_city' => $order->address->city ?? 'Jakarta',
-                        'destination_postal_code' => $order->address->postal_code ?? '10110',
-                        'item_description' => 'Parfum Eksklusif Aroma Palace (Haute Fragrance)',
-                        'total_amount' => (int) $order->total_amount,
-                    ]);
+                    ->post("{$base}/v6.2/request_pickup", $payload);
+
+                if (!$response->successful() || !$response->json('status')) {
+                    $response = Http::timeout(8)
+                        ->withHeaders([
+                            'Authorization' => 'Bearer ' . $this->apiKey,
+                            'Accept' => 'application/json',
+                        ])
+                        ->post("{$base}/request_pickup", $payload);
+                }
 
                 if ($response->successful() && $response->json('status')) {
                     $data = $response->json('data');

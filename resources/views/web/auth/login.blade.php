@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Sign In - Aroma Palace')
+@section('title', 'Masuk - Aroma Palace')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center">
@@ -19,8 +19,8 @@
                         <rect x="5.63" y="16.24" width="7" height="2.5" rx="1.25" transform="rotate(-45 9.13 17.49)"/>
                     </svg>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Welcome Back</h1>
-                <p class="text-xs text-gray-500 mt-1">Sign in to your account to continue</p>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Selamat Datang Kembali</h1>
+                <p class="text-xs text-gray-500 mt-1">Masuk ke akun Anda untuk melanjutkan belanja</p>
             </div>
 
             @if($errors->any())
@@ -46,17 +46,17 @@
                 <div class="flex items-center justify-between text-xs">
                     <label class="flex items-center gap-2 cursor-pointer text-gray-600">
                         <input type="checkbox" name="remember" class="rounded border-gray-300 text-[#650506] focus:ring-[#650506]">
-                        <span>Remember me</span>
+                        <span>Ingat Saya</span>
                     </label>
                 </div>
 
                 <button type="submit" class="w-full bg-[#650506] hover:bg-[#4A070B] text-white font-medium py-3.5 px-4 rounded-lg shadow-sm transition">
-                    Sign In
+                    Masuk ke Akun
                 </button>
             </form>
 
             <div class="mt-6 pt-6 border-t border-gray-100 text-center text-xs text-gray-500">
-                Don't have an account? <a href="{{ route('register') }}" class="font-bold text-[#650506] hover:underline">Create one</a>
+                Belum punya akun? <a href="{{ route('register') }}" class="font-bold text-[#650506] hover:underline">Daftar sekarang</a>
             </div>
         </div>
     </div>

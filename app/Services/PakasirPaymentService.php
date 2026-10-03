@@ -14,13 +14,15 @@ class PakasirPaymentService
     protected string $baseUrl;
     protected string $project;
     protected string $apiKey;
+    protected string $webhookSecret;
 
     public function __construct(
         protected PaymentService $paymentService
     ) {
-        $this->baseUrl = config('services.pakasir.base_url', 'https://api.pakasir.com');
-        $this->project = config('services.pakasir.project', 'aromapalace');
+        $this->baseUrl = config('services.pakasir.base_url', 'https://app.pakasir.com');
+        $this->project = config('services.pakasir.project', 'aromapalace-id');
         $this->apiKey = config('services.pakasir.api_key', 'demo_pakasir_key');
+        $this->webhookSecret = config('services.pakasir.webhook_secret', '');
     }
 
     /**
@@ -31,23 +33,19 @@ class PakasirPaymentService
         $amount = (int) round($order->total_amount);
         $orderNumber = $order->order_number;
 
-        // Jika mode live dengan API key asli, panggil HTTP API Pakasir
+        // Jika mode live dengan API key asli, panggil HTTP API Pakasir v2
         if ($this->apiKey !== 'demo_pakasir_key' && !app()->environment('testing')) {
             try {
+                $endpoint = rtrim($this->baseUrl, '/') . "/api/v2/create-transaction/{$this->project}/{$orderNumber}";
                 $response = Http::timeout(10)
                     ->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->apiKey,
+                        'X-Api-Key' => $this->apiKey,
                         'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
                     ])
-                    ->post("{$this->baseUrl}/v1/transaction/create", [
-                        'project' => $this->project,
-                        'order_id' => $orderNumber,
+                    ->post($endpoint, [
+                        'method' => $paymentMethod,
                         'amount' => $amount,
-                        'payment_method' => $paymentMethod,
-                        'customer_name' => $order->user->name ?? 'Pelanggan Aroma Palace',
-                        'customer_email' => $order->user->email ?? 'customer@aromapalace.com',
-                        'customer_phone' => $order->address->phone_number ?? ($order->user->phone ?? '08123456789'),
-                        'description' => "Pembayaran Pesanan Aroma Palace #{$orderNumber}",
                     ]);
 
                 if ($response->successful()) {
@@ -71,10 +69,10 @@ class PakasirPaymentService
      */
     protected function savePaymentRecord(Order $order, string $paymentMethod, int $amount, array $data): array
     {
-        $transactionId = $data['transaction_id'] ?? ('PKS-' . strtoupper(Str::random(12)));
+        $transactionId = $data['txn_id'] ?? ($data['transaction_id'] ?? ('PKS-' . strtoupper(Str::random(12))));
         $vaNumber = $data['va_number'] ?? null;
         $qrString = $data['qr_string'] ?? null;
-        $paymentUrl = $data['payment_url'] ?? null;
+        $paymentUrl = $data['payment_url'] ?? "https://app.pakasir.com/pay/{$transactionId}";
 
         Payment::updateOrCreate(
             ['order_id' => $order->id],
@@ -141,7 +139,7 @@ class PakasirPaymentService
     /**
      * Verifikasi integritas payload Webhook dari Pakasir
      */
-    public function verifyWebhook(array $payload, ?string $signature = null): bool
+    public function verifyWebhook(array $payload, ?string $signature = null, ?string $secret = null): bool
     {
         // Dalam mode demo / testing, izinkan lolos
         if ($this->apiKey === 'demo_pakasir_key' || app()->environment('testing')) {
@@ -153,10 +151,20 @@ class PakasirPaymentService
             return false;
         }
 
+        // Verifikasi X-Secret dari Pakasir Dashboard
+        if (!empty($this->webhookSecret) && !empty($secret)) {
+            return hash_equals($this->webhookSecret, $secret);
+        }
+
         // Validasi HMAC signature jika disertakan
         if ($signature) {
             $expected = hash_hmac('sha256', json_encode($payload), $this->apiKey);
             return hash_equals($expected, $signature);
+        }
+
+        // Jika webhookSecret dikonfigurasi tetapi secret kosong, tolak demi keamanan
+        if (!empty($this->webhookSecret) && empty($secret)) {
+            return false;
         }
 
         return true;
@@ -168,7 +176,7 @@ class PakasirPaymentService
     public function processWebhook(array $payload): array
     {
         $orderNumber = $payload['order_id'] ?? ($payload['order_number'] ?? null);
-        $transactionId = $payload['transaction_id'] ?? null;
+        $transactionId = $payload['txn_id'] ?? ($payload['transaction_id'] ?? null);
         $status = strtolower($payload['status'] ?? ($payload['transaction_status'] ?? 'settlement'));
         $paymentType = $payload['payment_method'] ?? ($payload['payment_type'] ?? 'qris');
 
@@ -176,7 +184,7 @@ class PakasirPaymentService
             throw new Exception('Payload webhook tidak memiliki order_id.');
         }
 
-        if (in_array($status, ['success', 'settlement', 'paid', 'capture'])) {
+        if (in_array($status, ['completed', 'success', 'settlement', 'paid', 'capture'])) {
             $payment = $this->paymentService->processSettlement(
                 $orderNumber,
                 $transactionId ?? 'PKS-TX-' . Str::random(8),

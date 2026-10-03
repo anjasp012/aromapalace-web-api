@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Journal & Stories - Aroma Palace')
+@section('title', 'Artikel - Aroma Palace')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-4 sm:pb-6 space-y-4 sm:space-y-6" x-data="articleCatalogApp()">
     <!-- Breadcrumb -->
     <nav id="articles-breadcrumb" class="text-[11px] sm:text-xs text-gray-500 flex items-center gap-1.5 sm:gap-2">
-        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Home</a>
+        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Beranda</a>
         <span>/</span>
-        <span class="text-gray-900 font-medium">Journal &amp; Stories</span>
+        <span class="text-gray-900 font-medium">Artikel</span>
     </nav>
 
     <!-- Main Dynamic Articles Container -->
@@ -19,9 +19,7 @@
         <!-- Header Banner -->
         <div class="flex flex-wrap items-end justify-between gap-2.5 sm:gap-4 border-b border-gray-200/80 pb-3 sm:pb-5">
             <div>
-                <span class="text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 font-semibold block mb-0.5 sm:mb-1">Editorial &amp; Stories</span>
-                <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">The Aroma Palace Journal</h1>
-                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Eksplorasi seni wewangian mewah, piramida aroma, dan gaya hidup elegan.</p>
+                <h1 class="text-xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Artikel</h1>
             </div>
         </div>
 
@@ -149,13 +147,7 @@
          }">
     <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between mb-4 sm:mb-6">
-            <div>
-                <h2 class="text-lg sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                    <span>Produk dengan Diskon</span>
-                    <span class="text-[10px] sm:text-xs bg-[#D4AF37] text-[#4A070B] px-2 sm:px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Sale</span>
-                </h2>
-                <p class="text-[11px] sm:text-sm text-stone-300 mt-0.5 sm:mt-1">Penawaran harga terbaik dengan potongan harga spesial terbatas.</p>
-            </div>
+            <h2 class="text-lg sm:text-2xl font-normal text-white tracking-tight">Produk dengan <span class="font-bold">Diskon</span></h2>
             
             <a href="{{ route('products.index', ['discount' => 1]) }}" class="text-xs sm:text-sm font-semibold text-amber-300 hover:text-white inline-flex items-center gap-1 group shrink-0 transition-colors">
                 <span>Lihat Semua</span>

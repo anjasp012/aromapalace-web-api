@@ -208,6 +208,38 @@ class AromaPalaceDatabaseSeeder extends Seeder
                 'description' => 'Wewangian ringan menyegarkan untuk rambut dan seluruh tubuh.',
                 'sort_order' => 5,
             ],
+            [
+                'name' => 'Lilin & Diffuser',
+                'slug' => 'lilin-aromaterapi-diffuser',
+                'icon_url' => 'https://cdn-icons-png.flaticon.com/512/3163/3163235.png',
+                'image_url' => 'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=400&q=80',
+                'description' => 'Lilin aromaterapi beraroma mewah dan reed diffuser untuk kenyamanan suasana ruangan.',
+                'sort_order' => 6,
+            ],
+            [
+                'name' => 'Oud & Oriental',
+                'slug' => 'oud-oriental',
+                'icon_url' => 'https://cdn-icons-png.flaticon.com/512/3163/3163240.png',
+                'image_url' => 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=400&q=80',
+                'description' => 'Koleksi aroma kayu gaharu (oud), amber, dan rempah eksotis khas wewangian oriental.',
+                'sort_order' => 7,
+            ],
+            [
+                'name' => 'Bath & Body Care',
+                'slug' => 'bath-and-body-care',
+                'icon_url' => 'https://cdn-icons-png.flaticon.com/512/3163/3163245.png',
+                'image_url' => 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=400&q=80',
+                'description' => 'Sabun mandi mewah, body wash, dan body lotion dengan wewangian tahan lama.',
+                'sort_order' => 8,
+            ],
+            [
+                'name' => 'Gift Sets & Hampers',
+                'slug' => 'gift-sets-and-hampers',
+                'icon_url' => 'https://cdn-icons-png.flaticon.com/512/3163/3163250.png',
+                'image_url' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=400&q=80',
+                'description' => 'Paket bingkisan wewangian istimewa dalam kemasan box eksklusif.',
+                'sort_order' => 9,
+            ],
         ];
 
         foreach ($categories as $cat) {

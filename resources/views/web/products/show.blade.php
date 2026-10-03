@@ -71,9 +71,9 @@
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 sm:space-y-12">
     <!-- Breadcrumb -->
     <nav class="text-[11px] sm:text-xs text-gray-500 flex items-center gap-1.5 sm:gap-2">
-        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Home</a>
+        <a href="{{ route('home') }}" class="hover:text-[#650506] transition">Beranda</a>
         <span>/</span>
-        <a href="{{ route('products.index') }}" class="hover:text-[#650506] transition">Shop</a>
+        <a href="{{ route('products.index') }}" class="hover:text-[#650506] transition">Katalog</a>
         @if($product->category)
             <span>/</span>
             <a href="{{ route('products.index', ['category' => $product->category->slug]) }}" class="hover:text-[#650506] transition">{{ $product->category->name }}</a>
@@ -82,8 +82,8 @@
         <span class="text-gray-900 font-medium truncate max-w-xs">{{ $product->name }}</span>
     </nav>
 
-    <!-- Product Overview Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-10 lg:gap-14 items-start">
+    <!-- Product Overview Grid (568px Gallery + Auto Details) -->
+    <div class="grid grid-cols-1 lg:grid-cols-[568px_1fr] gap-5 sm:gap-8 lg:gap-10 xl:gap-14 items-start">
         @php
             $galleryImages = collect([$product->primary_image])
                 ->merge($product->images->pluck('image_url'))
@@ -92,8 +92,8 @@
                 ->values();
         @endphp
 
-        <!-- Images Gallery (7 cols) -->
-        <div class="lg:col-span-7" 
+        <!-- Images Gallery (568px on Desktop) -->
+        <div class="w-full lg:w-[568px] lg:sticky lg:top-24" 
              x-data="{
                 images: {{ json_encode($galleryImages) }},
                 currentIndex: 0,
@@ -232,8 +232,8 @@
             $defaultStock = $defaultVariant ? $defaultVariant['stock'] : (int) $product->stock;
         @endphp
 
-        <!-- Product Actions & Buying Info (5 cols) -->
-        <div class="lg:col-span-5 space-y-6"
+        <!-- Product Actions & Buying Info (Auto remaining width) -->
+        <div class="min-w-0 space-y-6"
              x-data="{
                 variants: @js($variantsData),
                 hasVariants: {{ $variantsData->isNotEmpty() ? 'true' : 'false' }},
@@ -344,8 +344,6 @@
                     </span>
                 </div>
             </div>
-
-            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">{{ $product->short_description }}</p>
 
             <!-- Add to Cart Form -->
             @auth

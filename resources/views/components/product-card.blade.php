@@ -48,12 +48,12 @@
                     -{{ $discountPercent }}%
                 </span>
             @elseif($product->is_featured)
-                <span class="bg-white text-gray-800 text-[9.5px] sm:text-[11px] font-medium px-1.5 sm:px-2 py-0.5 rounded-md border border-gray-200/80 shadow-2xs">
-                    New
+                <span class="bg-white text-gray-800 text-[9.5px] sm:text-[11px] font-medium px-1.5 sm:px-2 py-0.5 rounded-md border border-gray-200/80">
+                    Baru
                 </span>
             @elseif($product->is_popular)
-                <span class="bg-white text-gray-800 text-[9.5px] sm:text-[11px] font-medium px-1.5 sm:px-2 py-0.5 rounded-md border border-gray-200/80 shadow-2xs">
-                    Popular
+                <span class="bg-white text-gray-800 text-[9.5px] sm:text-[11px] font-medium px-1.5 sm:px-2 py-0.5 rounded-md border border-gray-200/80">
+                    Populer
                 </span>
             @endif
         </div>
@@ -91,7 +91,7 @@
 
             <!-- Subtitle / Brand / Category Descriptor -->
             <p class="text-[10px] sm:text-xs mt-0.5 line-clamp-1 font-normal {{ $isDark ? 'text-stone-300' : 'text-gray-500' }}">
-                {{ $product->brand?->name ?? 'Aroma Palace' }} &middot; {{ $product->category?->name ?? 'Fragrance' }}
+                {{ $product->brand?->name ?? 'Aroma Palace' }} &middot; {{ $product->category?->name ?? 'Parfum' }}
             </p>
         </div>
 

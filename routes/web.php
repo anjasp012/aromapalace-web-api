@@ -86,6 +86,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/addresses', [AccountController::class, 'addresses'])->name('addresses');
         Route::post('/addresses', [AccountController::class, 'storeAddress'])->name('addresses.store');
+        Route::post('/addresses/{id}/primary', [AccountController::class, 'setPrimaryAddress'])->name('addresses.primary');
         Route::delete('/addresses/{id}', [AccountController::class, 'deleteAddress'])->name('addresses.destroy');
     });
 });

@@ -78,8 +78,11 @@ class PaymentController extends BaseApiController
     {
         try {
             $payload = $request->all();
-            if (!$pakasirService->verifyWebhook($payload, $request->header('X-Signature'))) {
-                return response()->json(['status' => 'error', 'message' => 'Invalid Pakasir signature'], 403);
+            $signature = $request->header('X-Signature') ?? $request->header('x-signature');
+            $secret = $request->header('X-Secret') ?? $request->header('x-secret');
+
+            if (!$pakasirService->verifyWebhook($payload, $signature, $secret)) {
+                return response()->json(['status' => 'error', 'message' => 'Invalid Pakasir secret or signature'], 403);
             }
 
             $result = $pakasirService->processWebhook($payload);

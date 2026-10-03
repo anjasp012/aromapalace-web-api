@@ -9,10 +9,10 @@
     <link rel="canonical" href="@yield('canonical', url()->current())">
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 
-    <!-- Fonts: Inter / Plus Jakarta Sans -->
+    <!-- Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Production Assets via Vite (Tailwind CSS v4) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -33,14 +33,14 @@
         }
     </style>
 </head>
-<body class="bg-white font-sans text-[#111827] antialiased flex flex-col min-h-screen" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+<body class="bg-white font-sans text-[#111827] antialiased flex flex-col min-h-screen" style="font-family: 'Outfit', sans-serif;">
     <!-- Top Announcement Bar (Aroma Palace Royal Maroon Style) -->
     <div class="bg-[#4A070B] border-b border-[#3B0407] text-white text-xs py-2 relative z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
             <!-- Left: Promo Announcement -->
             <button type="button" @click="window.openPromoModal()" class="flex items-center gap-2 text-[11px] sm:text-xs text-amber-100 font-medium hover:text-white transition cursor-pointer group text-left">
                 <span class="text-amber-400 text-sm leading-none group-hover:scale-110 transition-transform">✦</span>
-                <span class="">Summer Sale is Live – Up to 40% Off! Klaim Voucher &rarr;</span>
+                <span class="">Promo Spesial – Diskon hingga 40%! Klaim Voucher &rarr;</span>
             </button>
 
             <!-- Right: Free Shipping & Authentic Brands -->
@@ -51,8 +51,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
                     </svg>
                     <div class="flex flex-col leading-tight">
-                        <span class="font-bold text-white uppercase text-[9.5px] tracking-wider">Free Shipping</span>
-                        <span class="text-[8.5px] text-amber-200/90 uppercase tracking-wider">Across Indonesia</span>
+                        <span class="font-bold text-white uppercase text-[9.5px] tracking-wider">Gratis Ongkir</span>
+                        <span class="text-[8.5px] text-amber-200/90 uppercase tracking-wider">Seluruh Indonesia</span>
                     </div>
                 </div>
 
@@ -64,8 +64,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 8v13m0-13V4a2 2 0 114 0v4m-4 0V4a2 2 0 10-4 0v4m-5 4h18M5 12a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2H5z" />
                     </svg>
                     <div class="flex flex-col leading-tight">
-                        <span class="font-bold text-white uppercase text-[9.5px] tracking-wider">Authentic Brands</span>
-                        <span class="text-[8.5px] text-amber-200/90 uppercase tracking-wider">Direct from Dubai</span>
+                        <span class="font-bold text-white uppercase text-[9.5px] tracking-wider">100% Produk Asli</span>
+                        <span class="text-[8.5px] text-amber-200/90 uppercase tracking-wider">Langsung dari Dubai</span>
                     </div>
                 </div>
             </div>
@@ -73,7 +73,7 @@
     </div>
 
     <!-- Main Navigation Bar -->
-    <header x-data class="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-2xs">
+    <header x-data class="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Upper Row: Search & Hamburger | Centered Logo | User Actions -->
             <div class="flex items-center justify-between py-3 sm:py-3.5 lg:py-4 gap-2 sm:gap-4">
@@ -87,7 +87,7 @@
                         <svg class="w-4 h-4 text-[#8C6239] group-hover:text-[#704828] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        <span class="text-xs text-gray-400 group-hover:text-gray-600 transition-colors select-none font-normal">Search for perfumes...</span>
+                        <span class="text-xs text-gray-400 group-hover:text-gray-600 transition-colors select-none font-normal">Cari parfum mewah...</span>
                     </button>
 
                     <!-- Mobile Search Button -->
@@ -119,17 +119,158 @@
 
                 <!-- Right: Utilities (Desktop: Account, Wishlist, Cart | Mobile: Cart Only) -->
                 <div class="flex items-center justify-end flex-1 gap-2.5 sm:gap-4 lg:gap-7 shrink-0 lg:max-w-[260px]">
-                    <!-- Account Icon + Label (Desktop Only - accessible via Bottom Nav on Mobile) -->
+                    <!-- Account Icon + Label with Dropdown (Desktop Only - accessible via Bottom Nav on Mobile) -->
                     @auth
-                        <a href="{{ route('account.index') }}" class="hidden lg:flex flex-col items-center gap-1 text-[#704828] hover:text-[#4A250D] transition group" title="{{ auth()->user()->name }}">
-                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                            <span class="text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none">Account</span>
-                        </a>
+                        <div x-data="{ open: false }" 
+                             @mouseenter="open = true" 
+                             @mouseleave="open = false" 
+                             @click.outside="open = false" 
+                             class="relative hidden lg:block group">
+                            <button @click="open = !open" 
+                                    type="button" 
+                                    class="flex flex-col items-center gap-1 text-[#704828] hover:text-[#4A250D] transition group cursor-pointer focus:outline-none" 
+                                    title="{{ auth()->user()->name }}">
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <span class="text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none flex items-center gap-1">
+                                    Akun
+                                    <svg class="w-3 h-3 text-gray-400 group-hover:text-[#650506] transition-transform duration-200" :class="open ? 'rotate-180 text-[#650506]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </span>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open" 
+                                 x-cloak
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 translate-y-1 scale-95"
+                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                                 class="absolute right-0 top-full pt-2 w-52 z-50">
+                                <div class="bg-white rounded-xl shadow-xl border border-gray-100 p-1.5 text-xs normal-case tracking-normal space-y-0.5">
+                                    
+                                    <!-- User Info Header -->
+                                    <div class="px-3 py-2 border-b border-gray-100 mb-1">
+                                        <p class="text-xs font-bold text-gray-900 truncate">{{ auth()->user()->name }}</p>
+                                        <p class="text-[10px] text-gray-500 truncate">{{ auth()->user()->email }}</p>
+                                    </div>
+
+                                    <!-- Menu Items -->
+                                    <a href="{{ route('account.index') }}" 
+                                       @click="open = false"
+                                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                            </svg>
+                                            <span class="truncate">Akun Saya</span>
+                                        </div>
+                                        <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+
+                                    <a href="{{ route('account.orders') }}" 
+                                       @click="open = false"
+                                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                            </svg>
+                                            <span class="truncate">Riwayat Pesanan</span>
+                                        </div>
+                                        <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+
+                                    <!-- Logout -->
+                                    <div class="border-t border-gray-100 pt-1 mt-1">
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" 
+                                                    class="w-full flex items-center justify-between px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 rounded-lg transition font-medium cursor-pointer text-left group">
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                                    </svg>
+                                                    <span>Keluar</span>
+                                                </div>
+                                                <svg class="w-3.5 h-3.5 text-rose-400 group-hover:translate-x-0.5 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     @else
-                        <a href="{{ route('login') }}" class="hidden lg:flex flex-col items-center gap-1 text-[#704828] hover:text-[#4A250D] transition group" title="Login / Register">
-                            <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                            <span class="text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none">Account</span>
-                        </a>
+                        <div x-data="{ open: false }" 
+                             @mouseenter="open = true" 
+                             @mouseleave="open = false" 
+                             @click.outside="open = false" 
+                             class="relative hidden lg:block group">
+                            <a href="{{ route('login') }}" 
+                               class="flex flex-col items-center gap-1 text-[#704828] hover:text-[#4A250D] transition group cursor-pointer focus:outline-none" 
+                               title="Masuk / Daftar">
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <span class="text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none flex items-center gap-1">
+                                    Akun
+                                    <svg class="w-3 h-3 text-gray-400 group-hover:text-[#650506] transition-transform duration-200" :class="open ? 'rotate-180 text-[#650506]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </span>
+                            </a>
+
+                            <!-- Dropdown Menu for Guest -->
+                            <div x-show="open" 
+                                 x-cloak
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 translate-y-1 scale-95"
+                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                                 class="absolute right-0 top-full pt-2 w-52 z-50">
+                                <div class="bg-white rounded-xl shadow-xl border border-gray-100 p-1.5 text-xs normal-case tracking-normal space-y-0.5">
+                                    <div class="px-3 py-2 border-b border-gray-100 mb-1">
+                                        <p class="text-xs font-bold text-gray-900">Selamat Datang</p>
+                                        <p class="text-[10px] text-gray-500">Masuk atau buat akun baru</p>
+                                    </div>
+                                    <a href="{{ route('login') }}" 
+                                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                                            </svg>
+                                            <span class="truncate">Masuk</span>
+                                        </div>
+                                        <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                    <a href="{{ route('register') }}" 
+                                       class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                                            </svg>
+                                            <span class="truncate">Daftar Akun</span>
+                                        </div>
+                                        <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     @endauth
 
                     <!-- Wishlist Icon + Label (Desktop Only - accessible via Bottom Nav on Mobile) -->
@@ -154,14 +295,14 @@
                             ? \App\Models\CartItem::whereHas('cart', fn($q) => $q->where('user_id', auth()->id()))->count() 
                             : 0;
                     @endphp
-                    <a href="{{ route('cart.index') }}" class="flex flex-col items-center gap-0.5 lg:gap-1 p-1 lg:p-0 text-[#704828] hover:text-[#4A250D] transition relative group" title="Shopping Cart">
+                    <a href="{{ route('cart.index') }}" class="flex flex-col items-center gap-0.5 lg:gap-1 p-1 lg:p-0 text-[#704828] hover:text-[#4A250D] transition relative group" title="Keranjang">
                         <div class="relative">
                             <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                             <span id="cart-badge" class="{{ $cartCount > 0 ? '' : 'hidden' }} absolute -top-1.5 -right-2 w-4 h-4 bg-[#650506] text-white rounded-full text-[10px] font-bold flex items-center justify-center">
                                 {{ $cartCount }}
                             </span>
                         </div>
-                        <span class="hidden lg:block text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none">Cart</span>
+                        <span class="hidden lg:block text-[11px] font-medium text-[#704828] group-hover:text-[#4A250D] leading-none">Keranjang</span>
                     </a>
                 </div>
             </div>
@@ -201,7 +342,7 @@
                     }
                 }"
                 @click.outside="shopOpen = false"
-                class="relative flex items-center border-t border-gray-100 py-2 sm:py-2.5 lg:py-3 px-1 sm:px-2 lg:px-0">
+                class="relative flex items-center border-t border-gray-100 -mb-px px-1 sm:px-2 lg:px-0">
 
                 <!-- Horizontal Nav Track (Scrollable without visible scrollbar on mobile, Centered & Overflow Visible on desktop) -->
                 <div x-ref="navTrack" 
@@ -209,8 +350,8 @@
                      class="flex items-center overflow-x-auto lg:overflow-visible no-scrollbar lg:justify-center gap-4 sm:gap-6 lg:gap-8 xl:gap-10 text-[10.5px] sm:text-[11.5px] lg:text-[12px] uppercase tracking-[0.08em] sm:tracking-[0.12em] lg:tracking-[0.14em] font-semibold text-gray-700 whitespace-nowrap w-full pr-10 lg:pr-0 scroll-smooth"
                      style="-webkit-overflow-scrolling: touch;">
                     <!-- 1. Home -->
-                    <a href="{{ route('home') }}" class="relative pb-1 transition shrink-0 {{ request()->routeIs('home') ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
-                        HOME
+                    <a href="{{ route('home') }}" class="relative py-2.5 sm:py-3 lg:py-3.5 transition shrink-0 {{ request()->routeIs('home') ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
+                        BERANDA
                     </a>
 
                     <!-- 2. Shop (All Product, Category, Brands) Simple Dropdown -->
@@ -220,8 +361,8 @@
                         <button x-ref="shopBtn"
                                 type="button"
                                 @click="toggleShop($event)"
-                                class="relative pb-1 flex items-center gap-1 sm:gap-1.5 transition cursor-pointer {{ (request()->routeIs('products*') && !request()->get('sort') && !request()->has('discount')) ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
-                            <span>SHOP</span>
+                                class="relative py-2.5 sm:py-3 lg:py-3.5 flex items-center gap-1 sm:gap-1.5 transition cursor-pointer {{ (request()->routeIs('products*') && !request()->get('sort') && !request()->has('discount')) ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
+                            <span>KATALOG</span>
                             <svg class="w-3 h-3 text-gray-400 group-hover:text-[#650506] transition-transform duration-200" :class="shopOpen ? 'rotate-180 text-[#650506]' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
 
@@ -234,50 +375,71 @@
                              x-transition:leave="transition ease-in duration-100" 
                              x-transition:leave-start="opacity-100 translate-y-0 scale-100" 
                              x-transition:leave-end="opacity-0 translate-y-1 scale-95" 
-                             class="hidden lg:block absolute left-0 top-full pt-2 w-48 z-50">
-                            <div class="bg-white rounded-xl shadow-xl border border-gray-100 p-2 text-xs normal-case tracking-normal space-y-0.5">
+                             class="hidden lg:block absolute left-0 top-full pt-2 w-52 z-50">
+                            <div class="bg-white rounded-xl shadow-xl border border-gray-100 p-1.5 text-xs normal-case tracking-normal space-y-0.5">
                                 <a href="{{ route('products.index') }}" 
-                                   class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-stone-50 hover:text-[#650506] text-gray-800 font-medium transition group">
-                                    <span>All Product</span>
-                                    <span class="text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5">&rarr;</span>
+                                   class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                        </svg>
+                                        <span class="truncate">Semua Produk</span>
+                                    </div>
+                                    <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                    </svg>
                                 </a>
                                 <a href="{{ route('home') }}#categories" 
-                                   class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-stone-50 hover:text-[#650506] text-gray-800 font-medium transition group">
-                                    <span>Category</span>
-                                    <span class="text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5">&rarr;</span>
+                                   class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                        </svg>
+                                        <span class="truncate">Kategori</span>
+                                    </div>
+                                    <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                    </svg>
                                 </a>
                                 <a href="{{ route('home') }}#brands" 
-                                   class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-stone-50 hover:text-[#650506] text-gray-800 font-medium transition group">
-                                    <span>Brands</span>
-                                    <span class="text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5">&rarr;</span>
+                                   class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                        </svg>
+                                        <span class="truncate">Merek</span>
+                                    </div>
+                                    <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                    </svg>
                                 </a>
                             </div>
                         </div>
                     </div>
 
                     <!-- 3. Best Sellers -->
-                    <a href="{{ route('products.index', ['sort' => 'popular']) }}" class="relative pb-1 transition shrink-0 {{ request()->get('sort') === 'popular' ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
-                        BEST SELLERS
+                    <a href="{{ route('products.index', ['sort' => 'popular']) }}" class="relative py-2.5 sm:py-3 lg:py-3.5 transition shrink-0 {{ request()->get('sort') === 'popular' ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
+                        TERLARIS
                     </a>
 
                     <!-- 4. Special Offers -->
-                    <a href="{{ route('products.index', ['discount' => 1]) }}" class="relative pb-1 transition shrink-0 {{ request()->has('discount') ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
-                        SPECIAL OFFERS
+                    <a href="{{ route('products.index', ['discount' => 1]) }}" class="relative py-2.5 sm:py-3 lg:py-3.5 transition shrink-0 {{ request()->has('discount') ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
+                        PROMO SPESIAL
                     </a>
 
                     <!-- 5. Store Locator -->
-                    <a href="{{ route('stores.index') }}" class="relative pb-1 transition shrink-0 {{ request()->routeIs('stores*') ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
-                        STORE LOCATOR
+                    <a href="{{ route('stores.index') }}" class="relative py-2.5 sm:py-3 lg:py-3.5 transition shrink-0 {{ request()->routeIs('stores*') ? 'text-[#650506] font-bold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#650506]' : 'hover:text-[#650506]' }}">
+                        LOKASI TOKO
                     </a>
 
                     <!-- 6. About Us -->
-                    <a href="{{ route('home') }}#about-us" class="relative pb-1 transition shrink-0 hover:text-[#650506]">
-                        ABOUT US
+                    <a href="{{ route('home') }}#about-us" class="relative py-2.5 sm:py-3 lg:py-3.5 transition shrink-0 hover:text-[#650506]">
+                        TENTANG KAMI
                     </a>
 
                     <!-- 7. Contact -->
-                    <a href="https://wa.me/6281188888888" target="_blank" class="relative pb-1 transition shrink-0 hover:text-[#650506]">
-                        CONTACT
+                    <a href="https://wa.me/6281188888888" target="_blank" class="relative py-2.5 sm:py-3 lg:py-3.5 transition shrink-0 hover:text-[#650506]">
+                        HUBUNGI KAMI
                     </a>
                 </div>
 
@@ -291,25 +453,46 @@
                      x-transition:leave-start="opacity-100 translate-y-0 scale-100" 
                      x-transition:leave-end="opacity-0 -translate-y-2 scale-95" 
                      :style="{ left: mobileShopLeft + 'px' }"
-                     class="lg:hidden absolute top-full pt-1.5 w-48 z-50">
-                    <div class="bg-white rounded-xl shadow-xl border border-gray-100 p-2 text-xs normal-case tracking-normal space-y-0.5">
+                     class="lg:hidden absolute top-full pt-1.5 w-52 z-50">
+                    <div class="bg-white rounded-xl shadow-xl border border-gray-100 p-1.5 text-xs normal-case tracking-normal space-y-0.5">
                         <a href="{{ route('products.index') }}" 
                            @click="shopOpen = false"
-                           class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-stone-50 hover:text-[#650506] text-gray-800 font-medium transition group">
-                            <span>All Product</span>
-                            <span class="text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5">&rarr;</span>
+                           class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                                <span class="truncate">Semua Produk</span>
+                            </div>
+                            <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                            </svg>
                         </a>
                         <a href="{{ route('home') }}#categories" 
                            @click="shopOpen = false"
-                           class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-stone-50 hover:text-[#650506] text-gray-800 font-medium transition group">
-                            <span>Category</span>
-                            <span class="text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5">&rarr;</span>
+                           class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                </svg>
+                                <span class="truncate">Kategori</span>
+                            </div>
+                            <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                            </svg>
                         </a>
                         <a href="{{ route('home') }}#brands" 
                            @click="shopOpen = false"
-                           class="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-stone-50 hover:text-[#650506] text-gray-800 font-medium transition group">
-                            <span>Brands</span>
-                            <span class="text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5">&rarr;</span>
+                           class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-gray-700 hover:text-[#650506] hover:bg-stone-50 transition group">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <svg class="w-4 h-4 text-gray-400 group-hover:text-[#650506] transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                </svg>
+                                <span class="truncate">Merek</span>
+                            </div>
+                            <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#650506] transition-transform group-hover:translate-x-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                            </svg>
                         </a>
                     </div>
                 </div>
@@ -345,8 +528,7 @@
     </main>
 
     <!-- Lumora 5-Column Clean Light Footer -->
-    @unless(request()->routeIs('cart*') || request()->is('cart*'))
-    <footer class="bg-white text-gray-600 mt-6 sm:mt-10 lg:mt-14 border-t border-gray-100">
+    <footer class="{{ (request()->routeIs('cart*') || request()->is('cart*')) ? 'hidden lg:block' : '' }} bg-white text-gray-600 mt-6 sm:mt-10 lg:mt-14 border-t border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-14 pb-24 sm:pb-24 lg:pb-12">
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-12 gap-x-5 gap-y-7 sm:gap-8 lg:gap-8 pb-8 sm:pb-12 border-b border-gray-200">
                 <!-- Col 1: Brand Info & Socials (Full width on mobile/tablet, 3 cols on desktop) -->
@@ -356,7 +538,7 @@
                         <span class="text-sm sm:text-base font-extrabold tracking-[0.14em] text-[#4A070B] uppercase">AROMA PALACE</span>
                     </div>
                     <p class="text-xs text-gray-500 leading-relaxed max-w-sm">
-                        Luxury fragrances and artisanal lifestyle essentials direct from Dubai. Quality products, exceptional service.
+                        Parfum mewah dan wewangian artisanal pilihan langsung dari Dubai. Kualitas premium, layanan istimewa.
                     </p>
                     <div class="flex items-center gap-2 pt-1">
                         <!-- Instagram -->
@@ -380,39 +562,39 @@
 
                 <!-- Col 2: Shop (1 col on mobile, 1 on tablet, 2 cols on desktop) -->
                 <div class="col-span-1 sm:col-span-1 lg:col-span-2 space-y-2.5 sm:space-y-3">
-                    <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Shop</h5>
+                    <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Katalog</h5>
                     <ul class="space-y-2 text-xs text-gray-600">
-                        <li><a href="{{ route('products.index') }}" class="hover:text-[#650506] transition">All Products</a></li>
-                        <li><a href="{{ route('products.index', ['sort' => 'popular']) }}" class="hover:text-[#650506] transition">Best Sellers</a></li>
-                        <li><a href="{{ route('products.index', ['sort' => 'newest']) }}" class="hover:text-[#650506] transition">New Arrivals</a></li>
-                        <li><a href="{{ route('home') }}#categories" class="hover:text-[#650506] transition">Categories</a></li>
-                        <li><a href="{{ route('home') }}#brands" class="hover:text-[#650506] transition">Featured Brands</a></li>
-                        <li><a href="{{ route('products.index', ['discount' => 1]) }}" class="hover:text-[#650506] transition">Special Offers &amp; Sale</a></li>
+                        <li><a href="{{ route('products.index') }}" class="hover:text-[#650506] transition">Semua Produk</a></li>
+                        <li><a href="{{ route('products.index', ['sort' => 'popular']) }}" class="hover:text-[#650506] transition">Produk Terlaris</a></li>
+                        <li><a href="{{ route('products.index', ['sort' => 'newest']) }}" class="hover:text-[#650506] transition">Produk Terbaru</a></li>
+                        <li><a href="{{ route('home') }}#categories" class="hover:text-[#650506] transition">Kategori</a></li>
+                        <li><a href="{{ route('home') }}#brands" class="hover:text-[#650506] transition">Merek Pilihan</a></li>
+                        <li><a href="{{ route('products.index', ['discount' => 1]) }}" class="hover:text-[#650506] transition">Promo &amp; Diskon Spesial</a></li>
                     </ul>
                 </div>
 
                 <!-- Col 3: Customer Service (1 col on mobile, 1 on tablet, 2 cols on desktop) -->
                 <div class="col-span-1 sm:col-span-1 lg:col-span-2 space-y-2.5 sm:space-y-3">
-                    <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Customer Service</h5>
+                    <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Layanan Pelanggan</h5>
                     <ul class="space-y-2 text-xs text-gray-600">
-                        <li><a href="https://wa.me/6281188888888?text=Halo%20Aroma%20Palace%2C%20saya%20butuh%20bantuan%20layanan%20pelanggan" target="_blank" rel="noopener noreferrer" class="hover:text-[#650506] transition flex items-center gap-1"><span>Help Center</span><span class="text-[10px] text-emerald-600 font-bold">(WA)</span></a></li>
-                        <li><a href="{{ route('account.orders') }}" class="hover:text-[#650506] transition">Track Order</a></li>
+                        <li><a href="https://wa.me/6281188888888?text=Halo%20Aroma%20Palace%2C%20saya%20butuh%20bantuan%20layanan%20pelanggan" target="_blank" rel="noopener noreferrer" class="hover:text-[#650506] transition flex items-center gap-1"><span>Pusat Bantuan</span><span class="text-[10px] text-emerald-600 font-bold">(WA)</span></a></li>
+                        <li><a href="{{ route('account.orders') }}" class="hover:text-[#650506] transition">Lacak Pesanan</a></li>
                         <li><a href="{{ route('wishlist.index') }}" class="hover:text-[#650506] transition">Wishlist Saya</a></li>
-                        <li><button type="button" @click="window.openInfoModal('shipping')" class="hover:text-[#650506] transition text-left cursor-pointer">Shipping &amp; Delivery</button></li>
-                        <li><button type="button" @click="window.openInfoModal('returns')" class="hover:text-[#650506] transition text-left cursor-pointer">Returns &amp; Warranty</button></li>
-                        <li><button type="button" @click="window.openInfoModal('faq')" class="hover:text-[#650506] transition text-left cursor-pointer">FAQs</button></li>
+                        <li><button type="button" @click="window.openInfoModal('shipping')" class="hover:text-[#650506] transition text-left cursor-pointer">Pengiriman &amp; Ekspedisi</button></li>
+                        <li><button type="button" @click="window.openInfoModal('returns')" class="hover:text-[#650506] transition text-left cursor-pointer">Pengembalian &amp; Garansi</button></li>
+                        <li><button type="button" @click="window.openInfoModal('faq')" class="hover:text-[#650506] transition text-left cursor-pointer">Tanya Jawab (FAQ)</button></li>
                     </ul>
                 </div>
 
                 <!-- Col 4: Company (1 col on mobile, 1 on tablet, 2 cols on desktop) -->
                 <div class="col-span-1 sm:col-span-1 lg:col-span-2 space-y-2.5 sm:space-y-3">
-                    <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Company</h5>
+                    <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Tentang Kami</h5>
                     <ul class="space-y-2 text-xs text-gray-600">
-                        <li><a href="{{ route('home') }}#about-us" class="hover:text-[#650506] transition">About Us</a></li>
-                        <li><a href="{{ route('stores.index') }}" class="hover:text-[#650506] transition">Store Locator</a></li>
-                        <li><a href="{{ route('articles.index') }}" class="hover:text-[#650506] transition">Aroma Journal (Blog)</a></li>
-                        <li><a href="https://wa.me/6281188888888?text=Halo%20Tim%20Aroma%20Palace%2C%20saya%20tertarik%20dengan%20peluang%20karir%20atau%20kemitraan" target="_blank" rel="noopener noreferrer" class="hover:text-[#650506] transition">Careers &amp; Partners</a></li>
-                        <li><a href="https://wa.me/6281188888888?text=Halo%20Aroma%20Palace%2C%20saya%20ingin%20menghubungi%20tim%20Aroma%20Palace" target="_blank" rel="noopener noreferrer" class="hover:text-[#650506] transition">Contact Us</a></li>
+                        <li><a href="{{ route('home') }}#about-us" class="hover:text-[#650506] transition">Tentang Aroma Palace</a></li>
+                        <li><a href="{{ route('stores.index') }}" class="hover:text-[#650506] transition">Lokasi Gerai Butik</a></li>
+                        <li><a href="{{ route('articles.index') }}" class="hover:text-[#650506] transition">Artikel &amp; Berita</a></li>
+                        <li><a href="https://wa.me/6281188888888?text=Halo%20Tim%20Aroma%20Palace%2C%20saya%20tertarik%20dengan%20peluang%20karir%20atau%20kemitraan" target="_blank" rel="noopener noreferrer" class="hover:text-[#650506] transition">Karir &amp; Kemitraan</a></li>
+                        <li><a href="https://wa.me/6281188888888?text=Halo%20Aroma%20Palace%2C%20saya%20ingin%20menghubungi%20tim%20Aroma%20Palace" target="_blank" rel="noopener noreferrer" class="hover:text-[#650506] transition">Hubungi Kami</a></li>
                     </ul>
                 </div>
 
@@ -430,7 +612,7 @@
 
                 <!-- Col 5: Download App (Full width on mobile/tablet, 3 cols on desktop) -->
                 <div class="col-span-2 sm:col-span-3 lg:col-span-3 space-y-3 sm:space-y-3.5 pt-4 sm:pt-6 lg:pt-0 border-t sm:border-t-0 border-gray-100">
-                    <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Download App</h5>
+                    <h5 class="text-xs font-bold uppercase tracking-wider text-gray-900">Unduh Aplikasi</h5>
                     <p class="text-[11px] sm:text-xs text-gray-500 leading-relaxed">
                         Unduh aplikasi kami untuk akses eksklusif katalog parfum Dubai.
                     </p>
@@ -446,7 +628,7 @@
                                 <path d="M16.9 15.3L20.4 13.3C21.4 12.7 21.4 11.3 20.4 10.7L16.9 8.7L13.6 12L16.9 15.3Z" fill="#FFC800"/>
                             </svg>
                             <div class="text-left leading-tight">
-                                <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-gray-500 block font-medium">GET IT ON</span>
+                                <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-gray-500 block font-medium">TEMUKAN DI</span>
                                 <span class="text-[11px] sm:text-xs font-bold text-gray-900 tracking-wide block">Google Play</span>
                             </div>
                         </button>
@@ -459,7 +641,7 @@
                                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.84c.62-.75 1.04-1.8 0.93-2.84-.9.04-1.99.6-2.63 1.35-.57.65-1.07 1.71-.94 2.73 1 .08 2.02-.49 2.64-1.24z"/>
                             </svg>
                             <div class="text-left leading-tight">
-                                <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-gray-500 block font-medium">Download on the</span>
+                                <span class="text-[8px] sm:text-[9px] uppercase tracking-wider text-gray-500 block font-medium">Unduh di</span>
                                 <span class="text-[11px] sm:text-xs font-bold text-gray-900 tracking-wide block">App Store</span>
                             </div>
                         </button>
@@ -470,19 +652,18 @@
             <!-- Bottom Row: Copyright -->
             <div class="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-[11px] sm:text-xs text-gray-500 text-center sm:text-left">
                 <div>
-                    &copy; {{ date('Y') }} Aroma Palace. All Rights Reserved.
+                    &copy; {{ date('Y') }} Aroma Palace. Hak Cipta Dilindungi.
                 </div>
                 <div class="flex items-center gap-3 sm:gap-5 text-gray-400">
-                    <button type="button" @click="window.openInfoModal('privacy')" class="hover:text-gray-900 transition cursor-pointer">Privacy Policy</button>
+                    <button type="button" @click="window.openInfoModal('privacy')" class="hover:text-gray-900 transition cursor-pointer">Kebijakan Privasi</button>
                     <span>&bull;</span>
-                    <button type="button" @click="window.openInfoModal('terms')" class="hover:text-gray-900 transition cursor-pointer">Terms of Service</button>
+                    <button type="button" @click="window.openInfoModal('terms')" class="hover:text-gray-900 transition cursor-pointer">Syarat &amp; Ketentuan</button>
                     <span>&bull;</span>
-                    <button type="button" @click="window.openInfoModal('faq')" class="hover:text-gray-900 transition cursor-pointer">FAQs</button>
+                    <button type="button" @click="window.openInfoModal('faq')" class="hover:text-gray-900 transition cursor-pointer">Tanya Jawab (FAQ)</button>
                 </div>
             </div>
         </div>
     </footer>
-    @endunless
 
     <!-- Wishlist Toast Notification -->
     <div id="wishlist-toast" class="fixed top-4 left-1/2 -translate-x-1/2 sm:top-6 sm:right-6 sm:left-auto sm:translate-x-0 z-50 transform -translate-y-12 opacity-0 pointer-events-none transition-all duration-300 ease-out bg-[#18181B]/95 backdrop-blur-md text-white py-2 px-4 rounded-full shadow-xl border border-white/10 flex items-center gap-2.5 text-xs font-medium w-fit max-w-[92vw] sm:max-w-md">
