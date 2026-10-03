@@ -118,8 +118,21 @@ class KiriminAjaShippingService
             $destinationPostal = $snap['postal_code'] ?? ($order->address?->postal_code ?? '10110');
             $destCityId = $this->resolveCityId($destinationCity);
 
+            $prefix = config('services.kiriminaja.order_prefix', '');
+            $rawOrder = $order->order_number;
+            if (!empty($prefix)) {
+                if (!str_starts_with($rawOrder, $prefix)) {
+                    $cleanSuffix = preg_replace('/^[A-Za-z0-9]+-?/', '', $rawOrder);
+                    $kiriminAjaOrderId = $prefix . $cleanSuffix;
+                } else {
+                    $kiriminAjaOrderId = $rawOrder;
+                }
+            } else {
+                $kiriminAjaOrderId = $rawOrder;
+            }
+
             $packageData = [
-                'order_id' => (string) Str::limit($order->order_number, 20, ''),
+                'order_id' => (string) Str::limit($kiriminAjaOrderId, 20, ''),
                 'destination_name' => (string) Str::limit($recipientName, 50, ''),
                 'destination_phone' => (string) Str::limit(preg_replace('/[^0-9]/', '', $recipientPhone), 15, ''),
                 'destination_address' => (string) Str::limit($destinationAddress, 200, ''),
