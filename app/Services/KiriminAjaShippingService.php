@@ -237,25 +237,61 @@ class KiriminAjaShippingService
             $addAttempt('ninja', 'STANDARD', 0, true);
 
             // 3. Susun data paket
-            $prefix = config('services.kiriminaja.order_prefix', '');
+            // Normalisasi recipient phone
+            $cleanPhone = preg_replace('/[^0-9]/', '', $recipientPhone);
+            if (!str_starts_with($cleanPhone, '0') && !str_starts_with($cleanPhone, '62')) {
+                $cleanPhone = '0' . $cleanPhone;
+            }
+
+            // Normalisasi Prefix Order ID (wajib diawali prefix terdaftar, misal ARPL)
+            $prefix = config('services.kiriminaja.order_prefix', 'ARPL');
+            $cleanPrefix = rtrim($prefix ?: 'ARPL', '-');
             $rawOrder = $order->order_number;
-            if (!empty($prefix)) {
-                if (!str_starts_with($rawOrder, $prefix)) {
-                    $cleanSuffix = preg_replace('/^[A-Za-z0-9]+-?/', '', $rawOrder);
-                    $kiriminAjaOrderId = $prefix . $cleanSuffix;
-                } else {
-                    $kiriminAjaOrderId = $rawOrder;
-                }
+            if (!str_starts_with($rawOrder, $cleanPrefix)) {
+                $cleanSuffix = preg_replace('/^[A-Za-z0-9]+-?/', '', $rawOrder);
+                $kiriminAjaOrderId = Str::limit($cleanPrefix . '-' . $cleanSuffix, 20, '');
             } else {
-                $kiriminAjaOrderId = $rawOrder;
+                $kiriminAjaOrderId = Str::limit($rawOrder, 20, '');
+            }
+
+            // 1. Cek apakah pengiriman untuk order_id ini sudah sukses terdaftar di KiriminAja sebelumnya
+            $existing = $this->checkExistingShipment($kiriminAjaOrderId);
+            if ($existing) {
+                $this->updateOrderTracking($order, $existing['tracking_number'], $existing['courier'], $existing['service'], $existing['booking_id']);
+                return $existing;
+            }
+
+            // 2. Susun detail items dalam paket
+            $packageItems = [];
+            foreach ($order->items as $item) {
+                $packageItems[] = [
+                    'name' => (string) Str::limit($item->product_name ?? 'Parfum Aroma Palace', 50, ''),
+                    'price' => (int) round($item->price ?? 100000),
+                    'weight' => max(100, (int) round(($item->quantity ?? 1) * 250)),
+                    'width' => 10,
+                    'height' => 10,
+                    'length' => 10,
+                    'qty' => max(1, (int) ($item->quantity ?? 1)),
+                ];
+            }
+            if (empty($packageItems)) {
+                $packageItems[] = [
+                    'name' => 'Parfum Eksklusif Aroma Palace',
+                    'price' => (int) round($order->total_amount),
+                    'weight' => $packageWeight,
+                    'width' => 10,
+                    'height' => 10,
+                    'length' => 10,
+                    'qty' => 1,
+                ];
             }
 
             $pickupSchedule = $this->resolvePickupSchedule();
 
             $basePackageData = [
-                'order_id' => (string) Str::limit($kiriminAjaOrderId, 20, ''),
+                'order_id' => $kiriminAjaOrderId,
                 'destination_name' => (string) Str::limit($recipientName, 50, ''),
-                'destination_phone' => (string) Str::limit(preg_replace('/[^0-9]/', '', $recipientPhone), 15, ''),
+                'destination_phone' => (string) Str::limit($cleanPhone, 15, ''),
                 'destination_address' => (string) Str::limit($destinationAddress, 200, ''),
                 'destination_kecamatan_id' => $destCityId,
                 'destination_zipcode' => $destinationPostal,
@@ -269,6 +305,7 @@ class KiriminAjaShippingService
                 'item_name' => 'Parfum Eksklusif Aroma Palace (Haute Fragrance)',
                 'cod' => 0,
                 'package_type_id' => 1,
+                'items' => $packageItems,
             ];
 
             $mitraBase = $this->getMitraBaseUrl();
@@ -335,6 +372,46 @@ class KiriminAjaShippingService
                     $lastError .= " (IP Server: {$json['your_ip']} belum di-whitelist di Dashboard KiriminAja)";
                     // Jika IP terblokir, tidak perlu loop berulang kali
                     break;
+                }
+
+                // Jika terjadi kesalahan sistem / duplikat order_id pada KiriminAja
+                if (str_contains(strtolower($lastError), 'terjadi kesalahan') || str_contains(strtolower($lastError), 'already')) {
+                    $tracked = $this->checkExistingShipment($pkg['order_id']);
+                    if ($tracked) {
+                        $this->updateOrderTracking($order, $tracked['tracking_number'], $tracked['courier'], $tracked['service'], $tracked['booking_id']);
+                        return $tracked;
+                    }
+
+                    // Coba retry dengan order_id fresh unik tetap menggunakan prefix terdaftar
+                    $freshOrderId = Str::limit($cleanPrefix . '-' . strtoupper(Str::random(10)), 20, '');
+                    $retryPkg = array_merge($pkg, ['order_id' => $freshOrderId]);
+                    $pickupPayload['packages'] = [$retryPkg];
+
+                    $retryRes = Http::timeout(10)
+                        ->withHeaders([
+                            'Authorization' => 'Bearer ' . $this->apiKey,
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json',
+                        ])
+                        ->post("{$mitraBase}/v6.1/request_pickup", $pickupPayload);
+
+                    if (!$retryRes->successful() || !$retryRes->json('status')) {
+                        $retryRes = Http::timeout(10)
+                            ->withHeaders([
+                                'Authorization' => 'Bearer ' . $this->apiKey,
+                                'Accept' => 'application/json',
+                                'Content-Type' => 'application/json',
+                            ])
+                            ->post("{$mitraBase}/request_pickup", $pickupPayload);
+                    }
+
+                    if ($retryRes->successful() && $retryRes->json('status')) {
+                        $successfulResponse = $retryRes;
+                        $succeededCourier = $currCourier;
+                        $succeededService = $currServiceType;
+                        $wasAdapted = !empty($attempt['is_alternative']) || ($currCourier !== $courier);
+                        break;
+                    }
                 }
             }
 
@@ -456,7 +533,11 @@ class KiriminAjaShippingService
                         if (strlen($clock) === 5) {
                             $clock .= ':00';
                         }
-                        return $now->format('Y-m-d') . ' ' . $clock;
+                        $slotDateTime = \Illuminate\Support\Carbon::createFromFormat('Y-m-d H:i:s', $now->format('Y-m-d') . ' ' . $clock, 'Asia/Jakarta');
+                        // Pastikan slot waktu adalah di masa depan dengan jarak minimal 45 menit dari sekarang
+                        if ($slotDateTime && $slotDateTime->isFuture() && $slotDateTime->diffInMinutes($now) >= 45) {
+                            return $slotDateTime->format('Y-m-d H:i:s');
+                        }
                     }
                 }
             }
@@ -464,15 +545,63 @@ class KiriminAjaShippingService
             Log::info('KiriminAja schedules check notice: ' . $e->getMessage());
         }
 
-        // Fallback waktu yang valid (format: Y-m-d H:i:s)
-        if ($now->hour >= 16) {
-            return $now->copy()->addDay()->setTime(10, 0, 0)->format('Y-m-d H:i:s');
-        }
-        if ($now->hour < 9) {
-            return $now->copy()->setTime(11, 0, 0)->format('Y-m-d H:i:s');
+        // Jika lewat pukul 14:00 WIB, semua slot pickup kurir hari ini sudah ditutup.
+        // Jadwalkan pickup untuk hari kerja berikutnya pukul 10:00 WIB (atau Senin jika besok Minggu).
+        if ($now->hour >= 14) {
+            $target = $now->copy()->addDay();
+            if ($target->isSunday()) {
+                $target->addDay();
+            }
+            return $target->setTime(10, 0, 0)->format('Y-m-d H:i:s');
         }
 
-        return $now->copy()->addHours(2)->format('Y-m-d H:i:00');
+        if ($now->hour < 9) {
+            return $now->copy()->setTime(10, 0, 0)->format('Y-m-d H:i:s');
+        }
+
+        return $now->copy()->addHours(2)->setTime($now->hour + 2, 0, 0)->format('Y-m-d H:i:00');
+    }
+
+    /**
+     * Periksa apakah order sudah pernah terdaftar dan diterbitkan resi di KiriminAja
+     */
+    public function checkExistingShipment(string $orderId): ?array
+    {
+        if (empty($orderId) || $this->apiKey === 'demo_kiriminaja_key' || app()->environment('testing')) {
+            return null;
+        }
+
+        try {
+            $mitraBase = $this->getMitraBaseUrl();
+            $res = Http::timeout(5)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$mitraBase}/tracking", ['order_id' => $orderId]);
+
+            if ($res->successful() && $res->json('status')) {
+                $details = $res->json('details') ?? [];
+                if (!empty($details) && is_array($details)) {
+                    $awb = $details['awb'] ?? ($details['order_id'] ?? $orderId);
+                    return [
+                        'success' => true,
+                        'courier' => strtoupper($details['service'] ?? 'KIRIMINAJA'),
+                        'service' => strtoupper($details['service_name'] ?? 'REG'),
+                        'tracking_number' => $awb,
+                        'booking_id' => $details['order_id'] ?? $orderId,
+                        'is_simulation' => false,
+                        'adapted' => false,
+                        'original_courier' => strtoupper($details['service'] ?? 'KIRIMINAJA'),
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::info("KiriminAja checkExistingShipment error: " . $e->getMessage());
+        }
+
+        return null;
     }
 
     /**
