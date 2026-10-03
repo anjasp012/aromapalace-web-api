@@ -215,15 +215,9 @@
 
                 @if($order->payment)
                     <div class="pt-2.5 sm:pt-3 border-t border-gray-100 text-[11px] sm:text-xs space-y-1.5 sm:space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-500">Gateway:</span>
-                            <span class="px-2 py-0.5 rounded bg-gray-100 text-gray-800 border border-gray-200 font-semibold uppercase text-[10px]">
-                                {{ strtoupper($order->payment->payment_gateway ?? 'Pakasir') }}
-                            </span>
-                        </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Metode:</span>
-                            <span class="font-bold text-gray-800">{{ strtoupper($order->payment->payment_type ?? $order->payment_method) }}</span>
+                            <span class="font-bold text-gray-800">{{ strtoupper(str_replace('_', ' ', $order->payment->payment_type ?? $order->payment_method)) }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Status Pembayaran:</span>
@@ -250,9 +244,9 @@
                                     <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
                                         <div class="flex items-center gap-1.5 font-bold mb-0.5 text-amber-800">
                                             <span>🧪</span>
-                                            <span>Mode Sandbox Pakasir (Testing)</span>
+                                            <span>Mode Sandbox (Testing)</span>
                                         </div>
-                                        <p class="text-amber-700">Transaksi aktif dalam mode sandbox Pakasir. Gunakan tombol <strong>Simulasikan Pembayaran Sukses</strong> di bawah untuk menguji perubahan status menjadi Lunas secara instan.</p>
+                                        <p class="text-amber-700">Transaksi aktif dalam mode sandbox pengujian. Gunakan tombol <strong>Simulasikan Pembayaran Sukses</strong> di bawah untuk menguji perubahan status menjadi Lunas secara instan.</p>
                                     </div>
                                 @endif
 
@@ -288,7 +282,7 @@
                                     @if($paymentUrl)
                                         <a href="{{ $paymentUrl }}" target="_blank" rel="noopener noreferrer"
                                            class="w-full bg-[#650506] hover:bg-[#4A070B] text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition text-center shadow-2xs">
-                                            <span>💳 Buka Halaman Bayar Pakasir</span>
+                                            <span>💳 Buka Halaman Pembayaran</span>
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </a>
                                     @endif

@@ -142,10 +142,10 @@ class CheckoutService
             'applied_promo' => $validPromo,
             'total_amount' => $totalAmount,
             'available_payment_methods' => [
-                ['code' => 'qris', 'name' => 'QRIS Instant (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'qr'],
-                ['code' => 'bri_va', 'name' => 'BRI Virtual Account (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'bank'],
-                ['code' => 'bni_va', 'name' => 'BNI Virtual Account (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'bank'],
-                ['code' => 'permata_va', 'name' => 'Permata Virtual Account (via Pakasir)', 'provider' => 'Pakasir', 'icon' => 'bank'],
+                ['code' => 'qris', 'name' => 'QRIS Instant', 'provider' => 'QRIS', 'icon' => 'qr'],
+                ['code' => 'bri_va', 'name' => 'BRI Virtual Account', 'provider' => 'Bank BRI', 'icon' => 'bank'],
+                ['code' => 'bni_va', 'name' => 'BNI Virtual Account', 'provider' => 'Bank BNI', 'icon' => 'bank'],
+                ['code' => 'permata_va', 'name' => 'Permata Virtual Account', 'provider' => 'Bank Permata', 'icon' => 'bank'],
                 ['code' => 'cod', 'name' => 'Cash On Delivery (Bayar di Tempat)', 'provider' => 'COD', 'icon' => 'cash'],
             ],
         ];

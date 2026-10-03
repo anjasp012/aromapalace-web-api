@@ -75,8 +75,7 @@ class CheckoutController extends Controller
                 ]);
             }
 
-            return redirect()->route('account.orders.show', $order->order_number)
-                ->with('success', "Pesanan #{$order->order_number} berhasil dibuat via Pakasir! Silakan selesaikan pembayaran.");
+            return redirect()->route('account.orders.show', $order->order_number);
         } catch (Exception $e) {
             if ($request->expectsJson()) {
                 return response()->json([
