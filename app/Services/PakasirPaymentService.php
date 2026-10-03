@@ -65,10 +65,24 @@ class PakasirPaymentService
                     return $this->savePaymentRecord($order, $paymentMethod, $amount, $resData);
                 }
 
-                Log::warning('Pakasir API response error: ' . $response->body());
+                Log::warning("Pakasir API create-transaction failed [HTTP {$response->status()}]: " . $response->body(), [
+                    'endpoint' => $endpoint,
+                    'order' => $orderNumber,
+                    'method' => $targetMethod,
+                    'amount' => $amount,
+                ]);
             } catch (Exception $e) {
-                Log::error('Pakasir API connection error: ' . $e->getMessage());
+                Log::error('Pakasir API connection exception: ' . $e->getMessage(), [
+                    'endpoint' => $endpoint ?? null,
+                    'order' => $orderNumber,
+                ]);
             }
+        } else {
+            Log::info('Pakasir running in simulation mode (API call skipped).', [
+                'reason' => ($this->apiKey === 'demo_pakasir_key') ? 'API key is still demo_pakasir_key (check .env / config:cache)' : 'App environment is testing',
+                'env' => app()->environment(),
+                'api_key_configured' => ($this->apiKey !== 'demo_pakasir_key'),
+            ]);
         }
 
         // Mode Sandbox / Simulasi Cerdas (Bila API key belum dikonfigurasi / pengujian lokal)
