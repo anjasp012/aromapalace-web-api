@@ -65,17 +65,22 @@ class PakasirPaymentService
                     return $this->savePaymentRecord($order, $paymentMethod, $amount, $resData);
                 }
 
+                $errMessage = $response->json('message') ?? $response->body();
                 Log::warning("Pakasir API create-transaction failed [HTTP {$response->status()}]: " . $response->body(), [
                     'endpoint' => $endpoint,
                     'order' => $orderNumber,
                     'method' => $targetMethod,
                     'amount' => $amount,
                 ]);
+
+                throw new Exception("Gateway pembayaran menolak transaksi ({$errMessage})");
             } catch (Exception $e) {
                 Log::error('Pakasir API connection exception: ' . $e->getMessage(), [
                     'endpoint' => $endpoint ?? null,
                     'order' => $orderNumber,
                 ]);
+
+                throw new Exception("Gagal menghubungi gateway pembayaran: " . $e->getMessage());
             }
         } else {
             Log::info('Pakasir running in simulation mode (API call skipped).', [
@@ -85,7 +90,7 @@ class PakasirPaymentService
             ]);
         }
 
-        // Mode Sandbox / Simulasi Cerdas (Bila API key belum dikonfigurasi / pengujian lokal)
+        // Mode Sandbox / Simulasi Cerdas (Hanya aktif bila API key belum dikonfigurasi / pengujian testing)
         $simulatedData = $this->generateSimulationData($orderNumber, $paymentMethod, $amount);
         return $this->savePaymentRecord($order, $paymentMethod, $amount, $simulatedData);
     }
