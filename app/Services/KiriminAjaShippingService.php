@@ -106,7 +106,7 @@ class KiriminAjaShippingService
     public function createShipment(Order $order): array
     {
         $courier = strtolower($order->shipping_courier ?: 'jne');
-        $service = strtolower($order->shipping_service ?: 'reg');
+        $rawService = strtolower($order->shipping_service ?: 'reg');
 
         // Jika mode live dengan API key asli (bukan testing/demo)
         if ($this->apiKey !== 'demo_kiriminaja_key' && !app()->environment('testing')) {
@@ -117,6 +117,9 @@ class KiriminAjaShippingService
             $destinationCity = $snap['city'] ?? ($order->address?->city ?? 'Jakarta');
             $destinationPostal = $snap['postal_code'] ?? ($order->address?->postal_code ?? '10110');
             $destCityId = $this->resolveCityId($destinationCity);
+
+            // JNE intra-city menggunakan CTC (bukan REG), J&T menggunakan EZ
+            $service = $this->resolveServiceType($courier, $rawService, $this->senderCityId, $destCityId);
 
             $prefix = config('services.kiriminaja.order_prefix', '');
             $rawOrder = $order->order_number;
@@ -184,6 +187,46 @@ class KiriminAjaShippingService
                         'Content-Type' => 'application/json',
                     ])
                     ->post("{$mitraBase}/request_pickup", $pickupPayload);
+            }
+
+            // 3. Jika gagal karena "tidak tersedia", otomatis coba alternatif service type kurir
+            if (!$response->successful() || !$response->json('status')) {
+                $resText = strtolower($response->json('text') ?? ($response->json('message') ?? ''));
+                if (str_contains($resText, 'tidak tersedia')) {
+                    $alternatives = [];
+                    if ($courier === 'jne') {
+                        $alternatives = ($service === 'ctc') ? ['reg', 'oke'] : ['ctc', 'oke'];
+                    } elseif ($courier === 'jnt' || $courier === 'j&t') {
+                        $alternatives = ($service === 'ez') ? ['reg'] : ['ez'];
+                    }
+
+                    foreach ($alternatives as $alt) {
+                        $pickupPayload['packages'][0]['service_type'] = $alt;
+                        $retryRes = Http::timeout(10)
+                            ->withHeaders([
+                                'Authorization' => 'Bearer ' . $this->apiKey,
+                                'Accept' => 'application/json',
+                                'Content-Type' => 'application/json',
+                            ])
+                            ->post("{$mitraBase}/v6.1/request_pickup", $pickupPayload);
+
+                        if (!$retryRes->successful() || !$retryRes->json('status')) {
+                            $retryRes = Http::timeout(10)
+                                ->withHeaders([
+                                    'Authorization' => 'Bearer ' . $this->apiKey,
+                                    'Accept' => 'application/json',
+                                    'Content-Type' => 'application/json',
+                                ])
+                                ->post("{$mitraBase}/request_pickup", $pickupPayload);
+                        }
+
+                        if ($retryRes->successful() && $retryRes->json('status')) {
+                            $response = $retryRes;
+                            $service = $alt;
+                            break;
+                        }
+                    }
+                }
             }
 
             // Jika API KiriminAja merespon gagal
@@ -296,6 +339,42 @@ class KiriminAjaShippingService
         }
 
         return $now->copy()->addHours(2)->format('Y-m-d H:i:00');
+    }
+
+    /**
+     * Map service type agar valid sesuai ketentuan kurir KiriminAja
+     */
+    protected function resolveServiceType(string $courier, string $service, int $originId, int $destId): string
+    {
+        $courier = strtolower($courier);
+        $service = strtolower($service);
+
+        // JNE: Intra-DKI Jakarta / sesama kota menggunakan CTC (City to City), bukan REG
+        if ($courier === 'jne') {
+            $isJakartaOrigin = in_array($originId, [151, 152, 153, 154, 155]);
+            $isJakartaDest = in_array($destId, [151, 152, 153, 154, 155]);
+
+            if ($isJakartaOrigin && $isJakartaDest) {
+                if (in_array($service, ['reg', 'regular', 'standard'])) {
+                    return 'ctc';
+                }
+                if ($service === 'yes') {
+                    return 'ctcyes';
+                }
+                if ($service === 'oke') {
+                    return 'ctcoke';
+                }
+            }
+        }
+
+        // J&T: Layanan standar adalah EZ
+        if ($courier === 'jnt' || $courier === 'j&t') {
+            if (in_array($service, ['reg', 'regular', 'standard'])) {
+                return 'ez';
+            }
+        }
+
+        return $service;
     }
 
     /**
