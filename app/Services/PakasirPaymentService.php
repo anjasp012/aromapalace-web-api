@@ -47,8 +47,9 @@ class PakasirPaymentService
 
         // Jika mode live dengan API key asli, panggil HTTP API Pakasir v2
         if ($this->apiKey !== 'demo_pakasir_key' && !app()->environment('testing')) {
+            $endpoint = rtrim($this->baseUrl, '/') . "/api/v2/create-transaction/{$this->project}/{$orderNumber}";
+
             try {
-                $endpoint = rtrim($this->baseUrl, '/') . "/api/v2/create-transaction/{$this->project}/{$orderNumber}";
                 $response = Http::timeout(10)
                     ->withHeaders([
                         'X-Api-Key' => $this->apiKey,
@@ -59,29 +60,28 @@ class PakasirPaymentService
                         'method' => $targetMethod,
                         'amount' => $amount,
                     ]);
-
-                if ($response->successful()) {
-                    $resData = $response->json('data') ?? $response->json();
-                    return $this->savePaymentRecord($order, $paymentMethod, $amount, $resData);
-                }
-
-                $errMessage = $response->json('message') ?? $response->body();
-                Log::warning("Pakasir API create-transaction failed [HTTP {$response->status()}]: " . $response->body(), [
-                    'endpoint' => $endpoint,
-                    'order' => $orderNumber,
-                    'method' => $targetMethod,
-                    'amount' => $amount,
-                ]);
-
-                throw new Exception("Gateway pembayaran menolak transaksi ({$errMessage})");
             } catch (Exception $e) {
                 Log::error('Pakasir API connection exception: ' . $e->getMessage(), [
-                    'endpoint' => $endpoint ?? null,
+                    'endpoint' => $endpoint,
                     'order' => $orderNumber,
                 ]);
 
-                throw new Exception("Gagal menghubungi gateway pembayaran: " . $e->getMessage());
+                throw new Exception('Layanan pembayaran sedang mengalami gangguan koneksi. Silakan coba beberapa saat lagi.');
             }
+
+            if ($response->successful()) {
+                $resData = $response->json('data') ?? $response->json();
+                return $this->savePaymentRecord($order, $paymentMethod, $amount, $resData);
+            }
+
+            Log::warning("Pakasir API create-transaction failed [HTTP {$response->status()}]: " . $response->body(), [
+                'endpoint' => $endpoint,
+                'order' => $orderNumber,
+                'method' => $targetMethod,
+                'amount' => $amount,
+            ]);
+
+            throw new Exception('Metode pembayaran sedang tidak dapat diproses. Silakan pilih metode lain atau coba beberapa saat lagi.');
         } else {
             Log::info('Pakasir running in simulation mode (API call skipped).', [
                 'reason' => ($this->apiKey === 'demo_pakasir_key') ? 'API key is still demo_pakasir_key (check .env / config:cache)' : 'App environment is testing',
