@@ -52,8 +52,10 @@ class OrderController extends Controller
     {
         $order = $this->findOrder($id);
 
+        $shipmentInfo = null;
+
         try {
-            DB::transaction(function () use ($order, $kiriminAjaService) {
+            DB::transaction(function () use ($order, $kiriminAjaService, &$shipmentInfo) {
                 $trackingNumber = $order->tracking_number;
                 $orderStatus = 'processing';
 
@@ -66,8 +68,8 @@ class OrderController extends Controller
                 } else {
                     // Pengiriman kurir (home_delivery): otomatis terbitkan resi via KiriminAja
                     if (empty($trackingNumber)) {
-                        $shipment = $kiriminAjaService->createShipment($order);
-                        $trackingNumber = $shipment['tracking_number'] ?? null;
+                        $shipmentInfo = $kiriminAjaService->createShipment($order);
+                        $trackingNumber = $shipmentInfo['tracking_number'] ?? null;
                     }
                     $orderStatus = 'shipped';
                 }
@@ -101,6 +103,15 @@ class OrderController extends Controller
                 $msg .= " Nomor Resi Otomatis: {$order->tracking_number} ({$order->shipping_courier})";
             } elseif ($order->pickup_code) {
                 $msg .= " Kode Pickup Butik: {$order->pickup_code}";
+            }
+
+            // Jika ada info error / peringatan dari API KiriminAja (misal IP Whitelist):
+            if (!empty($shipmentInfo['api_error'])) {
+                $warningMsg = "<strong>Respon KiriminAja:</strong> " . e($shipmentInfo['api_error']);
+                if (!empty($shipmentInfo['detected_ip'])) {
+                    $warningMsg .= "<br><span class='mt-1 inline-block text-[11px] text-amber-900'>IP Server Anda (<strong>" . e($shipmentInfo['detected_ip']) . "</strong>) belum di-whitelist di <em>Dashboard KiriminAja &rarr; Pengaturan / Integrasi &rarr; IP Whitelist</em>. Resi internal tetap diterbitkan agar proses admin berjalan, tetapi paket belum tercatat live di sistem KiriminAja hingga IP tersebut ditambahkan.</span>";
+                }
+                return back()->with('success', $msg)->with('warning', $warningMsg);
             }
 
             return back()->with('success', $msg);

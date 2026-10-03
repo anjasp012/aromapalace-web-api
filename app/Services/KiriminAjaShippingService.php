@@ -181,9 +181,14 @@ class KiriminAjaShippingService
                         ->post("{$mitraBase}/request_pickup", $flatPayload);
                 }
 
+                $apiError = null;
+                $detectedIp = null;
+
                 if (!$response->successful() || !$response->json('status')) {
                     $resJson = $response->json() ?? [];
+                    $apiError = $resJson['text'] ?? ($resJson['message'] ?? ("KiriminAja HTTP {$response->status()}"));
                     if (isset($resJson['your_ip'])) {
+                        $detectedIp = $resJson['your_ip'];
                         Log::warning("KiriminAja IP Whitelist: IP {$resJson['your_ip']} belum di-whitelist di dashboard KiriminAja!");
                     }
                     Log::warning("KiriminAja request_pickup [HTTP {$response->status()}]: " . $response->body());
@@ -215,9 +220,13 @@ class KiriminAjaShippingService
                         'courier' => $courier,
                         'tracking_number' => $trackingNumber,
                         'booking_id' => $bookingId,
+                        'is_simulation' => false,
+                        'api_error' => null,
+                        'detected_ip' => null,
                     ];
                 }
             } catch (Exception $e) {
+                $apiError = $e->getMessage();
                 Log::warning('KiriminAja createShipment error: ' . $e->getMessage());
             }
         }
@@ -233,6 +242,9 @@ class KiriminAjaShippingService
             'courier' => $courier,
             'tracking_number' => $trackingNumber,
             'booking_id' => $bookingId,
+            'is_simulation' => true,
+            'api_error' => $apiError ?? null,
+            'detected_ip' => $detectedIp ?? null,
         ];
     }
 
