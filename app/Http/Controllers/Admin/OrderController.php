@@ -101,6 +101,9 @@ class OrderController extends Controller
             $msg = "Pesanan #{$order->order_number} berhasil DITERIMA!";
             if ($order->tracking_number) {
                 $msg .= " Nomor Resi Otomatis: {$order->tracking_number} ({$order->shipping_courier})";
+                if (!empty($shipmentInfo['adapted'])) {
+                    $msg .= " - [Catatan: Kurir otomatis dialihkan ke {$order->shipping_courier} karena {$shipmentInfo['original_courier']} tidak aktif di KiriminAja]";
+                }
             } elseif ($order->pickup_code) {
                 $msg .= " Kode Pickup Butik: {$order->pickup_code}";
             }
