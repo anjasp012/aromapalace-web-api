@@ -78,13 +78,13 @@ class AccountController extends Controller
         $order = $this->orderService->getOrderDetail($user, $orderNumber);
 
         if ($order->payment_status === 'paid') {
-            return back()->with('success', 'Pesanan ini sudah berstatus LUNAS.');
+            return back();
         }
 
         try {
             $result = $pakasirService->checkTransactionStatus($order);
             if ($result['paid']) {
-                return back()->with('success', 'Pembayaran berhasil terverifikasi! Pesanan Anda sedang diproses.');
+                return back();
             }
             return back()->with('info', $result['message'] ?? 'Menunggu pembayaran diselesaikan.');
         } catch (Exception $e) {
@@ -98,7 +98,7 @@ class AccountController extends Controller
         $order = $this->orderService->getOrderDetail($user, $orderNumber);
 
         if ($order->payment_status === 'paid') {
-            return back()->with('success', 'Pesanan sudah berstatus LUNAS.');
+            return back();
         }
 
         try {
@@ -107,7 +107,7 @@ class AccountController extends Controller
                 'PKS-SIM-' . strtoupper(\Illuminate\Support\Str::random(8)),
                 $order->payment_method
             );
-            return back()->with('success', 'Simulasi pembayaran sukses! Status pesanan kini menjadi DIPROSES.');
+            return back();
         } catch (Exception $e) {
             return back()->with('error', 'Gagal memproses simulasi: ' . $e->getMessage());
         }
