@@ -111,30 +111,66 @@ class KiriminAjaShippingService
         // Jika mode live dengan API key asli
         if ($this->apiKey !== 'demo_kiriminaja_key' && !app()->environment('testing')) {
             try {
-                $payload = [
+                $snap = $order->shipping_address_snapshot ?? [];
+                $recipientName = $snap['recipient_name'] ?? ($order->address?->recipient_name ?? ($order->user?->name ?? 'Customer'));
+                $recipientPhone = $snap['phone_number'] ?? ($order->address?->phone_number ?? '08123456789');
+                $destinationAddress = $snap['full_address'] ?? ($order->address?->full_address ?? 'Alamat Pemesan');
+                $destinationCity = $snap['city'] ?? ($order->address?->city ?? 'Jakarta');
+                $destinationPostal = $snap['postal_code'] ?? ($order->address?->postal_code ?? '10110');
+                $destCityId = $this->resolveCityId($destinationCity);
+
+                $packageData = [
+                    'order_id' => (string) $order->order_number,
+                    'destination_name' => $recipientName,
+                    'destination_phone' => $recipientPhone,
+                    'destination_address' => $destinationAddress,
+                    'destination_kecamatan_id' => $destCityId,
+                    'destination_zipcode' => $destinationPostal,
+                    'weight' => max(250, (int) $order->items->sum(fn($i) => ($i->quantity * 250))),
+                    'item_value' => (int) round($order->total_amount),
+                    'shipping_cost' => (int) round($order->shipping_cost),
+                    'service' => strtolower($service),
+                    'service_type' => strtolower($courier),
+                    'item_description' => 'Parfum Eksklusif Aroma Palace (Haute Fragrance)',
+                ];
+
+                $v6Payload = [
+                    'address' => 'Jl. M.H. Thamrin No. 88, Menteng, Jakarta Pusat',
+                    'phone' => $this->senderPhone,
+                    'name' => $this->senderName,
+                    'zipcode' => '10350',
+                    'packages' => [$packageData],
+                ];
+
+                $flatPayload = [
                     'order_id' => $order->order_number,
                     'courier' => strtolower($courier),
                     'service' => strtolower($service),
                     'sender_name' => $this->senderName,
                     'sender_phone' => $this->senderPhone,
-                    'recipient_name' => $order->address->recipient_name ?? $order->user->name,
-                    'recipient_phone' => $order->address->phone_number ?? '08123456789',
-                    'destination_address' => $order->address->full_address ?? 'Alamat Pemesan',
-                    'destination_city' => $order->address->city ?? 'Jakarta',
-                    'destination_postal_code' => $order->address->postal_code ?? '10110',
+                    'origin_id' => $this->senderCityId,
+                    'destination_id' => $destCityId,
+                    'recipient_name' => $recipientName,
+                    'recipient_phone' => $recipientPhone,
+                    'destination_address' => $destinationAddress,
+                    'destination_city' => $destinationCity,
+                    'destination_postal_code' => $destinationPostal,
                     'item_description' => 'Parfum Eksklusif Aroma Palace (Haute Fragrance)',
-                    'total_amount' => (int) $order->total_amount,
+                    'weight' => max(250, (int) $order->items->sum(fn($i) => ($i->quantity * 250))),
+                    'total_amount' => (int) round($order->total_amount),
                 ];
 
                 $mitraBase = $this->getMitraBaseUrl();
+                // 1. Coba endpoint resmi v6.2
                 $response = Http::timeout(10)
                     ->withHeaders([
                         'Authorization' => 'Bearer ' . $this->apiKey,
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
                     ])
-                    ->post("{$mitraBase}/v6.2/request_pickup", $payload);
+                    ->post("{$mitraBase}/v6.2/request_pickup", $v6Payload);
 
+                // 2. Jika gagal, coba fallback flat format
                 if (!$response->successful() || !$response->json('status')) {
                     $response = Http::timeout(10)
                         ->withHeaders([
@@ -142,13 +178,35 @@ class KiriminAjaShippingService
                             'Accept' => 'application/json',
                             'Content-Type' => 'application/json',
                         ])
-                        ->post("{$mitraBase}/request_pickup", $payload);
+                        ->post("{$mitraBase}/request_pickup", $flatPayload);
+                }
+
+                if (!$response->successful() || !$response->json('status')) {
+                    $resJson = $response->json() ?? [];
+                    if (isset($resJson['your_ip'])) {
+                        Log::warning("KiriminAja IP Whitelist: IP {$resJson['your_ip']} belum di-whitelist di dashboard KiriminAja!");
+                    }
+                    Log::warning("KiriminAja request_pickup [HTTP {$response->status()}]: " . $response->body());
                 }
 
                 if ($response->successful() && $response->json('status')) {
                     $data = $response->json('data');
-                    $trackingNumber = $data['awb'] ?? ('KA-' . strtoupper($courier) . '-' . rand(10000000, 99999999));
-                    $bookingId = $data['booking_id'] ?? ('BKG-' . Str::random(8));
+                    $trackingNumber = null;
+                    $bookingId = null;
+
+                    if (is_array($data)) {
+                        if (isset($data['awb']) || isset($data['booking_id'])) {
+                            $trackingNumber = $data['awb'] ?? null;
+                            $bookingId = $data['booking_id'] ?? null;
+                        } elseif (isset($data[0])) {
+                            $first = $data[0];
+                            $trackingNumber = $first['awb'] ?? ($first['tracking_number'] ?? null);
+                            $bookingId = $first['booking_id'] ?? null;
+                        }
+                    }
+
+                    $trackingNumber = $trackingNumber ?: ('KA-' . strtoupper($courier) . '-' . rand(10000000, 99999999));
+                    $bookingId = $bookingId ?: ('BKG-' . Str::random(8));
 
                     $this->updateOrderTracking($order, $trackingNumber, $courier, $service, $bookingId);
 

@@ -249,7 +249,7 @@ class WebAndAdminViewsTest extends TestCase
         $res->assertStatus(200)
             ->assertSee('Free Shipping', false)
             ->assertSee('Authentic Brands', false)
-            ->assertSee('Search for perfumes...', false)
+            ->assertSee('Cari parfum', false)
             ->assertSee('Account', false)
             ->assertSee('Wishlist', false)
             ->assertSee('Cart', false)

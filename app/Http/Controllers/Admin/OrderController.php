@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderStatusHistory;
 use App\Services\OrderService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -40,6 +43,141 @@ class OrderController extends Controller
         $order = $this->findOrder($id);
 
         return view('admin.orders.show', compact('order'));
+    }
+
+    /**
+     * Terima Pesanan: Otomatis terbitkan resi pengiriman kurir via KiriminAja & ubah status pesanan
+     */
+    public function acceptOrder(string|int $id, \App\Services\KiriminAjaShippingService $kiriminAjaService): RedirectResponse
+    {
+        $order = $this->findOrder($id);
+
+        try {
+            DB::transaction(function () use ($order, $kiriminAjaService) {
+                $trackingNumber = $order->tracking_number;
+                $orderStatus = 'processing';
+
+                // 1. Jika penjemputan butik vs pengiriman kurir
+                if (in_array($order->fulfillment_type, ['store_pickup', 'pickup'])) {
+                    if (empty($order->pickup_code)) {
+                        $order->pickup_code = 'PCK-' . strtoupper(Str::random(6));
+                    }
+                    $orderStatus = 'ready_for_pickup';
+                } else {
+                    // Pengiriman kurir (home_delivery): otomatis terbitkan resi via KiriminAja
+                    if (empty($trackingNumber)) {
+                        $shipment = $kiriminAjaService->createShipment($order);
+                        $trackingNumber = $shipment['tracking_number'] ?? null;
+                    }
+                    $orderStatus = 'shipped';
+                }
+
+                // 2. Set status pesanan dan pembayaran (Lunas)
+                $order->update([
+                    'order_status' => $orderStatus,
+                    'payment_status' => 'paid',
+                    'tracking_number' => $trackingNumber,
+                    'pickup_code' => $order->pickup_code ?? null,
+                ]);
+
+                if ($order->payment) {
+                    $order->payment->update(['transaction_status' => 'settlement']);
+                }
+
+                // 3. Catat history log
+                OrderStatusHistory::create([
+                    'order_id' => $order->id,
+                    'status' => $orderStatus,
+                    'title' => 'Pesanan Diterima oleh Butik',
+                    'description' => $trackingNumber
+                        ? "Pesanan telah diterima. Resi kurir otomatis telah diterbitkan: {$trackingNumber}."
+                        : "Pesanan telah diterima dan siap untuk diambil di butik.",
+                ]);
+            });
+
+            $order->refresh();
+            $msg = "Pesanan #{$order->order_number} berhasil DITERIMA!";
+            if ($order->tracking_number) {
+                $msg .= " Nomor Resi Otomatis: {$order->tracking_number} ({$order->shipping_courier})";
+            } elseif ($order->pickup_code) {
+                $msg .= " Kode Pickup Butik: {$order->pickup_code}";
+            }
+
+            return back()->with('success', $msg);
+        } catch (Exception $e) {
+            return back()->with('error', 'Gagal memproses penerimaan pesanan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Tolak Pesanan: Batalkan pesanan dan otomatis kembalikan stok produk ke etalase
+     */
+    public function rejectOrder(Request $request, string|int $id): RedirectResponse
+    {
+        $order = $this->findOrder($id);
+        $reason = $request->input('reason', 'Pesanan ditolak oleh pihak butik / admin.');
+
+        try {
+            DB::transaction(function () use ($order, $reason) {
+                // 1. Kembalikan stok produk jika belum pernah dibatalkan
+                if ($order->order_status !== 'cancelled') {
+                    foreach ($order->items as $item) {
+                        if ($item->variant) {
+                            $item->variant->increment('stock', $item->quantity);
+                        }
+                        if ($item->product) {
+                            $item->product->increment('stock', $item->quantity);
+                        }
+                    }
+                }
+
+                // 2. Tandai cancelled
+                $order->update([
+                    'order_status' => 'cancelled',
+                    'cancelled_at' => now(),
+                    'notes' => $order->notes ? ($order->notes . ' | Alasan Ditolak: ' . $reason) : ('Alasan Ditolak: ' . $reason),
+                ]);
+
+                // 3. Catat history
+                OrderStatusHistory::create([
+                    'order_id' => $order->id,
+                    'status' => 'cancelled',
+                    'title' => 'Pesanan Ditolak',
+                    'description' => $reason,
+                ]);
+            });
+
+            return back()->with('success', "Pesanan #{$order->order_number} telah DITOLAK. Stok produk berhasil dikembalikan.");
+        } catch (Exception $e) {
+            return back()->with('error', 'Gagal menolak pesanan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Tandai pesanan selesai
+     */
+    public function completeOrder(string|int $id): RedirectResponse
+    {
+        $order = $this->findOrder($id);
+
+        try {
+            $order->update([
+                'order_status' => 'completed',
+                'payment_status' => 'paid',
+                'completed_at' => now(),
+            ]);
+
+            OrderStatusHistory::create([
+                'order_id' => $order->id,
+                'status' => 'completed',
+                'title' => 'Pesanan Selesai',
+                'description' => 'Pesanan telah selesai dan barang telah diterima pelanggan dengan baik.',
+            ]);
+
+            return back()->with('success', "Pesanan #{$order->order_number} telah selesai diproses.");
+        } catch (Exception $e) {
+            return back()->with('error', 'Gagal menyelesaikan pesanan: ' . $e->getMessage());
+        }
     }
 
     public function updateStatus(Request $request, string|int $id): RedirectResponse

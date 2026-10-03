@@ -29,6 +29,9 @@ Route::middleware(['auth', EnsureUserIsAdmin::class])->group(function () {
     // Orders Management
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{id}/accept', [OrderController::class, 'acceptOrder'])->name('orders.accept');
+    Route::post('/orders/{id}/reject', [OrderController::class, 'rejectOrder'])->name('orders.reject');
+    Route::post('/orders/{id}/complete', [OrderController::class, 'completeOrder'])->name('orders.complete');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.update_status');
     Route::post('/orders/{id}/kiriminaja-awb', [OrderController::class, 'generateKiriminAjaAwb'])->name('orders.kiriminaja_awb');
 

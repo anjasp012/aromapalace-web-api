@@ -281,4 +281,89 @@ class PakasirAndKiriminAjaTest extends TestCase
         $this->assertEquals('bri_va', $payment->payment_type);
         $this->assertNotEmpty($payment->va_number);
     }
+
+    public function test_admin_can_accept_order_and_automatically_generate_resi(): void
+    {
+        $this->actingAs($this->admin);
+
+        $order = Order::create([
+            'user_id' => $this->user->id,
+            'order_number' => 'AP-TEST-ACC-' . uniqid(),
+            'order_status' => 'pending_payment',
+            'payment_status' => 'unpaid',
+            'subtotal' => 350000,
+            'shipping_cost' => 18000,
+            'total_amount' => 368000,
+            'fulfillment_type' => 'home_delivery',
+            'shipping_courier' => 'JNE',
+            'shipping_service' => 'REG',
+            'shipping_address_snapshot' => [
+                'recipient_name' => 'Budi Santoso',
+                'phone_number' => '08123456789',
+                'city' => 'Surabaya',
+                'postal_code' => '60111',
+                'full_address' => 'Jl. Pemuda No. 12',
+            ],
+        ]);
+
+        $response = $this->post("/admin/orders/{$order->id}/accept");
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $order->refresh();
+        $this->assertEquals('shipped', $order->order_status);
+        $this->assertEquals('paid', $order->payment_status);
+        $this->assertNotEmpty($order->tracking_number);
+        $this->assertStringContainsString('KA-JNE', $order->tracking_number);
+
+        $this->assertDatabaseHas('order_status_histories', [
+            'order_id' => $order->id,
+            'status' => 'shipped',
+        ]);
+    }
+
+    public function test_admin_can_reject_order_and_restock_products(): void
+    {
+        $this->actingAs($this->admin);
+
+        $initialStock = $this->product->stock;
+
+        $order = Order::create([
+            'user_id' => $this->user->id,
+            'order_number' => 'AP-TEST-REJ-' . uniqid(),
+            'order_status' => 'pending_payment',
+            'payment_status' => 'unpaid',
+            'subtotal' => 250000,
+            'shipping_cost' => 15000,
+            'total_amount' => 265000,
+            'fulfillment_type' => 'home_delivery',
+        ]);
+
+        $order->items()->create([
+            'product_id' => $this->product->id,
+            'product_name' => $this->product->name,
+            'price' => 250000,
+            'quantity' => 2,
+            'subtotal' => 500000,
+        ]);
+
+        $response = $this->post("/admin/orders/{$order->id}/reject", [
+            'reason' => 'Stok varian aroma sedang habis produksi',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $order->refresh();
+        $this->assertEquals('cancelled', $order->order_status);
+        $this->assertNotNull($order->cancelled_at);
+
+        $this->product->refresh();
+        $this->assertEquals($initialStock + 2, $this->product->stock);
+
+        $this->assertDatabaseHas('order_status_histories', [
+            'order_id' => $order->id,
+            'status' => 'cancelled',
+        ]);
+    }
 }

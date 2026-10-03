@@ -97,80 +97,107 @@
         </div>
     </div>
 
-    <!-- ADMIN ACTION CARD: Update Status Pesanan & Logistik -->
-    <div class="bg-white rounded-2xl border border-stone-200 shadow-sm p-6 space-y-4">
+    <!-- ADMIN ACTION BAR: HANYA TERIMA PESANAN & TOLAK PESANAN (RESI OTOMATIS) -->
+    <div class="bg-white rounded-2xl border border-stone-200 shadow-sm p-5 sm:p-6 space-y-4">
         <div class="flex items-center justify-between border-b border-stone-100 pb-3">
             <div>
-                <h4 class="font-bold text-stone-900 text-base">Kontrol Status & Pengiriman</h4>
-                <p class="text-xs text-stone-500 mt-0.5">Perbarui progres pemenuhan barang, resi kurir, atau verifikasi pembayaran.</p>
+                <h4 class="font-bold text-stone-900 text-base">Keputusan Pesanan</h4>
+                <p class="text-xs text-stone-500 mt-0.5">
+                    @if(in_array($order->order_status, ['pending_payment', 'processing']))
+                        Pilih <strong>Terima Pesanan</strong> untuk menerbitkan resi pengiriman kurir otomatis, atau <strong>Tolak Pesanan</strong> untuk membatalkan transaksi dan mengembalikan stok.
+                    @elseif(in_array($order->order_status, ['shipped', 'ready_for_pickup', 'delivered']))
+                        Pesanan telah diterima dan resi otomatis aktif.
+                    @elseif($order->order_status === 'completed')
+                        Pesanan ini telah selesai diproses.
+                    @else
+                        Pesanan ini telah ditolak / dibatalkan.
+                    @endif
+                </p>
             </div>
             <span class="text-xs text-stone-400 font-mono">Order ID #{{ $order->id }}</span>
         </div>
 
-        <form method="POST" action="{{ route('admin.orders.update_status', $order->id) }}" class="space-y-4">
-            @csrf
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Status Pesanan -->
-                <div>
-                    <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Status Pemrosesan *</label>
-                    <select name="order_status" required class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2.5 text-xs font-bold text-stone-800 focus:bg-white focus:ring-2 focus:ring-[#38050D] focus:outline-none">
-                        <option value="pending_payment" {{ $order->order_status === 'pending_payment' ? 'selected' : '' }}>Pending Payment (Menunggu Pembayaran)</option>
-                        <option value="processing" {{ $order->order_status === 'processing' ? 'selected' : '' }}>Processing (Sedang Dikemas / Siap Kirim)</option>
-                        <option value="shipped" {{ $order->order_status === 'shipped' ? 'selected' : '' }}>Shipped (Diserahkan ke Kurir)</option>
-                        <option value="ready_for_pickup" {{ $order->order_status === 'ready_for_pickup' ? 'selected' : '' }}>Ready for Pickup (Siap di Butik)</option>
-                        <option value="completed" {{ $order->order_status === 'completed' ? 'selected' : '' }}>Completed (Pesanan Selesai / Diterima)</option>
-                        <option value="cancelled" {{ $order->order_status === 'cancelled' ? 'selected' : '' }}>Cancelled (Dibatalkan)</option>
-                    </select>
+        @if(in_array($order->order_status, ['pending_payment', 'processing']))
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+                <div class="text-xs text-stone-600">
+                    <span class="inline-flex items-center gap-1.5 font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
+                        <span>⏳</span>
+                        <span>Menunggu Keputusan Butik</span>
+                    </span>
+                    <span class="text-stone-400 block mt-1.5 text-[11px]">
+                        Mengklik <strong>Terima Pesanan</strong> akan otomatis menerbitkan nomor resi kurir resmi dan mengubah status pesanan.
+                    </span>
                 </div>
 
-                <!-- Status Pembayaran (Bisa diubah manual oleh Admin jika COD/Transfer) -->
-                <div>
-                    <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Status Pembayaran</label>
-                    <select name="payment_status" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2.5 text-xs font-bold text-stone-800 focus:bg-white focus:ring-2 focus:ring-[#38050D] focus:outline-none">
-                        <option value="unpaid" {{ $order->payment_status === 'unpaid' ? 'selected' : '' }}>Unpaid (Belum Lunas)</option>
-                        <option value="paid" {{ $order->payment_status === 'paid' ? 'selected' : '' }}>Paid (Lunas / Terverifikasi)</option>
-                        <option value="refunded" {{ $order->payment_status === 'refunded' ? 'selected' : '' }}>Refunded (Dana Dikembalikan)</option>
-                    </select>
-                </div>
-
-                <!-- Nomor Resi Pengiriman -->
-                <div>
-                    <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Nomor Resi Kurir</label>
-                    <input type="text" name="tracking_number" value="{{ old('tracking_number', $order->tracking_number) }}" 
-                           placeholder="Contoh: JNE0192849201"
-                           class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3 py-2.5 text-xs font-mono font-bold text-stone-800 focus:bg-white focus:ring-2 focus:ring-[#38050D] focus:outline-none">
-                </div>
-            </div>
-
-            <!-- Catatan Pembaruan -->
-            <div>
-                <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Catatan Riwayat / Alasan Perubahan (Opsional)</label>
-                <input type="text" name="notes" placeholder="Misal: Paket telah diserahkan ke drop point JNE cabang Sudirman..."
-                       class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2 text-xs text-stone-800 focus:bg-white focus:ring-2 focus:ring-[#38050D] focus:outline-none">
-            </div>
-
-            <!-- Form Actions -->
-            <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-stone-100">
-                <div>
-                    @if($order->fulfillment_type === 'home_delivery' && empty($order->tracking_number))
-                        <button type="submit" form="kiriminAjaForm" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs transition inline-flex items-center gap-1.5">
-                            <span>📦</span>
-                            <span>Generate Resi Otomatis (KiriminAja)</span>
+                <div class="flex items-center gap-3 shrink-0">
+                    <!-- Tombol Tolak Pesanan -->
+                    <form method="POST" action="{{ route('admin.orders.reject', $order->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin MENOLAK pesanan #{{ $order->order_number }}? Stok produk akan otomatis dikembalikan ke etalase.');">
+                        @csrf
+                        <button type="submit" 
+                                class="px-5 py-2.5 rounded-xl border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs shadow-2xs transition cursor-pointer flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <span>Tolak Pesanan</span>
                         </button>
-                    @endif
+                    </form>
+
+                    <!-- Tombol Terima Pesanan (Resi Otomatis) -->
+                    <form method="POST" action="{{ route('admin.orders.accept', $order->id) }}">
+                        @csrf
+                        <button type="submit" 
+                                class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition cursor-pointer flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            <span>Terima Pesanan (Resi Otomatis)</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        @elseif($order->order_status === 'shipped' || $order->order_status === 'ready_for_pickup')
+            <div class="p-4 rounded-xl bg-emerald-50/80 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0">✓</span>
+                    <div class="text-xs">
+                        <strong class="font-bold text-emerald-950 block">Pesanan Telah Diterima & Resi Otomatis Aktif</strong>
+                        @if($order->tracking_number)
+                            <span class="text-emerald-800">
+                                Nomor Resi ({{ $order->shipping_courier ?? 'Kurir' }}): 
+                                <code class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-emerald-300 text-emerald-950 text-xs">{{ $order->tracking_number }}</code>
+                            </span>
+                        @elseif($order->pickup_code)
+                            <span class="text-emerald-800">
+                                Kode Pickup Butik: 
+                                <code class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-emerald-300 text-emerald-950 text-xs">{{ $order->pickup_code }}</code>
+                            </span>
+                        @endif
+                    </div>
                 </div>
 
-                <button type="submit" class="bg-[#38050D] hover:bg-[#520813] text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-sm transition">
-                    Simpan Perubahan Pesanan
-                </button>
+                <form method="POST" action="{{ route('admin.orders.complete', $order->id) }}">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition cursor-pointer">
+                        ✓ Tandai Selesai Diterima
+                    </button>
+                </form>
             </div>
-        </form>
 
-        @if($order->fulfillment_type === 'home_delivery' && empty($order->tracking_number))
-            <form id="kiriminAjaForm" method="POST" action="{{ route('admin.orders.kiriminaja_awb', $order->id) }}" class="hidden">
-                @csrf
-            </form>
+        @elseif($order->order_status === 'completed')
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">✓</span>
+                    <span>Pesanan telah <strong>Selesai</strong> dan diterima oleh pelanggan.</span>
+                </div>
+                @if($order->tracking_number)
+                    <span class="font-mono text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200">Resi: {{ $order->tracking_number }}</span>
+                @endif
+            </div>
+
+        @elseif($order->order_status === 'cancelled')
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-7 h-7 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0">✕</span>
+                    <span>Pesanan telah <strong>Ditolak / Dibatalkan</strong>. Seluruh stok produk telah dikembalikan ke etalase.</span>
+                </div>
+            </div>
         @endif
     </div>
 

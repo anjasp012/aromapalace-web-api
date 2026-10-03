@@ -251,11 +251,32 @@
 
                             <!-- Column 7: Actions -->
                             <td class="px-5 py-4 text-right">
-                                <a href="{{ route('admin.orders.show', $order->id) }}" 
-                                   class="inline-flex items-center gap-1.5 bg-[#38050D] hover:bg-[#520813] text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow-xs transition">
-                                    <span>Kelola</span>
-                                    <span>&rarr;</span>
-                                </a>
+                                <div class="flex items-center justify-end gap-1.5">
+                                    @if(in_array($order->order_status, ['pending_payment', 'processing']))
+                                        <form method="POST" action="{{ route('admin.orders.accept', $order->id) }}" class="inline">
+                                            @csrf
+                                            <button type="submit" title="Terima Pesanan & Terbitkan Resi Otomatis" 
+                                                    class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs shadow-xs transition cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                                <span>Terima</span>
+                                            </button>
+                                        </form>
+
+                                        <form method="POST" action="{{ route('admin.orders.reject', $order->id) }}" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin MENOLAK pesanan #{{ $order->order_number }}? Stok produk akan otomatis dikembalikan.');">
+                                            @csrf
+                                            <button type="submit" title="Tolak Pesanan" 
+                                                    class="inline-flex items-center bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 font-bold p-1.5 rounded-xl text-xs shadow-2xs transition cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    <a href="{{ route('admin.orders.show', $order->id) }}" 
+                                       class="inline-flex items-center gap-1 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold px-2.5 py-1.5 rounded-xl text-xs border border-stone-200 transition">
+                                        <span>Detail</span>
+                                        <span>&rarr;</span>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @empty
