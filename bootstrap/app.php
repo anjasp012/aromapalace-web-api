@@ -14,13 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            // Admin Subdomain (admin.aromapalace.test)
-            Route::middleware('web')
-                ->domain('admin.aromapalace.test')
-                ->name('admin.')
-                ->group(base_path('routes/admin.php'));
-
-            // Local fallback /admin
+            // Admin Routes (/admin)
             Route::middleware('web')
                 ->prefix('admin')
                 ->name('admin.')
