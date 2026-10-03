@@ -348,31 +348,46 @@ class KiriminAjaShippingService
             }
 
             // 6. Parsing response sukses dan ambil nomor AWB / Resi resmi
-            $data = $successfulResponse->json('data') ?? [];
-            $trackingNumber = null;
-            $bookingId = null;
+            $resJson = $successfulResponse->json() ?? [];
+            Log::info('KiriminAja request_pickup success response: ' . json_encode($resJson));
 
-            if (is_array($data)) {
-                if (isset($data['awb']) || isset($data['booking_id'])) {
-                    $trackingNumber = $data['awb'] ?? null;
-                    $bookingId = $data['booking_id'] ?? null;
-                } elseif (isset($data['details'][0])) {
-                    $first = $data['details'][0];
-                    $trackingNumber = $first['awb'] ?? ($first['tracking_number'] ?? null);
-                    $bookingId = $first['booking_id'] ?? ($data['pickup_number'] ?? null);
-                } elseif (isset($data[0])) {
-                    $first = $data[0];
-                    $trackingNumber = $first['awb'] ?? ($first['tracking_number'] ?? null);
-                    $bookingId = $first['booking_id'] ?? null;
-                }
-            }
+            // KiriminAja v6.1 / v6.2 mengembalikan data di root atau di dalam 'details' / 'data'
+            $data = $resJson['data'] ?? ($resJson['result'] ?? ($resJson['results'] ?? []));
+            $details = $resJson['details'] ?? ($data['details'] ?? ($resJson['packages'] ?? ($data['packages'] ?? [])));
+            $firstDetail = (is_array($details) && isset($details[0]) && is_array($details[0]))
+                ? $details[0]
+                : ((is_array($data) && isset($data[0]) && is_array($data[0])) ? $data[0] : (is_array($data) ? $data : []));
 
-            $trackingNumber = $trackingNumber ?: ($data['pickup_number'] ?? null);
-            $bookingId = $bookingId ?: ($data['pickup_number'] ?? ('BKG-' . Str::random(8)));
+            $awb = $firstDetail['awb']
+                ?? ($firstDetail['tracking_number']
+                ?? ($data['awb']
+                ?? ($data['tracking_number']
+                ?? ($resJson['awb']
+                ?? ($resJson['tracking_number'] ?? null)))));
 
-            if (empty($trackingNumber)) {
-                throw new Exception("KiriminAja berhasil menerima penjemputan namun belum mengembalikan nomor resi.");
-            }
+            $pickupNumber = $resJson['pickup_number']
+                ?? ($data['pickup_number']
+                ?? ($firstDetail['pickup_number']
+                ?? ($resJson['booking_id']
+                ?? ($data['booking_id']
+                ?? ($firstDetail['booking_id'] ?? null)))));
+
+            $kjOrderId = $firstDetail['kj_order_id']
+                ?? ($data['kj_order_id']
+                ?? ($resJson['kj_order_id']
+                ?? ($firstDetail['order_id']
+                ?? ($data['order_id']
+                ?? ($resJson['order_id'] ?? null)))));
+
+            $bookingId = $pickupNumber ?: ($kjOrderId ?: ($firstDetail['booking_id'] ?? ('BKG-' . Str::random(8))));
+
+            // Nomor resi kurir:
+            // 1. Jika kurir langsung mengembalikan AWB fisik (misal SiCepat/J&T), gunakan AWB
+            // 2. Jika AWB masih null / diterbitkan saat scan penjemputan (misal JNE), gunakan Pickup Number resmi KiriminAja (misal EPR-123456789)
+            // 3. Fallback ke kj_order_id atau order_id resmi yang didaftarkan ke KiriminAja
+            $trackingNumber = (!empty($awb) && is_string($awb))
+                ? $awb
+                : ($pickupNumber ?: ($kjOrderId ?: $kiriminAjaOrderId));
 
             // Simpan resi ke order
             $this->updateOrderTracking($order, $trackingNumber, strtoupper($succeededCourier), strtoupper($succeededService), $bookingId);
@@ -509,11 +524,15 @@ class KiriminAjaShippingService
             'shipped_at' => now(),
         ]);
 
+        $desc = ($trackingNumber === $bookingId)
+            ? "Paket telah dijadwalkan pickup kurir {$courier} via KiriminAja. No. Booking / Resi: {$trackingNumber}."
+            : "Paket telah dijadwalkan pickup kurir {$courier} via KiriminAja. No. Resi: {$trackingNumber} (ID Booking: {$bookingId}).";
+
         OrderStatusHistory::create([
             'order_id' => $order->id,
             'status' => 'shipped',
             'title' => 'Pesanan Dikirim dengan ' . $courier,
-            'description' => "Paket telah di-pickup kurir {$courier} via KiriminAja. No. Resi: {$trackingNumber} (ID Booking: {$bookingId})",
+            'description' => $desc,
         ]);
     }
 
@@ -561,12 +580,20 @@ class KiriminAjaShippingService
         }
 
         $order = Order::where(function ($q) use ($orderNumber, $trackingNumber) {
-            if ($orderNumber) $q->where('order_number', $orderNumber);
-            if ($trackingNumber) $q->orWhere('tracking_number', $trackingNumber);
+            if ($orderNumber) {
+                $q->where('order_number', $orderNumber)->orWhere('order_number', 'like', "%{$orderNumber}%");
+            }
+            if ($trackingNumber) {
+                $q->orWhere('tracking_number', $trackingNumber);
+            }
         })->first();
 
         if (!$order) {
             return ['status' => 'ignored', 'message' => 'Pesanan tidak ditemukan'];
+        }
+
+        if ($trackingNumber && $order->tracking_number !== $trackingNumber) {
+            $order->update(['tracking_number' => $trackingNumber]);
         }
 
         if (in_array($status, ['delivered', 'selesai', 'sukses'])) {
