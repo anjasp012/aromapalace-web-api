@@ -50,7 +50,16 @@ class AccountController extends Controller
         $orders = $this->orderService->getUserOrders($user, $status, 8)->withQueryString();
         $stats = $this->getAccountStats($user, $membershipStatus);
 
-        return view('web.account.orders', compact('user', 'membershipStatus', 'orders', 'status', 'stats'));
+        $statusCounts = [
+            'all' => $user->orders()->count(),
+            'pending_payment' => $user->orders()->where('order_status', 'pending_payment')->count(),
+            'processing' => $user->orders()->where('order_status', 'processing')->count(),
+            'shipped' => $user->orders()->where('order_status', 'shipped')->count(),
+            'completed' => $user->orders()->where('order_status', 'completed')->count(),
+            'cancelled' => $user->orders()->where('order_status', 'cancelled')->count(),
+        ];
+
+        return view('web.account.orders', compact('user', 'membershipStatus', 'orders', 'status', 'stats', 'statusCounts'));
     }
 
     public function orderShow(string $orderNumber): View

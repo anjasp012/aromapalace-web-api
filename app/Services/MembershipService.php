@@ -23,7 +23,7 @@ class MembershipService
     {
         $membership = Membership::firstOrCreate(
             ['user_id' => $user->id],
-            ['tier' => 'Member', 'points' => 0, 'total_spent' => 0, 'joined_at' => now()]
+            ['tier' => 'Silver', 'points' => 0, 'total_spent' => 0, 'joined_at' => now()]
         );
 
         $benefits = [

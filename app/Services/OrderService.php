@@ -17,7 +17,7 @@ class OrderService
      */
     public function getUserOrders(User $user, ?string $status = null, int $perPage = 10): LengthAwarePaginator
     {
-        $query = Order::with(['items', 'store', 'payment'])->where('user_id', $user->id);
+        $query = Order::with(['items.product', 'items.variant', 'store', 'payment'])->where('user_id', $user->id);
 
         if ($status) {
             if ($status === 'processing') {
