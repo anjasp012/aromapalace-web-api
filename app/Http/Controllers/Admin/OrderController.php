@@ -105,15 +105,6 @@ class OrderController extends Controller
                 $msg .= " Kode Pickup Butik: {$order->pickup_code}";
             }
 
-            // Jika ada info error / peringatan dari API KiriminAja (misal IP Whitelist):
-            if (!empty($shipmentInfo['api_error'])) {
-                $warningMsg = "<strong>Respon KiriminAja:</strong> " . e($shipmentInfo['api_error']);
-                if (!empty($shipmentInfo['detected_ip'])) {
-                    $warningMsg .= "<br><span class='mt-1 inline-block text-[11px] text-amber-900'>IP Server Anda (<strong>" . e($shipmentInfo['detected_ip']) . "</strong>) belum di-whitelist di <em>Dashboard KiriminAja &rarr; Pengaturan / Integrasi &rarr; IP Whitelist</em>. Resi internal tetap diterbitkan agar proses admin berjalan, tetapi paket belum tercatat live di sistem KiriminAja hingga IP tersebut ditambahkan.</span>";
-                }
-                return back()->with('success', $msg)->with('warning', $warningMsg);
-            }
-
             return back()->with('success', $msg);
         } catch (Exception $e) {
             return back()->with('error', 'Gagal memproses penerimaan pesanan: ' . $e->getMessage());
