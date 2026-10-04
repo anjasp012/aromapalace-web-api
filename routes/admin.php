@@ -34,6 +34,7 @@ Route::middleware(['auth', EnsureUserIsAdmin::class])->group(function () {
     Route::post('/orders/{id}/complete', [OrderController::class, 'completeOrder'])->name('orders.complete');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.update_status');
     Route::post('/orders/{id}/kiriminaja-awb', [OrderController::class, 'generateKiriminAjaAwb'])->name('orders.kiriminaja_awb');
+    Route::get('/orders/{id}/kiriminaja-print', [OrderController::class, 'printKiriminAjaAwb'])->name('orders.kiriminaja_print');
 
     // Promotions & Vouchers
     Route::get('/promotions', [PromotionController::class, 'index'])->name('promotions.index');

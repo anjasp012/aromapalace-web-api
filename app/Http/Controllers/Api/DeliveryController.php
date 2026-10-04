@@ -91,4 +91,33 @@ class DeliveryController extends BaseApiController
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
         }
     }
+
+    /**
+     * Daftar Provinsi dari KiriminAja SDK
+     */
+    public function provinces(): JsonResponse
+    {
+        $provinces = $this->kiriminAjaService->getProvinces();
+        return $this->sendResponse($provinces, 'Daftar provinsi KiriminAja.');
+    }
+
+    /**
+     * Daftar Kota dari KiriminAja SDK berdasarkan province_id
+     */
+    public function cities(Request $request): JsonResponse
+    {
+        $provinceId = (int) $request->query('province_id', 0);
+        $cities = $provinceId ? $this->kiriminAjaService->getCities($provinceId) : [];
+        return $this->sendResponse($cities, 'Daftar kota KiriminAja.');
+    }
+
+    /**
+     * Daftar Kecamatan dari KiriminAja SDK berdasarkan city_id
+     */
+    public function districts(Request $request): JsonResponse
+    {
+        $cityId = (int) $request->query('city_id', 0);
+        $districts = $cityId ? $this->kiriminAjaService->getDistricts($cityId) : [];
+        return $this->sendResponse($districts, 'Daftar kecamatan KiriminAja.');
+    }
 }

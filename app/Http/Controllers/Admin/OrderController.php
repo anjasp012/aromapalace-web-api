@@ -117,12 +117,17 @@ class OrderController extends Controller
     /**
      * Tolak Pesanan: Batalkan pesanan dan otomatis kembalikan stok produk ke etalase
      */
-    public function rejectOrder(Request $request, string|int $id): RedirectResponse
+    public function rejectOrder(Request $request, string|int $id, \App\Services\KiriminAjaShippingService $kiriminAjaService): RedirectResponse
     {
         $order = $this->findOrder($id);
         $reason = $request->input('reason', 'Pesanan ditolak oleh pihak butik / admin.');
 
         try {
+            // Batalkan shipment di KiriminAja jika resi sudah pernah diterbitkan
+            if (!empty($order->tracking_number) && $order->fulfillment_type === 'home_delivery') {
+                $kiriminAjaService->cancelShipment($order->tracking_number, $reason);
+            }
+
             DB::transaction(function () use ($order, $reason) {
                 // 1. Kembalikan stok produk jika belum pernah dibatalkan
                 if ($order->order_status !== 'cancelled') {
@@ -236,6 +241,25 @@ class OrderController extends Controller
         } catch (Exception $e) {
             return back()->with('error', 'Gagal menerbitkan resi KiriminAja: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Cetak Thermal/PDF Shipping Label AWB via KiriminAja SDK
+     */
+    public function printKiriminAjaAwb(string|int $id, \App\Services\KiriminAjaShippingService $kiriminAjaService): RedirectResponse
+    {
+        $order = $this->findOrder($id);
+
+        if (empty($order->tracking_number)) {
+            return back()->with('error', 'Nomor resi belum diterbitkan untuk pesanan ini.');
+        }
+
+        $labelUrl = $kiriminAjaService->printShippingLabel($order->tracking_number);
+        if ($labelUrl && filter_var($labelUrl, FILTER_VALIDATE_URL)) {
+            return redirect()->away($labelUrl);
+        }
+
+        return back()->with('info', "Label pengiriman KiriminAja untuk resi {$order->tracking_number} siap dicetak via invoice butik.");
     }
 
     /**

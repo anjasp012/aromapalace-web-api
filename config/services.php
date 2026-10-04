@@ -44,12 +44,14 @@ return [
 
     'kiriminaja' => [
         'mode' => env('KIRIMINAJA_MODE', 'staging'),
-        'base_url' => env('KIRIMINAJA_BASE_URL', 'https://tdev.kiriminaja.com/api/mitra'),
+        'base_url' => env('KIRIMINAJA_BASE_URL', 'https://tdev.kiriminaja.com'),
         'api_key' => env('KIRIMINAJA_API_KEY', 'demo_kiriminaja_key'),
         'order_prefix' => env('KIRIMINAJA_ORDER_PREFIX', 'AP-'),
         'sender_name' => env('KIRIMINAJA_SENDER_NAME', 'Aroma Palace Haute Parfumerie'),
         'sender_phone' => env('KIRIMINAJA_SENDER_PHONE', '081100001111'),
         'sender_city_id' => env('KIRIMINAJA_SENDER_CITY_ID', 151), // Jakarta Pusat
+        'cache_store' => env('KIRIMINAJA_CACHE_STORE', 'file'),
+        'cache_prefix' => env('KIRIMINAJA_CACHE_PREFIX', 'kiriminaja:'),
     ],
 
     'carto' => [

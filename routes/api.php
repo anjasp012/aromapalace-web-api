@@ -61,8 +61,11 @@ $registerV1Routes = function () {
         Route::get('/{id}', [StoreController::class, 'show']);
     });
 
-    // 10. Delivery & Kurir Options
+    // 10. Delivery & Kurir Options (KiriminAja SDK)
     Route::get('/delivery/options', [DeliveryController::class, 'options']);
+    Route::get('/delivery/provinces', [DeliveryController::class, 'provinces']);
+    Route::get('/delivery/cities', [DeliveryController::class, 'cities']);
+    Route::get('/delivery/districts', [DeliveryController::class, 'districts']);
 
     // 12. Promotions & Vouchers
     Route::prefix('promotions')->group(function () {

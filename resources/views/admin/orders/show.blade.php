@@ -170,14 +170,22 @@
                             </span>
                         @endif
                     </div>
-                </div>
+                <div class="flex items-center gap-2">
+                    @if($order->tracking_number)
+                        <a href="{{ route('admin.orders.kiriminaja_print', $order->id) }}" target="_blank" 
+                           class="px-3.5 py-2 rounded-xl bg-white border border-stone-300 hover:bg-stone-50 text-stone-700 font-bold text-xs shadow-2xs transition flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                            <span>Cetak Label Kurir</span>
+                        </a>
+                    @endif
 
-                <form method="POST" action="{{ route('admin.orders.complete', $order->id) }}">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition cursor-pointer">
-                        ✓ Tandai Selesai Diterima
-                    </button>
-                </form>
+                    <form method="POST" action="{{ route('admin.orders.complete', $order->id) }}">
+                        @csrf
+                        <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition cursor-pointer">
+                            ✓ Tandai Selesai Diterima
+                        </button>
+                    </form>
+                </div>
             </div>
 
         @elseif($order->order_status === 'completed')
