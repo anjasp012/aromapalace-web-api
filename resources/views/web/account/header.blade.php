@@ -96,11 +96,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
             <span>Riwayat Pesanan</span>
-            @if(($stats['pending_orders'] ?? 0) > 0)
-                <span class="px-1.5 py-0.5 rounded-full {{ request()->routeIs('account.orders*') ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800' }} text-[9px] sm:text-[10px] font-bold">
-                    {{ $stats['pending_orders'] }}
-                </span>
-            @endif
         </a>
 
         <!-- 4. Tukar Poin -->
@@ -110,9 +105,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             <span>Tukar Poin</span>
-            <span class="px-1.5 py-0.5 rounded-full {{ request()->routeIs('account.rewards') ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600' }} text-[9px] sm:text-[10px] font-mono font-bold">
-                {{ number_format($stats['points'] ?? ($membershipStatus['points'] ?? 0)) }} pts
-            </span>
         </a>
 
         <!-- 5. Riwayat Poin -->
@@ -122,11 +114,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             <span>Riwayat Poin</span>
-            @if(($stats['point_history_count'] ?? 0) > 0)
-                <span class="px-1.5 py-0.5 rounded-full {{ request()->routeIs('account.points') ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800' }} text-[9px] sm:text-[10px] font-mono font-bold">
-                    {{ $stats['point_history_count'] }}
-                </span>
-            @endif
         </a>
     </div>
 </div>

@@ -78,6 +78,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [AccountController::class, 'index'])->name('index');
         Route::get('/orders', [AccountController::class, 'orders'])->name('orders');
         Route::get('/orders/{orderNumber}', [AccountController::class, 'orderShow'])->name('orders.show');
+        Route::get('/orders/{orderNumber}/invoice', [AccountController::class, 'orderInvoice'])->name('orders.invoice');
+        Route::post('/orders/{orderNumber}/refresh-tracking', [AccountController::class, 'orderRefreshTracking'])->name('orders.refresh_tracking');
+        Route::post('/orders/{orderNumber}/confirm-received', [AccountController::class, 'orderConfirmReceived'])->name('orders.confirm_received');
         Route::post('/orders/{orderNumber}/check-payment', [AccountController::class, 'orderCheckPayment'])->name('orders.check_payment');
         Route::post('/orders/{orderNumber}/simulate-payment', [AccountController::class, 'orderSimulatePayment'])->name('orders.simulate_payment');
         Route::post('/orders/{orderNumber}/cancel', [AccountController::class, 'orderCancel'])->name('orders.cancel');

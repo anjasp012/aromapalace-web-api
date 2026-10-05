@@ -8,153 +8,247 @@
     <!-- Unified Luxury Account Header & Tabs -->
     @include('web.account.header')
 
-    <!-- Status Filter Buttons Bar -->
-    <div class="flex items-center justify-between gap-3 flex-wrap pt-1 sm:pt-2">
-        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-[11px] sm:text-xs font-medium">
-            @php
-                $currentStatus = request('status');
-                $filters = [
-                    '' => 'Semua Pesanan',
-                    'pending_payment' => 'Menunggu Pembayaran',
-                    'processing' => 'Diproses',
-                    'shipped' => 'Dalam Pengiriman',
-                    'delivered' => 'Tiba di Tujuan',
-                    'completed' => 'Selesai',
-                    'cancelled' => 'Dibatalkan',
-                ];
-            @endphp
-            @foreach($filters as $val => $label)
-                <a href="{{ route('account.orders', $val ? ['status' => $val] : []) }}"
-                   class="px-3 sm:px-3.5 py-1.5 rounded-lg border transition {{ ($currentStatus === $val || (!$currentStatus && $val === '')) ? 'bg-[#650506] text-white border-[#650506] shadow-xs font-bold' : 'bg-white text-gray-700 border-gray-200 hover:border-[#650506] hover:text-[#650506]' }}">
-                    {{ $label }}
-                </a>
-            @endforeach
+    @php
+        $ordersMeta = $orders->map(function($o) {
+            $inv = 'INV/' . $o->created_at->format('dmy') . '/AP/' . str_replace('AP-', '', $o->order_number);
+            $itemsText = $o->items->pluck('product_name')->join(' ');
+            return [
+                'id' => $o->id,
+                'status' => $o->order_status,
+                'search' => strtolower($inv . ' ' . $o->order_number . ' ' . ($o->tracking_number ?? '') . ' ' . $itemsText),
+            ];
+        })->values();
+    @endphp
+
+    <!-- Alpine.js Instant Client-Side Zero-Reload Tabs & Search -->
+    <div x-data="{
+        activeTab: new URLSearchParams(window.location.search).get('status') || '{{ $status ?: 'all' }}',
+        searchQuery: '',
+        ordersMeta: @js($ordersMeta),
+        setTab(tab) {
+            this.activeTab = tab;
+            const newUrl = tab === 'all' 
+                ? window.location.pathname 
+                : window.location.pathname + '?status=' + tab;
+            window.history.replaceState({}, '', newUrl);
+        },
+        isOrderVisible(status, searchTerms) {
+            const matchesTab = (this.activeTab === 'all' || this.activeTab === status);
+            if (!matchesTab) return false;
+            const q = this.searchQuery.toLowerCase().trim();
+            if (!q) return true;
+            return searchTerms.toLowerCase().includes(q);
+        },
+        countVisible() {
+            const q = this.searchQuery.toLowerCase().trim();
+            return this.ordersMeta.filter(o => {
+                const tabMatch = (this.activeTab === 'all' || this.activeTab === o.status);
+                if (!tabMatch) return false;
+                if (!q) return true;
+                return o.search.includes(q);
+            }).length;
+        }
+    }" class="space-y-4">
+
+        <!-- Status Filter Buttons Bar & Search Input -->
+        <div class="flex items-center justify-between gap-3 flex-wrap pt-1 sm:pt-2">
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-[11px] sm:text-xs font-medium">
+                @php
+                    $tabDefinitions = [
+                        'all' => 'Semua Pesanan',
+                        'pending_payment' => 'Menunggu Pembayaran',
+                        'processing' => 'Diproses',
+                        'shipped' => 'Dalam Pengiriman',
+                        'delivered' => 'Tiba di Tujuan',
+                        'completed' => 'Selesai',
+                        'cancelled' => 'Dibatalkan',
+                    ];
+                @endphp
+                @foreach($tabDefinitions as $key => $label)
+                    <button type="button"
+                            @click="setTab('{{ $key }}')"
+                            :class="activeTab === '{{ $key }}' ? 'bg-[#650506] text-white border-[#650506] shadow-xs font-bold' : 'bg-white text-gray-700 border-gray-200 hover:border-[#650506] hover:text-[#650506]'"
+                            class="px-3 sm:px-3.5 py-1.5 rounded-lg border transition text-[11px] sm:text-xs font-medium cursor-pointer">
+                        {{ $label }}
+                    </button>
+                @endforeach
+            </div>
+
+            <!-- Search Input Box (Menggantikan Total Pesanan) -->
+            <div class="relative w-full sm:w-64 lg:w-72">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <input type="text"
+                       x-model="searchQuery"
+                       placeholder="Cari no. invoice, resi, produk..."
+                       class="w-full pl-8.5 pr-8 py-1.5 rounded-lg border border-gray-200 bg-white text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#650506] focus:ring-1 focus:ring-[#650506] transition shadow-2xs">
+                <button type="button"
+                        x-show="searchQuery.length > 0"
+                        @click="searchQuery = ''"
+                        class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer text-xs"
+                        aria-label="Hapus pencarian">
+                    &times;
+                </button>
+            </div>
         </div>
 
-        <div class="text-[11px] sm:text-xs text-gray-500 font-medium">
-            Total {{ $orders->total() }} pesanan
-        </div>
-    </div>
+        <!-- Orders List Container -->
+        <div class="space-y-3 sm:space-y-4">
+            @forelse($orders as $order)
+                @php
+                    $firstItem = $order->items->first();
+                    $otherCount = $order->items->count() - 1;
+                    $invoiceNumber = 'INV/' . $order->created_at->format('dmy') . '/AP/' . str_replace('AP-', '', $order->order_number);
+                    $productNames = $order->items->pluck('product_name')->join(' ');
+                    $searchTerms = strtolower($invoiceNumber . ' ' . $order->order_number . ' ' . ($order->tracking_number ?? '') . ' ' . $productNames);
 
-    <!-- Orders List -->
-    <div class="space-y-3 sm:space-y-4">
-        @forelse($orders as $order)
-            <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-2xs hover:shadow-sm transition">
-                <!-- Header: Order Number, Date & Status -->
-                <div class="flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 pb-3 sm:pb-4 border-b border-gray-100">
-                    <div class="flex items-center gap-2.5 sm:gap-3">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[#650506]/10 text-[#650506] flex items-center justify-center font-bold text-xs sm:text-sm">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                            </svg>
+                    $statusStyles = [
+                        'pending_payment' => 'bg-amber-50 text-amber-700 border-amber-200',
+                        'processing' => 'bg-blue-50 text-blue-700 border-blue-200',
+                        'shipped' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                        'delivered' => 'bg-teal-50 text-teal-700 border-teal-200',
+                        'completed' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'cancelled' => 'bg-rose-50 text-rose-600 border-rose-200',
+                    ];
+                    $style = $statusStyles[$order->order_status] ?? 'bg-stone-50 text-stone-700 border-stone-200';
+                    
+                    $statusLabels = [
+                        'pending_payment' => 'Menunggu Pembayaran',
+                        'processing' => 'Diproses',
+                        'shipped' => 'Dalam Pengiriman',
+                        'delivered' => 'Tiba di Tujuan',
+                        'completed' => 'Selesai',
+                        'cancelled' => 'Dibatalkan',
+                    ];
+                    $label = $statusLabels[$order->order_status] ?? strtoupper(str_replace('_', ' ', $order->order_status));
+                @endphp
+                <div data-order-status="{{ $order->order_status }}"
+                     x-show="isOrderVisible('{{ $order->order_status }}', @js($searchTerms))"
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 -translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-2xs space-y-4 hover:shadow-xs transition">
+                    
+                    <!-- 1. Top Header: No. Invoice di kiri atas & Tanggal + Status di kanan -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gray-100 text-xs">
+                        <!-- Bagian Kiri Atas: No Invoice -->
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-gray-900 text-xs sm:text-[13px] select-all">
+                                {{ $invoiceNumber }}
+                            </span>
                         </div>
-                        <div>
-                            <div class="flex items-center gap-1.5 sm:gap-2">
-                                <span class="font-bold text-gray-900 text-xs sm:text-sm font-mono">#{{ $order->order_number }}</span>
-                                <span class="text-gray-400 text-xs">&bull; {{ $order->created_at->format('d M Y, H:i') }}</span>
-                            </div>
-                            <span class="text-[10px] sm:text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                                <svg class="w-3 h-3 text-[#650506]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                {{ in_array($order->fulfillment_type, ['store_pickup', 'pickup']) ? 'Ambil di Butik (Click & Collect)' : 'Pengiriman Kurir (' . ($order->shipping_courier ?? 'Reguler') . ')' }}
+
+                        <!-- Bagian Kanan Atas: Tanggal & Badge Status -->
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <span class="text-gray-400 text-[11px] sm:text-xs">
+                                {{ $order->created_at->translatedFormat('d M Y - H:i') }} WIB
+                            </span>
+                            <span class="px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full border {{ $style }}">
+                                {{ $label }}
                             </span>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        @php
-                            $statusStyles = [
-                                'pending_payment' => 'bg-amber-50 text-amber-900 border-amber-200',
-                                'processing' => 'bg-blue-50 text-blue-900 border-blue-200',
-                                'shipped' => 'bg-purple-50 text-purple-900 border-purple-200',
-                                'delivered' => 'bg-teal-50 text-teal-900 border-teal-200',
-                                'completed' => 'bg-emerald-50 text-emerald-900 border-emerald-200',
-                                'cancelled' => 'bg-rose-50 text-rose-900 border-rose-200',
-                            ];
-                            $style = $statusStyles[$order->order_status] ?? 'bg-gray-100 text-gray-700 border-gray-200';
-                            
-                            $statusLabels = [
-                                'pending_payment' => 'Menunggu Pembayaran',
-                                'processing' => 'Diproses',
-                                'shipped' => 'Dalam Pengiriman',
-                                'delivered' => 'Tiba di Tujuan',
-                                'completed' => 'Pesanan Selesai',
-                                'cancelled' => 'Dibatalkan',
-                            ];
-                            $label = $statusLabels[$order->order_status] ?? strtoupper(str_replace('_', ' ', $order->order_status));
-                        @endphp
-                        <span class="px-2.5 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold rounded-md border {{ $style }}">
-                            {{ $label }}
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Items Preview -->
-                <div class="py-3 sm:py-4 space-y-2.5 sm:space-y-3">
-                    @foreach($order->items as $item)
-                        <div class="flex items-center justify-between gap-3 sm:gap-4">
-                            <div class="flex items-center gap-2.5 sm:gap-4 min-w-0">
-                                <img src="{{ $item->product?->images?->first()?->image_url ?? 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=150&q=80' }}"
-                                     alt="{{ $item->product?->name ?? 'Produk Parfum' }}"
-                                     class="w-11 h-11 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl object-cover border border-gray-200 bg-[#F4F2EE] shrink-0">
+                    <!-- 2. Middle Row: Foto & Detail Produk di kiri, Total Belanja di kanan -->
+                    <div class="flex items-center justify-between gap-4 py-1">
+                        <!-- Kiri: Foto Produk + Nama + Qty x Harga -->
+                        <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                            @if($firstItem)
+                                <img src="{{ $firstItem->product_image ?? ($firstItem->product?->primary_image ?? ($firstItem->product?->images?->first()?->image_url ?? 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=150&q=80')) }}"
+                                     alt="{{ $firstItem->product_name ?? 'Produk' }}"
+                                     class="w-16 h-16 sm:w-18 sm:h-18 rounded-xl object-cover border border-gray-200 bg-stone-50 shrink-0">
                                 <div class="min-w-0">
-                                    <h4 class="text-xs sm:text-sm font-bold text-gray-900 truncate">{{ $item->product?->name ?? 'Parfum Eksklusif' }}</h4>
-                                    <p class="text-[10px] sm:text-xs text-gray-500 mt-0.5">
-                                        {{ $item->variant?->name ?? 'Default' }} &bull; {{ $item->quantity }} &times; Rp {{ number_format($item->price, 0, ',', '.') }}
+                                    <h4 class="font-bold text-xs sm:text-sm text-gray-900 line-clamp-1 sm:line-clamp-2">
+                                        {{ $firstItem->product_name ?? ($firstItem->product?->name ?? 'Produk Aroma Palace') }}
+                                    </h4>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        {{ $firstItem->quantity }} Pcs x Rp {{ number_format($firstItem->price, 0, ',', '.') }}
                                     </p>
+                                    @if($otherCount > 0)
+                                        <p class="text-[11px] text-gray-400 mt-0.5">
+                                            +{{ $otherCount }} produk lainnya
+                                        </p>
+                                    @endif
                                 </div>
-                            </div>
-                            <span class="text-xs sm:text-sm font-bold text-gray-900 font-mono shrink-0">
-                                Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                            @endif
+                        </div>
+
+                        <!-- Kanan: Total Belanja -->
+                        <div class="text-right shrink-0">
+                            <span class="text-xs text-gray-400 block font-medium">Total Belanja</span>
+                            <span class="text-base sm:text-lg font-bold text-gray-900 font-mono block mt-0.5">
+                                Rp {{ number_format($order->total_amount, 0, ',', '.') }}
                             </span>
                         </div>
-                    @endforeach
-                </div>
-
-                <!-- Footer: Total & Actions -->
-                <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pt-3 sm:pt-4 border-t border-gray-100 bg-[#FBF9F6] -mx-4 -mb-4 sm:-mx-6 sm:-mb-6 p-3.5 sm:p-5 rounded-b-xl sm:rounded-b-2xl">
-                    <div>
-                        <span class="text-[10px] sm:text-xs text-gray-500 block">Total Pembayaran:</span>
-                        <span class="text-sm sm:text-base font-bold text-[#650506] font-mono">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                        @if($order->tracking_number)
-                            <span class="text-[10px] sm:text-xs text-gray-600 block mt-0.5">
-                                No. Resi: <code class="bg-stone-200/70 px-1.5 py-0.5 rounded text-gray-800 font-mono">{{ $order->tracking_number }}</code>
-                            </span>
-                        @endif
                     </div>
 
-                    <div>
-                        <a href="{{ route('account.orders.show', $order->order_number) }}"
-                           class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-[#650506] hover:bg-[#4A070B] text-white font-semibold text-[11px] sm:text-xs shadow-xs transition">
-                            <span>Detail Pesanan</span>
+                    <!-- 3. Bottom Row: Tombol Lihat Detail Transaksi di kanan -->
+                    <div class="flex items-center justify-end pt-3 border-t border-gray-100">
+                        <button type="button" onclick="openTransactionModal('{{ $order->order_number }}')"
+                                class="px-4 py-2 rounded-lg border border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-900 font-bold text-xs shadow-2xs transition cursor-pointer">
+                            Lihat Detail Transaksi
+                        </button>
+                    </div>
+
+                </div>
+            @empty
+                <div class="text-center py-12 sm:py-16 bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-6 sm:p-8 space-y-3">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-stone-100 text-[#650506] flex items-center justify-center">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-sm sm:text-base font-bold text-gray-900">Belum Ada Pesanan</h3>
+                    <p class="text-xs text-gray-500 max-w-sm mx-auto">Anda belum pernah melakukan transaksi di Aroma Palace.</p>
+                    <div class="pt-2">
+                        <a href="{{ route('products.index') }}" class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-[#650506] hover:bg-[#4A070B] text-white text-xs font-semibold shadow-xs transition">
+                            <span>Mulai Belanja</span>
                             <span>&rarr;</span>
                         </a>
                     </div>
                 </div>
-            </div>
-        @empty
-            <div class="text-center py-12 sm:py-16 bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-6 sm:p-8 space-y-3">
-                <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-stone-100 text-[#650506] flex items-center justify-center">
-                    <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                    </svg>
-                </div>
-                <h3 class="text-sm sm:text-base font-bold text-gray-900">Belum Ada Pesanan</h3>
-                <p class="text-xs text-gray-500 max-w-sm mx-auto">Anda belum memiliki riwayat pesanan dengan status yang dipilih.</p>
-                <div class="pt-2">
-                    <a href="{{ route('products.index') }}" class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-[#650506] hover:bg-[#4A070B] text-white text-xs font-semibold shadow-xs transition">
-                        <span>Mulai Belanja</span>
-                        <span>&rarr;</span>
-                    </a>
-                </div>
-            </div>
-        @endforelse
+            @endforelse
 
-        <!-- Pagination -->
-        @if($orders->hasPages())
-            <div class="pt-4">
-                {{ $orders->links() }}
+            <!-- Empty State with Alpine (Saat tidak ada pesanan di tab / hasil pencarian kosong) -->
+            <div x-show="countVisible() === 0 && {{ $orders->count() }} > 0"
+                 x-cloak
+                 class="text-center py-12 sm:py-16 bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-6 sm:p-8 space-y-3">
+                <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-stone-100 text-[#650506] flex items-center justify-center text-2xl">
+                    <span x-text="searchQuery.trim() ? '🔍' : '📦'"></span>
+                </div>
+                <h3 class="text-sm sm:text-base font-bold text-gray-900" 
+                    x-text="searchQuery.trim() ? 'Pesanan Tidak Ditemukan' : 'Tidak Ada Pesanan'"></h3>
+                <p class="text-xs text-gray-500 max-w-sm mx-auto" 
+                   x-text="searchQuery.trim() ? `Tidak ada pesanan yang cocok dengan kata kunci '${searchQuery}' pada filter ini.` : 'Tidak ada transaksi di tab status ini. Anda dapat beralih ke tab status lain atau melihat semua pesanan.'">
+                </p>
+                <div class="pt-2 flex items-center justify-center gap-2">
+                    <button type="button" x-show="searchQuery.trim()" @click="searchQuery = ''"
+                            class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-semibold shadow-xs transition cursor-pointer">
+                        <span>Hapus Pencarian</span>
+                    </button>
+                    <button type="button" @click="setTab('all')"
+                            class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-lg bg-[#650506] hover:bg-[#4A070B] text-white text-xs font-semibold shadow-xs transition cursor-pointer">
+                        <span>Lihat Semua Pesanan</span>
+                        <span>&rarr;</span>
+                    </button>
+                </div>
             </div>
-        @endif
+
+            <!-- Pagination (jika lebih dari 100 pesanan) -->
+            @if($orders->hasPages())
+                <div class="pt-4">
+                    {{ $orders->links() }}
+                </div>
+            @endif
+        </div>
+
     </div>
+
 </div>
+
+<!-- Include Transaction Details Modal Popup Component -->
+@include('web.account.partials.transaction-modal')
 @endsection

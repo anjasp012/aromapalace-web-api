@@ -38,11 +38,20 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders', 'counts', 'status', 'search'));
     }
 
-    public function show(string|int $id): View
+    public function show(string|int $id, \App\Services\KiriminAjaShippingService $kiriminAjaService): View
     {
         $order = $this->findOrder($id);
+        $tracking = null;
 
-        return view('admin.orders.show', compact('order'));
+        if (!in_array($order->fulfillment_type, ['pickup', 'store_pickup']) && !empty($order->tracking_number)) {
+            $tracking = $kiriminAjaService->trackShipment(
+                $order->shipping_courier ?? 'KIRIMINAJA',
+                $order->tracking_number,
+                $order
+            );
+        }
+
+        return view('admin.orders.show', compact('order', 'tracking'));
     }
 
     /**
@@ -250,10 +259,7 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Cetak Thermal/PDF Shipping Label AWB via KiriminAja SDK
-     */
-    public function printKiriminAjaAwb(string|int $id, \App\Services\KiriminAjaShippingService $kiriminAjaService): RedirectResponse
+    public function printKiriminAjaAwb(string|int $id, \App\Services\KiriminAjaShippingService $kiriminAjaService)
     {
         $order = $this->findOrder($id);
 
@@ -261,12 +267,14 @@ class OrderController extends Controller
             return back()->with('error', 'Nomor resi belum diterbitkan untuk pesanan ini.');
         }
 
+        // Jika KiriminAja API mengembalikan link PDF resmi, redirect ke PDF
         $labelUrl = $kiriminAjaService->printShippingLabel($order->tracking_number);
         if ($labelUrl && filter_var($labelUrl, FILTER_VALIDATE_URL)) {
             return redirect()->away($labelUrl);
         }
 
-        return back()->with('info', "Label pengiriman KiriminAja untuk resi {$order->tracking_number} siap dicetak via invoice butik.");
+        // Tampilkan Thermal Label Pengiriman Standar A6 Resmi sesuai checklist UAT KiriminAja
+        return view('admin.orders.shipping-label', compact('order'));
     }
 
     /**

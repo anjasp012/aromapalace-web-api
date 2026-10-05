@@ -108,53 +108,54 @@
                             $firstItem = $order->items->first();
                         @endphp
                         <div class="py-3.5 sm:py-4.5 first:pt-1 last:pb-1 space-y-2.5 sm:space-y-3">
-                            <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-                                <div class="flex items-center gap-1.5 sm:gap-2">
-                                    <span class="font-bold text-gray-900 text-xs sm:text-sm font-mono">#{{ $order->order_number }}</span>
-                                    <span class="text-gray-400 text-xs">&bull;</span>
-                                    <span class="text-[11px] sm:text-xs text-gray-500">{{ $order->created_at->format('d M Y, H:i') }}</span>
-                                    <span class="text-gray-400 text-xs">&bull;</span>
-                                    <span class="text-[10px] sm:text-[11px] text-gray-600 bg-gray-100 px-1.5 sm:px-2 py-0.5 rounded font-medium">
-                                        {{ in_array($order->fulfillment_type, ['store_pickup', 'pickup']) ? 'Ambil di Butik' : ($order->shipping_courier ?? 'Kurir') }}
+                            @php
+                                $invoiceNumber = 'INV/' . $order->created_at->format('dmy') . '/AP/' . str_replace('AP-', '', $order->order_number);
+                            @endphp
+                            <!-- Top Row: No Invoice di kiri atas & Tanggal + Status di kanan -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-gray-100 text-xs">
+                                <span class="font-bold text-gray-900 text-xs sm:text-[13px] font-mono select-all">
+                                    {{ $invoiceNumber }}
+                                </span>
+
+                                <div class="flex items-center gap-2 sm:gap-3">
+                                    <span class="text-gray-400 text-[11px] sm:text-xs">{{ $order->created_at->translatedFormat('d M Y - H:i') }} WIB</span>
+                                    <span class="px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full border {{ $style }}">
+                                        {{ $statusLabel }}
                                     </span>
                                 </div>
-
-                                <span class="px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full border {{ $style }}">
-                                    {{ $statusLabel }}
-                                </span>
                             </div>
 
                             @if($firstItem)
-                            <div class="flex items-center justify-between gap-3 sm:gap-4 bg-stone-50/60 rounded-xl p-2.5 sm:p-3 border border-gray-100">
+                            <!-- Middle Row: Produk di kiri & Total Belanja di kanan -->
+                            <div class="flex items-center justify-between gap-3 sm:gap-4 py-1">
                                 <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                                     <img src="{{ $firstItem->product?->images?->first()?->image_url ?? 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=120&q=80' }}" 
                                          alt="{{ $firstItem->product?->name ?? 'Produk' }}" 
-                                         class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover bg-white border border-gray-200 shrink-0">
+                                         class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover bg-stone-50 border border-gray-200 shrink-0">
                                     <div class="min-w-0">
-                                        <h4 class="font-bold text-xs text-gray-900 truncate">{{ $firstItem->product?->name ?? 'Produk Aroma Palace' }}</h4>
-                                        <p class="text-[10px] sm:text-[11px] text-gray-500 mt-0.5">
-                                            {{ $firstItem->variant?->name ?? 'Default' }} &bull; {{ $firstItem->quantity }}x &bull; 
-                                            <span class="font-mono font-semibold text-gray-800">Rp {{ number_format($firstItem->price, 0, ',', '.') }}</span>
+                                        <h4 class="font-bold text-xs sm:text-sm text-gray-900 truncate">{{ $firstItem->product?->name ?? 'Produk Aroma Palace' }}</h4>
+                                        <p class="text-[11px] text-gray-500 mt-0.5">
+                                            {{ $firstItem->quantity }} Pcs x Rp {{ number_format($firstItem->price, 0, ',', '.') }}
                                             @if($order->items->count() > 1)
-                                                <span class="text-gray-400 font-medium">(+{{ $order->items->count() - 1 }} lainnya)</span>
+                                                <span class="text-gray-400 font-medium block sm:inline sm:ml-1">(+{{ $order->items->count() - 1 }} lainnya)</span>
                                             @endif
                                         </p>
                                     </div>
                                 </div>
 
                                 <div class="text-right shrink-0">
-                                    <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-wider block font-semibold">Total Tagihan</span>
-                                    <span class="text-xs sm:text-sm font-extrabold text-gray-900 font-mono">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                                    <span class="text-xs text-gray-400 block font-medium">Total Belanja</span>
+                                    <span class="text-sm sm:text-base font-bold text-gray-900 font-mono block mt-0.5">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
                                 </div>
                             </div>
                             @endif
 
-                            <div class="flex items-center justify-end gap-3 pt-0.5 sm:pt-1">
-                                <a href="{{ route('account.orders.show', $order->order_number) }}" 
-                                   class="inline-flex items-center gap-1 sm:gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg border border-gray-200 hover:border-[#650506] hover:text-[#650506] text-[11px] sm:text-xs font-semibold text-gray-700 transition">
-                                    <span>Rincian Lengkap</span>
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                                </a>
+                            <!-- Bottom Row: Tombol Lihat Detail Transaksi di kanan -->
+                            <div class="flex items-center justify-end pt-2.5 border-t border-gray-100">
+                                <button type="button" onclick="openTransactionModal('{{ $order->order_number }}')" 
+                                   class="px-4 py-2 rounded-lg border border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-900 font-bold text-xs shadow-2xs transition cursor-pointer">
+                                    <span>Lihat Detail Transaksi</span>
+                                </button>
                             </div>
                         </div>
                     @empty
@@ -271,4 +272,7 @@
         </div>
     </div>
 </div>
+
+<!-- Include Transaction Details Modal Popup Component -->
+@include('web.account.partials.transaction-modal')
 @endsection

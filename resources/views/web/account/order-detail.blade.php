@@ -260,58 +260,263 @@
     </div>
 
     <!-- TRACKING & FULFILLMENT TIMELINE CARD -->
-    <div class="bg-white rounded-2xl p-5 sm:p-7 border border-gray-200/90 shadow-2xs space-y-5">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 pb-4">
+    @php
+        $courierTracking = $tracking['courier_tracking'] ?? null;
+        $hasCourierTracking = !empty($courierTracking) && !empty($courierTracking['milestones']);
+        $isHomeDelivery = !in_array($order->fulfillment_type, ['pickup', 'store_pickup']);
+        $isDelivered = ($order->order_status === 'delivered') || (!empty($courierTracking['is_delivered']));
+    @endphp
+
+    <div class="bg-white rounded-2xl p-5 sm:p-7 border border-gray-200/90 shadow-2xs space-y-6">
+        <!-- Card Header: Status & Resi Info -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-5">
             <div>
-                <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Progres Pesanan</span>
-                <h3 class="font-bold text-gray-900 text-base sm:text-lg mt-0.5">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-bold">Pelacakan Pesanan</span>
+                    @if(!empty($courierTracking['is_live']))
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                            LIVE KURIR (KIRIMINAJA)
+                        </span>
+                    @endif
+                </div>
+
+                <h3 class="font-serif font-bold text-gray-900 text-lg sm:text-xl mt-1 flex items-center gap-2">
                     @php
                         $fulfillmentLabels = [
                             'pending_payment' => 'Menunggu Pembayaran',
-                            'processing' => 'Pesanan Sedang Diproses',
+                            'processing' => 'Pesanan Sedang Diproses Butik',
                             'shipped' => 'Dalam Pengiriman Kurir',
                             'ready_for_pickup' => 'Siap Diambil di Butik',
-                            'delivered' => 'Pesanan Telah Tiba',
+                            'delivered' => 'Paket Telah Tiba di Penerima',
                             'completed' => 'Pesanan Selesai',
                             'cancelled' => 'Pesanan Dibatalkan',
                         ];
                     @endphp
-                    {{ $fulfillmentLabels[$order->order_status] ?? strtoupper(str_replace('_', ' ', $order->order_status)) }}
+                    <span>{{ $fulfillmentLabels[$order->order_status] ?? strtoupper(str_replace('_', ' ', $order->order_status)) }}</span>
                 </h3>
             </div>
 
-            <div class="text-left sm:text-right text-xs">
-                @if(in_array($order->fulfillment_type, ['pickup', 'store_pickup']))
-                    <span class="text-gray-500 block text-[11px]">Kode Pickup Butik:</span>
-                    <span class="font-mono text-base font-black text-[#650506] bg-rose-50 px-2 py-0.5 rounded border border-rose-200">{{ $order->pickup_code ?? 'Siap saat notifikasi' }}</span>
+            <div class="flex flex-wrap items-center gap-3">
+                @if(!$isHomeDelivery)
+                    <!-- Pickup Butik Badge -->
+                    <div class="text-right">
+                        <span class="text-gray-500 block text-[11px] font-medium">Kode Pickup Butik:</span>
+                        <span class="font-mono text-base font-black text-[#650506] bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 inline-block shadow-2xs">
+                            {{ $order->pickup_code ?? 'Siap saat verifikasi' }}
+                        </span>
+                    </div>
                 @else
-                    <span class="text-gray-500 block text-[11px]">Nomor Resi ({{ $order->shipping_courier ?? 'Kurir' }}):</span>
+                    <!-- Courier AWB & Refresh Button -->
+                    <div class="text-left sm:text-right">
+                        @php
+                            $detailCourierName = $courierTracking['courier'] ?? ($order->shipping_courier ?? 'Kurir');
+                            $detailCourierLogo = \App\Services\KiriminAjaShippingService::getCourierLogoUrl($detailCourierName);
+                        @endphp
+                        <div class="flex items-center justify-start sm:justify-end gap-2 mb-0.5">
+                            @if($detailCourierLogo)
+                                <img src="{{ $detailCourierLogo }}" alt="{{ $detailCourierName }}" class="h-4 max-w-[60px] object-contain">
+                            @endif
+                            <span class="text-gray-500 text-[11px] font-medium">
+                                Ekspedisi: <strong class="text-gray-800">{{ $detailCourierName }} ({{ $courierTracking['service'] ?? ($order->shipping_service ?? 'REG') }})</strong>
+                            </span>
+                        </div>
+                        @if($order->tracking_number)
+                            <div class="inline-flex items-center gap-1.5 mt-0.5">
+                                <span class="font-mono text-xs sm:text-sm font-bold text-gray-900 bg-stone-100 px-2.5 py-1 rounded-lg border border-stone-200 select-all">
+                                    {{ $order->tracking_number }}
+                                </span>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $order->tracking_number }}'); alert('Nomor Resi berhasil disalin!');"
+                                        class="p-1 rounded-lg hover:bg-stone-100 text-stone-500 border border-stone-200 text-xs transition cursor-pointer" title="Salin Resi">
+                                    📋
+                                </button>
+                            </div>
+                        @else
+                            <span class="text-stone-400 italic text-xs">Menunggu serah terima kurir</span>
+                        @endif
+                    </div>
+
                     @if($order->tracking_number)
-                        <span class="font-mono text-sm sm:text-base font-bold text-gray-900 bg-stone-100 px-2 py-0.5 rounded border border-stone-200">{{ $order->tracking_number }}</span>
-                    @else
-                        <span class="text-stone-400 italic text-xs">Menunggu penyerahan ke kurir</span>
+                        <form method="POST" action="{{ route('account.orders.refresh_tracking', $order->order_number) }}" class="inline">
+                            @csrf
+                            <button type="submit" 
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-bold shadow-2xs transition cursor-pointer"
+                                    title="Sinkronkan pergerakan lokasi kurir terbaru secara real-time">
+                                <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                <span>Perbarui Lacak</span>
+                            </button>
+                        </form>
                     @endif
                 @endif
             </div>
         </div>
 
-        <!-- Timeline Log Visual -->
-        <div class="relative pl-6 sm:pl-7 border-l-2 border-stone-200 space-y-5 my-2">
-            @forelse($tracking['timeline'] as $step)
-                <div class="relative group">
-                    <span class="absolute -left-[31px] sm:-left-[35px] top-1 w-3.5 h-3.5 rounded-full bg-[#650506] ring-4 ring-rose-100"></span>
-                    <div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <h4 class="font-bold text-xs sm:text-sm text-gray-900">{{ $step['title'] }}</h4>
-                            <span class="text-[10px] text-gray-400 font-mono">{{ $step['time'] }}</span>
+        @if($isHomeDelivery && $hasCourierTracking)
+            <!-- LIVE TRANSIT & LOCATION HERO BANNER -->
+            <div class="rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-stone-50 via-amber-50/40 to-stone-50 border border-amber-200/70 shadow-2xs space-y-4">
+                <!-- Route Overview: Origin -> Destination -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border-b border-amber-200/50 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-full bg-stone-200 text-stone-700 flex items-center justify-center font-bold text-xs">🏢</span>
+                        <div>
+                            <span class="text-[10px] text-stone-400 block font-bold uppercase">Asal Pengiriman</span>
+                            <span class="font-bold text-stone-900">{{ $courierTracking['origin']['city'] ?? 'Jakarta Pusat' }}</span>
                         </div>
-                        <p class="text-xs text-gray-600 mt-0.5">{{ $step['description'] }}</p>
+                    </div>
+
+                    <div class="hidden sm:flex items-center gap-2 text-stone-300">
+                        <span class="w-10 border-t border-dashed border-stone-300"></span>
+                        <span class="text-sm">🚚</span>
+                        <span class="w-10 border-t border-dashed border-stone-300"></span>
+                    </div>
+
+                    <div class="flex items-center gap-2 sm:text-right">
+                        <div>
+                            <span class="text-[10px] text-stone-400 block font-bold uppercase">Tujuan Pengiriman</span>
+                            <span class="font-bold text-stone-900">{{ $courierTracking['destination']['city'] ?? ($order->shipping_address_snapshot['city'] ?? 'Kota Tujuan') }}</span>
+                        </div>
+                        <span class="w-7 h-7 rounded-full bg-[#650506] text-white flex items-center justify-center font-bold text-xs">🏡</span>
                     </div>
                 </div>
-            @empty
-                <p class="text-xs text-gray-400 italic">Belum ada pembaruan log pengiriman.</p>
-            @endforelse
-        </div>
+
+                <!-- Current Location Callout -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-amber-200">
+                    <div class="flex items-start sm:items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-rose-50 text-[#650506] flex items-center justify-center text-lg shrink-0 border border-rose-200">
+                            📍
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Posisi & Status Terkini Paket</span>
+                            <div class="text-xs sm:text-sm font-black text-stone-900">
+                                {{ $courierTracking['current_location'] ?? 'Dalam Perjalanan Kurir' }}
+                            </div>
+                            <span class="text-[11px] text-[#650506] font-semibold block">
+                                Status: {{ $courierTracking['status_label'] ?? 'Sedang Diproses Ekspedisi' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    @if($isDelivered && in_array($order->order_status, ['shipped', 'delivered']))
+                        <!-- Tombol Konfirmasi Selesai jika paket sudah sampai -->
+                        <form method="POST" action="{{ route('account.orders.confirm_received', $order->order_number) }}">
+                            @csrf
+                            <button type="submit" 
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition cursor-pointer">
+                                <span>✓ Konfirmasi Terima Pesanan</span>
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+
+            <!-- TIMELINE PERJALANAN LOKASI KURIR -->
+            <div class="space-y-3 pt-1">
+                <div class="flex items-center justify-between">
+                    <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-stone-700 flex items-center gap-2">
+                        <span>Riwayat Lokasi & Transit Ekspedisi</span>
+                        <span class="text-[10px] font-sans font-normal text-stone-400">({{ count($courierTracking['milestones']) }} Checkpoint)</span>
+                    </h4>
+                    <span class="text-[10px] text-stone-400 font-medium">Waktu Indonesia Barat (WIB)</span>
+                </div>
+
+                <div class="relative pl-6 sm:pl-7 border-l-2 border-stone-200 space-y-5 my-2">
+                    @foreach($courierTracking['milestones'] as $milestone)
+                        @php
+                            $isCurrent = !empty($milestone['is_current']);
+                        @endphp
+                        <div class="relative group {{ $isCurrent ? 'bg-amber-50/50 p-3.5 rounded-xl border border-amber-200 -ml-3.5 pl-9' : '' }}">
+                            @if($isCurrent)
+                                <span class="absolute left-1.5 top-3.5 w-4 h-4 rounded-full bg-[#650506] ring-4 ring-rose-200 flex items-center justify-center">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                                </span>
+                            @else
+                                <span class="absolute -left-[31px] sm:-left-[35px] top-1.5 w-3.5 h-3.5 rounded-full bg-stone-400 ring-4 ring-stone-100"></span>
+                            @endif
+
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h5 class="font-bold text-xs sm:text-sm {{ $isCurrent ? 'text-[#650506]' : 'text-gray-900' }}">
+                                        {{ $milestone['title'] }}
+                                    </h5>
+                                    <span class="text-[10px] text-gray-400 font-mono">{{ $milestone['time'] }}</span>
+                                    @if($isCurrent)
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-[#650506] text-white">POSISI TERKINI</span>
+                                    @endif
+                                </div>
+                                <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-stone-700 mt-0.5">
+                                    <span class="text-stone-400">📍</span>
+                                    <span>{{ $milestone['location'] }}</span>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-0.5 leading-relaxed">{{ $milestone['note'] }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- BUKTI PENGIRIMAN (POD PHOTO) JIKA ADA -->
+            @if(!empty($courierTracking['pod_images']))
+                <div class="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-2">
+                    <span class="text-xs font-bold text-stone-700 block">Bukti Serah Terima Kurir (Proof of Delivery)</span>
+                    <div class="flex flex-wrap items-center gap-3">
+                        @if(!empty($courierTracking['pod_images']['camera_img']))
+                            <a href="{{ $courierTracking['pod_images']['camera_img'] }}" target="_blank" class="block border rounded-lg overflow-hidden w-24 h-24 hover:opacity-90">
+                                <img src="{{ $courierTracking['pod_images']['camera_img'] }}" alt="Foto Serah Terima" class="w-full h-full object-cover">
+                            </a>
+                        @endif
+                        @if(!empty($courierTracking['pod_images']['signature_img']))
+                            <a href="{{ $courierTracking['pod_images']['signature_img'] }}" target="_blank" class="block border rounded-lg overflow-hidden w-24 h-24 bg-white p-1 hover:opacity-90">
+                                <img src="{{ $courierTracking['pod_images']['signature_img'] }}" alt="Tanda Tangan Penerima" class="w-full h-full object-contain">
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
+        @elseif(!$isHomeDelivery && $order->store)
+            <!-- STORE PICKUP BOUTIQUE DETAILS -->
+            <div class="p-5 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-[#650506] text-white flex items-center justify-center font-bold text-sm">🏛️</span>
+                    <div>
+                        <strong class="font-bold text-stone-900 block text-sm">{{ $order->store->name ?? 'Aroma Palace Flagship Boutique' }}</strong>
+                        <p class="text-xs text-stone-600 mt-0.5">{{ $order->store->address ?? 'Grand Indonesia Mall, East Mall Lt. 1, Jakarta Pusat' }}</p>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-amber-200/50 flex flex-wrap items-center justify-between text-xs text-stone-600 gap-2">
+                    <span>🕒 Jam Operasional Butik: <strong>10:00 - 22:00 WIB</strong></span>
+                    <span class="text-[#650506] font-bold">Harap tunjukkan Kode Pickup di atas ke Concierge Butik</span>
+                </div>
+            </div>
+        @endif
+
+        <!-- RIWAYAT STATUS PEMESANAN BUTIK (INTERNAL TIMELINE) -->
+        <details class="group pt-2 border-t border-stone-100">
+            <summary class="flex items-center justify-between cursor-pointer text-xs font-bold text-stone-500 hover:text-stone-800 transition py-1 select-none">
+                <span class="flex items-center gap-1.5">
+                    <span>📜 Lihat Riwayat Siklus Pemesanan Butik</span>
+                    <span class="text-[10px] font-normal text-stone-400">({{ count($tracking['timeline']) }} Peristiwa)</span>
+                </span>
+                <span class="text-stone-400 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            
+            <div class="relative pl-6 sm:pl-7 border-l-2 border-stone-200 space-y-4 my-3 text-xs">
+                @foreach($tracking['timeline'] as $step)
+                    <div class="relative">
+                        <span class="absolute -left-[31px] sm:-left-[35px] top-1 w-3 h-3 rounded-full bg-stone-300 ring-4 ring-stone-50"></span>
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h6 class="font-bold text-stone-800">{{ $step['title'] }}</h6>
+                                <span class="text-[10px] text-stone-400 font-mono">{{ $step['time'] }}</span>
+                            </div>
+                            <p class="text-stone-500 mt-0.5">{{ $step['description'] }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </details>
     </div>
 
     <!-- 2-COLUMN MAIN CONTENT: Order Items & Delivery Details -->

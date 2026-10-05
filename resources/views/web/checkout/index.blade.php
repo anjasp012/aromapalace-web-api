@@ -157,8 +157,15 @@
                             <div class="flex items-center gap-2.5 min-w-0 flex-1">
                                 <template x-if="selectedCourierObj">
                                     <div class="flex items-center gap-2 flex-wrap min-w-0">
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-50 text-[#650506] border border-rose-200 shrink-0"
-                                              x-text="selectedCourierObj.courier"></span>
+                                        <template x-if="getCourierLogoUrl(selectedCourierObj.courier)">
+                                            <div class="h-6 px-1.5 bg-stone-50 rounded border border-stone-200 flex items-center justify-center shrink-0">
+                                                <img :src="getCourierLogoUrl(selectedCourierObj.courier)" :alt="selectedCourierObj.courier" class="h-4 max-w-[50px] object-contain">
+                                            </div>
+                                        </template>
+                                        <template x-if="!getCourierLogoUrl(selectedCourierObj.courier)">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-50 text-[#650506] border border-rose-200 shrink-0"
+                                                  x-text="selectedCourierObj.courier"></span>
+                                        </template>
                                         <span class="font-bold text-xs sm:text-sm text-gray-900 font-mono" x-text="$money(selectedCourierObj.cost)"></span>
                                         <span class="text-gray-300 text-xs">·</span>
                                         <span class="text-xs text-gray-700 font-medium truncate" x-text="selectedCourierObj.service_name || (selectedCourierObj.courier + ' ' + selectedCourierObj.service)"></span>
@@ -436,7 +443,14 @@
                             </div>
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-50 text-[#650506] border border-rose-200 shrink-0" x-text="courier.courier"></span>
+                                    <template x-if="getCourierLogoUrl(courier.courier)">
+                                        <div class="h-6 px-1.5 bg-stone-50 rounded border border-stone-200 flex items-center justify-center shrink-0">
+                                            <img :src="getCourierLogoUrl(courier.courier)" :alt="courier.courier" class="h-4 max-w-[50px] object-contain">
+                                        </div>
+                                    </template>
+                                    <template x-if="!getCourierLogoUrl(courier.courier)">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-50 text-[#650506] border border-rose-200 shrink-0" x-text="courier.courier"></span>
+                                    </template>
                                     <span class="font-bold text-xs sm:text-sm text-gray-900" x-text="courier.service_name || (courier.courier + ' ' + courier.service)"></span>
                                 </div>
                                 <span class="text-[11px] text-gray-500 block mt-0.5" x-text="'Estimasi tiba ' + courier.etd"></span>
@@ -583,6 +597,26 @@ function checkoutApp(initialPreview, initialAddresses, initialStores) {
                 }
             }
             return top3;
+        },
+
+        getCourierLogoUrl(courierName) {
+            if (!courierName) return null;
+            const lower = courierName.toLowerCase();
+            let code = null;
+            if (lower.includes('jne')) code = 'jne';
+            else if (lower.includes('j&t') || lower.includes('jnt')) code = 'jnt';
+            else if (lower.includes('sicepat')) code = 'sicepat';
+            else if (lower.includes('lion')) code = 'lion';
+            else if (lower.includes('anteraja')) code = 'anteraja';
+            else if (lower.includes('ninja')) code = 'ninja';
+            else if (lower.includes('pos')) code = 'pos';
+            else if (lower.includes('tiki')) code = 'tiki';
+            else if (lower.includes('sap')) code = 'sap';
+            else if (lower.includes('wahana')) code = 'wahana';
+            else if (lower.includes('idx') || lower.includes('idexpress') || lower.includes('ide')) code = 'idx';
+            else if (lower.includes('gosend') || lower.includes('gojek')) code = 'gosend';
+            else if (lower.includes('grab')) code = 'grab';
+            return code ? `https://storage.googleapis.com/tprt0ezsggqjornc7nf1wwluvgulhr/assets/courier-logo/${code}.png` : null;
         },
 
         selectCourier(courier, service, cost, etd) {

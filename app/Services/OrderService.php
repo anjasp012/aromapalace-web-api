@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
+    public function __construct(
+        protected KiriminAjaShippingService $kiriminAjaService
+    ) {}
+
     /**
      * Ambil pesanan milik user
      */
@@ -44,11 +48,24 @@ class OrderService
     }
 
     /**
-     * Informasi tracking pengiriman pesanan
+     * Informasi tracking pengiriman pesanan (Internal Butik + Live Kurir KiriminAja)
      */
     public function getTrackingInfo(User $user, string $orderNumber): array
     {
         $order = $this->getOrderDetail($user, $orderNumber);
+
+        $courierTracking = null;
+        if ($order->fulfillment_type === 'home_delivery' && !empty($order->tracking_number)) {
+            $courierTracking = $this->kiriminAjaService->trackShipment(
+                $order->shipping_courier ?? 'KIRIMINAJA',
+                $order->tracking_number,
+                $order
+            );
+
+            // Muat ulang riwayat status jika ada pembaruan otomatis (misal delivered)
+            $order->refresh();
+            $order->load('statusHistories');
+        }
 
         $timeline = [];
         foreach ($order->statusHistories as $history) {
@@ -65,11 +82,13 @@ class OrderService
             'fulfillment_type' => $order->fulfillment_type,
             'order_status' => $order->order_status,
             'courier' => $order->shipping_courier,
+            'shipping_service' => $order->shipping_service,
             'tracking_number' => $order->tracking_number ?? 'Belum diterbitkan',
             'pickup_code' => $order->pickup_code,
             'store' => $order->store,
             'estimated_delivery' => $order->estimated_delivery,
             'timeline' => $timeline,
+            'courier_tracking' => $courierTracking,
         ];
     }
 

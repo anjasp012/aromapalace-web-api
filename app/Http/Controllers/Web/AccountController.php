@@ -47,7 +47,7 @@ class AccountController extends Controller
         $user = auth()->user();
         $membershipStatus = $this->membershipService->getStatus($user);
         $status = $request->query('status');
-        $orders = $this->orderService->getUserOrders($user, $status, 8)->withQueryString();
+        $orders = $this->orderService->getUserOrders($user, null, 100)->withQueryString();
         $stats = $this->getAccountStats($user, $membershipStatus);
 
         $statusCounts = [
@@ -55,6 +55,7 @@ class AccountController extends Controller
             'pending_payment' => $user->orders()->where('order_status', 'pending_payment')->count(),
             'processing' => $user->orders()->where('order_status', 'processing')->count(),
             'shipped' => $user->orders()->where('order_status', 'shipped')->count(),
+            'delivered' => $user->orders()->where('order_status', 'delivered')->count(),
             'completed' => $user->orders()->where('order_status', 'completed')->count(),
             'cancelled' => $user->orders()->where('order_status', 'cancelled')->count(),
         ];
@@ -62,13 +63,30 @@ class AccountController extends Controller
         return view('web.account.orders', compact('user', 'membershipStatus', 'orders', 'status', 'stats', 'statusCounts'));
     }
 
-    public function orderShow(string $orderNumber): View
+    public function orderShow(Request $request, string $orderNumber): View
     {
         $user = auth()->user();
         $order = $this->orderService->getOrderDetail($user, $orderNumber);
         $tracking = $this->orderService->getTrackingInfo($user, $orderNumber);
 
+        if ($request->query('tracking_modal')) {
+            return view('web.account.partials.tracking-modal-content', compact('order', 'tracking'));
+        }
+
+        if ($request->ajax() || $request->query('modal')) {
+            return view('web.account.partials.transaction-modal-content', compact('order', 'tracking'));
+        }
+
         return view('web.account.order-detail', compact('order', 'tracking'));
+    }
+
+    public function orderInvoice(string $orderNumber): View
+    {
+        $user = auth()->user();
+        $order = $this->orderService->getOrderDetail($user, $orderNumber);
+        $tracking = $this->orderService->getTrackingInfo($user, $orderNumber);
+
+        return view('web.account.invoice', compact('order', 'tracking'));
     }
 
     public function orderCancel(string $orderNumber): RedirectResponse
@@ -120,6 +138,48 @@ class AccountController extends Controller
         } catch (Exception $e) {
             return back()->with('error', 'Gagal memproses simulasi: ' . $e->getMessage());
         }
+    }
+
+    public function orderRefreshTracking(string $orderNumber): RedirectResponse
+    {
+        $user = auth()->user();
+        try {
+            $tracking = $this->orderService->getTrackingInfo($user, $orderNumber);
+            $courierStatus = $tracking['courier_tracking']['status_label'] ?? null;
+            $location = $tracking['courier_tracking']['current_location'] ?? null;
+
+            $msg = $courierStatus 
+                ? "Status kurir terkini: {$courierStatus}" . ($location ? " ({$location})" : "")
+                : "Informasi pelacakan kurir telah diperbarui.";
+
+            return back()->with('success', $msg);
+        } catch (Exception $e) {
+            return back()->with('error', 'Gagal memperbarui status kurir: ' . $e->getMessage());
+        }
+    }
+
+    public function orderConfirmReceived(string $orderNumber): RedirectResponse
+    {
+        $user = auth()->user();
+        $order = $this->orderService->getOrderDetail($user, $orderNumber);
+
+        if (!in_array($order->order_status, ['shipped', 'delivered', 'ready_for_pickup'])) {
+            return back()->with('error', 'Status pesanan belum memenuhi syarat konfirmasi penyelesaian.');
+        }
+
+        $order->update([
+            'order_status' => 'completed',
+            'completed_at' => now(),
+        ]);
+
+        \App\Models\OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'status' => 'completed',
+            'title' => 'Pesanan Diterima oleh Pelanggan',
+            'description' => 'Pelanggan telah mengonfirmasi bahwa produk parfum telah diterima dalam kondisi baik.',
+        ]);
+
+        return back()->with('success', 'Terima kasih telah berbelanja di Aroma Palace! Pesanan Anda telah resmi selesai.');
     }
 
     public function rewards(): View

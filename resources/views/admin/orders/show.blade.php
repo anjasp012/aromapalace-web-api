@@ -273,6 +273,80 @@
                 </div>
             </div>
 
+            <!-- Live Courier Tracking Card (KiriminAja) -->
+            @if(!empty($tracking) && !empty($tracking['milestones']))
+                <div class="bg-white rounded-2xl border border-amber-200 shadow-sm p-6 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-100 pb-3">
+                        @php
+                            $adminCourierName = $tracking['courier'] ?? $order->shipping_courier;
+                            $adminCourierLogo = \App\Services\KiriminAjaShippingService::getCourierLogoUrl($adminCourierName);
+                        @endphp
+                        <div class="flex items-center gap-2.5">
+                            @if($adminCourierLogo)
+                                <img src="{{ $adminCourierLogo }}" alt="{{ $adminCourierName }}" class="h-6 max-w-[80px] object-contain">
+                            @else
+                                <span class="text-base">🚚</span>
+                            @endif
+                            <div>
+                                <h4 class="font-bold text-stone-900 text-sm">Pelacakan Live Ekspedisi ({{ $adminCourierName }})</h4>
+                                <span class="text-[11px] text-stone-500 font-mono">No. Resi: {{ $tracking['tracking_number'] ?? $order->tracking_number }}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ !empty($tracking['is_delivered']) ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
+                                {{ $tracking['status_label'] ?? 'Dalam Pengiriman' }}
+                            </span>
+                            @if(!empty($tracking['is_live']))
+                                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-600 text-white">LIVE KIRIMINAJA</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Origin -> Destination Bar -->
+                    <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[10px] text-stone-400 block font-bold uppercase">Asal</span>
+                            <span class="font-bold text-stone-800">{{ $tracking['origin']['city'] ?? 'Jakarta Pusat' }}</span>
+                        </div>
+                        <span class="text-stone-300">➔</span>
+                        <div>
+                            <span class="text-[10px] text-stone-400 block font-bold uppercase">Posisi Terkini</span>
+                            <span class="font-bold text-[#650506]">📍 {{ $tracking['current_location'] ?? 'Hub Transit' }}</span>
+                        </div>
+                        <span class="text-stone-300">➔</span>
+                        <div>
+                            <span class="text-[10px] text-stone-400 block font-bold uppercase">Tujuan</span>
+                            <span class="font-bold text-stone-800">{{ $tracking['destination']['city'] ?? 'Kota Tujuan' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Milestones Timeline -->
+                    <div class="relative pl-5 border-l-2 border-amber-300 space-y-4">
+                        @foreach($tracking['milestones'] as $m)
+                            @php $isCurr = !empty($m['is_current']); @endphp
+                            <div class="relative group {{ $isCurr ? 'bg-amber-50/60 p-2.5 rounded-lg border border-amber-200 -ml-2 pl-6' : '' }}">
+                                @if($isCurr)
+                                    <span class="absolute left-1 top-2.5 w-3.5 h-3.5 rounded-full bg-[#650506] ring-4 ring-rose-200"></span>
+                                @else
+                                    <span class="absolute -left-[25px] top-1 w-2.5 h-2.5 rounded-full bg-stone-400"></span>
+                                @endif
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-xs {{ $isCurr ? 'text-[#650506]' : 'text-stone-900' }}">{{ $m['title'] }}</span>
+                                    <span class="text-[10px] text-stone-400 font-mono">{{ $m['time'] }}</span>
+                                    @if($isCurr)
+                                        <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-[#650506] text-white">POSISI TERKINI</span>
+                                    @endif
+                                </div>
+                                <div class="text-[11px] font-semibold text-stone-700 mt-0.5">
+                                    <span>📍 {{ $m['location'] }}</span>
+                                </div>
+                                <p class="text-xs text-stone-600 mt-0.5 leading-relaxed">{{ $m['note'] }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             <!-- Status Histories Timeline -->
             @if($order->statusHistories->isNotEmpty())
                 <div class="bg-white rounded-2xl border border-stone-200 shadow-sm p-6 space-y-4">
