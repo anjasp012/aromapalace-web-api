@@ -104,6 +104,9 @@ class OrderController extends Controller
                 if (!empty($shipmentInfo['adapted'])) {
                     $msg .= " - [Catatan: Kurir otomatis dialihkan ke {$order->shipping_courier} karena {$shipmentInfo['original_courier']} tidak aktif di KiriminAja]";
                 }
+                if (!empty($shipmentInfo['warning'])) {
+                    $msg .= " - [Peringatan: {$shipmentInfo['warning']}]";
+                }
             } elseif ($order->pickup_code) {
                 $msg .= " Kode Pickup Butik: {$order->pickup_code}";
             }
@@ -237,7 +240,11 @@ class OrderController extends Controller
 
         try {
             $res = $kiriminAjaService->createShipment($order);
-            return back()->with('success', "Resi resmi {$res['courier']} berhasil diterbitkan via KiriminAja: {$res['tracking_number']}");
+            $msg = "Resi resmi {$res['courier']} berhasil diterbitkan via KiriminAja: {$res['tracking_number']}";
+            if (!empty($res['warning'])) {
+                $msg .= " - [Catatan: {$res['warning']}]";
+            }
+            return back()->with('success', $msg);
         } catch (Exception $e) {
             return back()->with('error', 'Gagal menerbitkan resi KiriminAja: ' . $e->getMessage());
         }

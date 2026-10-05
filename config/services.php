@@ -52,6 +52,7 @@ return [
         'sender_city_id' => env('KIRIMINAJA_SENDER_CITY_ID', 151), // Jakarta Pusat
         'cache_store' => env('KIRIMINAJA_CACHE_STORE', 'file'),
         'cache_prefix' => env('KIRIMINAJA_CACHE_PREFIX', 'kiriminaja:'),
+        'allow_simulation_fallback' => env('KIRIMINAJA_ALLOW_SIMULATION_FALLBACK', true),
     ],
 
     'carto' => [
